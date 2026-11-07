@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+import '../../../core/database/app_database.dart';
+import '../../../core/utils/paisa_helper.dart';
+
 class BillItem {
   final int sn;
   final String description;
@@ -68,6 +71,56 @@ class BillData {
     required this.qrData,
   });
 
+  /// Factory creating [BillData] from real Drift SQLite database records.
+  factory BillData.fromSaleRecord({
+    required BusinessProfile profile,
+    required Sale sale,
+    required List<SaleItem> saleItems,
+    Uint8List? logoBytes,
+  }) {
+    final billItems = List.generate(saleItems.length, (index) {
+      final item = saleItems[index];
+      return BillItem(
+        sn: index + 1,
+        description: item.itemName,
+        quantity: item.quantity,
+        unit: item.unit,
+        rate: PaisaHelper.toRupees(item.ratePaisa),
+        amount: PaisaHelper.toRupees(item.lineTotalPaisa),
+      );
+    });
+
+    final subtotal = PaisaHelper.toRupees(sale.subtotalPaisa);
+    final discount = PaisaHelper.toRupees(sale.discountPaisa);
+    final taxable = PaisaHelper.toRupees(sale.taxablePaisa);
+    final vat = PaisaHelper.toRupees(sale.vatPaisa);
+    final grandTotal = PaisaHelper.toRupees(sale.totalPaisa);
+
+    final verificationQr =
+        'SAJILO|INV:${sale.invoiceNumber}|TOT:${grandTotal.toStringAsFixed(2)}|PAN:${profile.panVatNumber}|D:${sale.invoiceDate.toIso8601String().substring(0, 10)}';
+
+    return BillData(
+      businessName: profile.businessName,
+      panVatNumber: profile.panVatNumber,
+      contactNumber: profile.contactNumber,
+      shopAddress: profile.shopAddress,
+      logoBytes: logoBytes,
+      invoiceNumber: sale.invoiceNumber,
+      invoiceDate: sale.invoiceDate.toLocal(),
+      customerName: sale.customerName,
+      customerPan: sale.customerPan,
+      paymentMode: sale.paymentMode,
+      items: billItems,
+      subtotal: subtotal,
+      discountAmount: discount,
+      taxableAmount: taxable,
+      vatAmount: vat,
+      grandTotal: grandTotal,
+      inWords: PaisaHelper.paisaToWords(sale.totalPaisa),
+      qrData: verificationQr,
+    );
+  }
+
   /// Factory to generate dummy bill for testing Phase 1
   factory BillData.dummy({
     required String businessName,
@@ -77,7 +130,7 @@ class BillData {
     Uint8List? logoBytes,
   }) {
     final now = DateTime.now();
-    const invoiceNumber = 'SB-2081-0042';
+    const invoiceNumber = 'SB-2082-0042';
 
     final items = [
       const BillItem(
@@ -144,4 +197,3 @@ class BillData {
     );
   }
 }
-

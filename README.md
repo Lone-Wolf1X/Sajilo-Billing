@@ -17,6 +17,41 @@
 
 ---
 
+## Core Engineering & Consistency Architecture (Step 2)
+
+### 1. Stock Ledger vs. `stock_qty` Cache Consistency
+- **Auditability via `stock_ledger`**: The `stock_ledger` table is the immutable, single source of truth for all inventory movements.
+- **Cache for High-Throughput POS**: Reading the entire ledger history to compute stock at checkout would degrade performance as history grows. Therefore, the `items` table maintains a cached `stock_qty` column.
+- **Atomic Multi-Table Transactions**: Every operation affecting inventory (Supplier Purchase intake, Sales checkout, Void invoices, Purchase returns, or Audited Stock Adjustments) executes within a single `_db.transaction(() async { ... })`:
+  1. Validates quantity preconditions (e.g. preventing checkout if stock is insufficient).
+  2. Appends an immutable row to `stock_ledger` (`item_id`, `qty_change`, `reason`, `ref_type`, `ref_id`, `notes`).
+  3. Increments or decrements `items.stock_qty`.
+  4. Both writes commit together or roll back completely if any step fails.
+- **Stock Immutability**: Users cannot arbitrarily edit stock quantity. Changes must go through the audited Stock Adjustment screen, which logs physical count corrections with mandatory reasons in `stock_adjustments`.
+
+### 2. Gapless, Unique Bill Numbering (`bill_sequence`)
+- Invoices follow standard Nepali fiscal formats (e.g., `SB-2082-0001`).
+- An atomic sequence table (`bill_sequence`) tracks the last generated sequence number per fiscal year (`sequence_type`, `fiscal_year`, `prefix`, `current_number`).
+- Inside the checkout transaction, the next sequence number is reserved and committed together with the `sales` record, guaranteeing freedom from gaps and duplicate bill numbers even under rapid counter billing.
+
+### 3. Financial Precision with Integer Paisa
+- All prices, rates, subtotals, discounts, VAT amounts, and grand totals are stored as integers in **paisa** (1 Rupee = 100 Paisa).
+- Managed via `PaisaHelper`, eliminating floating-point IEEE-754 precision issues (e.g., `0.1 + 0.2 != 0.3`).
+- Display outputs format with proper South Asian thousands separators (`Rs. 2,550.00` / `रु. 2,550.00`) and convert to English/Nepali words for tax invoices.
+
+### 4. Sync-Readiness Hooks for Cloud Backup
+- Every table incorporates `SyncTableMixin`:
+  - `id` (UUID v4 string)
+  - `created_at` (UTC timestamp)
+  - `updated_at` (UTC timestamp)
+  - `sync_status` (`SyncStatus` enum: `pending`, `synced`, `failed`)
+  - `remote_id` (nullable string for future server primary keys)
+  - `is_deleted` (boolean soft-delete flag)
+- **Soft Deletes**: Business records are never hard-deleted from SQLite. When an item is deleted or an invoice is voided, `is_deleted = true`, `updated_at = now`, and `sync_status = pending` are set, ensuring tombstones propagate during synchronization.
+- **Future Sync Engine**: When cloud synchronization is connected in future phases, the sync worker simply queries records with `sync_status == pending` across all tables, batches them to the API, and sets `sync_status = synced` upon acknowledgement.
+
+---
+
 ## Project Structure
 
 ```
@@ -27,91 +62,55 @@ Sajilo_Billing/
 │       └── NotoSansDevanagari-Bold.ttf      <-- Embedded Nepali bold font
 ├── lib/
 │   ├── core/
-│   │   ├── constants/
 │   │   ├── database/
-│   │   │   ├── app_database.dart           <-- Drift database & connection
+│   │   │   ├── app_database.dart           <-- Drift database & migrations (v1 -> v2)
 │   │   │   ├── app_database.g.dart         <-- Generated Drift schema
 │   │   │   ├── database_provider.dart      <-- Riverpod provider for DB
-│   │   │   ├── sync_status.dart            <-- SyncStatus enum (pending/synced/failed)
+│   │   │   ├── sync_status.dart            <-- SyncStatus enum
 │   │   │   └── tables/
-│   │   │       ├── sync_table_mixin.dart   <-- Common sync fields (id, syncStatus, remoteId)
+│   │   │       ├── sync_table_mixin.dart   <-- id, timestamps, sync_status, remote_id, is_deleted
 │   │   │       ├── business_profiles_table.dart
-│   │   │       ├── inventories_table.dart
-│   │   │       ├── sales_table.dart
+│   │   │       ├── categories_table.dart   <-- Product categories
+│   │   │       ├── units_table.dart        <-- Configurable measurement units
+│   │   │       ├── items_table.dart        <-- Items master with paisa pricing & stock cache
+│   │   │       ├── suppliers_table.dart    <-- Wholesale suppliers
+│   │   │       ├── customers_table.dart    <-- Retail & credit customers
+│   │   │       ├── stock_ledger_table.dart <-- Audit stock movements
+│   │   │       ├── stock_adjustments_table.dart <-- Audited count corrections
+│   │   │       ├── purchases_table.dart    <-- Supplier purchase intake
+│   │   │       ├── purchase_items_table.dart
+│   │   │       ├── sales_table.dart        <-- Retail sales & invoices
 │   │   │       ├── sale_items_table.dart
-│   │   │       ├── purchases_table.dart
+│   │   │       ├── bill_sequence_table.dart<-- Atomic bill numbering
 │   │   │       └── bill_metadata_table.dart
 │   │   ├── localization/
-│   │   │   └── locale_provider.dart        <-- Language switcher (English / Nepali)
+│   │   │   └── locale_provider.dart        <-- English / Nepali switcher
 │   │   ├── theme/
 │   │   │   └── app_theme.dart              <-- Desktop ergonomics & typography
 │   │   └── utils/
-│   │       └── nepali_validators.dart      <-- 9-digit PAN & 10-digit mobile validators
+│   │       ├── nepali_validators.dart      <-- 9-digit PAN & 10-digit mobile validators
+│   │       └── paisa_helper.dart           <-- Safe integer paisa conversions & number-to-words
 │   ├── features/
-│   │   ├── onboarding/
-│   │   │   └── presentation/
-│   │   │       └── onboarding_screen.dart  <-- First-run shop setup wizard
-│   │   ├── business/
-│   │   │   ├── data/
-│   │   │   │   └── business_repository.dart
-│   │   │   └── presentation/
-│   │   │       ├── business_provider.dart
-│   │   │       └── edit_business_screen.dart
-│   │   ├── inventory/
-│   │   │   └── inventory_stub.dart         <-- Stub for Phase 2
-│   │   ├── backup/
-│   │   │   ├── domain/
-│   │   │   │   └── backup_service.dart     <-- Abstract BackupService interface
-│   │   │   ├── data/
-│   │   │   │   └── local_backup_service.dart<-- SQLite file export & restore
-│   │   │   └── presentation/
-│   │   │       ├── backup_provider.dart
-│   │   │       └── backup_screen.dart
-│   │   ├── billing/
-│   │   │   ├── domain/
-│   │   │   │   └── bill_model.dart         <-- Bill items, calculation, & dummy factory
-│   │   │   ├── data/
-│   │   │   │   └── pdf_bill_generator.dart <-- Bilingual PDF & QR generator
-│   │   │   └── presentation/
-│   │   │       └── sample_bill_screen.dart <-- Interactive bill preview & exporter
-│   │   └── settings/
-│   │       └── presentation/
-│   │           └── settings_screen.dart    <-- Profile overview, language & backup links
+│   │   ├── dashboard/                      <-- Basic store dashboard with real-time metrics
+│   │   ├── inventory/                      <-- Item master, search, category filter, stock adjustments
+│   │   ├── purchase/                       <-- Supplier purchases, multi-line intake, stock increase
+│   │   ├── billing/                        <-- POS counter billing, stock deduction, sales register, PDF & QR
+│   │   ├── onboarding/                     <-- First-run shop setup wizard
+│   │   ├── business/                       <-- Edit business profile
+│   │   └── backup/                         <-- LocalBackupService & export/restore dialogs
 │   ├── shared/
 │   │   └── widgets/
-│   │       └── desktop_app_shell.dart      <-- Desktop NavigationRail sidebar
+│   │       └── desktop_app_shell.dart      <-- Persistent NavigationRail
 │   ├── l10n/
 │   │   ├── app_en.arb                      <-- English translations
 │   │   └── app_ne.arb                      <-- Nepali translations
-│   └── main.dart                           <-- App entrypoint & routing
+│   └── main.dart                           <-- App entrypoint
+├── test/
+│   ├── business_logic_test.dart            <-- Paisa arithmetic & line calculation tests
+│   └── widget_test.dart                    <-- Validator tests
 ├── pubspec.yaml
-└── l10n.yaml
+└── README.md
 ```
-
----
-
-## Font Asset Configuration (Devanagari)
-
-For Devanagari text to render crisply both in the Flutter UI and inside generated PDF documents, TrueType font files are placed in:
-```
-assets/fonts/NotoSansDevanagari-Regular.ttf
-assets/fonts/NotoSansDevanagari-Bold.ttf
-```
-
-These are registered in `pubspec.yaml` under `fonts` and `assets`:
-```yaml
-flutter:
-  assets:
-    - assets/fonts/
-
-  fonts:
-    - family: NotoSansDevanagari
-      fonts:
-        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
-        - asset: assets/fonts/NotoSansDevanagari-Bold.ttf
-          weight: 700
-```
-*Note: Both static TTF files are already bundled and verified in the repository.*
 
 ---
 
@@ -124,7 +123,7 @@ flutter:
    flutter config --enable-windows-desktop
    flutter config --enable-linux-desktop
    ```
-2. Run dependency resolution & code generation:
+2. Generate code and localizations:
    ```bash
    flutter pub get
    flutter gen-l10n
@@ -137,51 +136,11 @@ flutter run -d macos
 ```
 
 ### Running on Windows
-Make sure "Desktop development with C++" workload is installed in Visual Studio.
 ```bash
 flutter run -d windows
 ```
 
 ### Running on Linux
-Ensure required libraries are installed (`clang`, `cmake`, `ninja-build`, `pkg-config`, `libgtk-3-dev`, `liblzma-dev`):
 ```bash
 flutter run -d linux
 ```
-
----
-
-## Phase 1 Feature Walkthrough
-
-1. **First-Run Onboarding Wizard**:
-   - Automatically displayed when no business profile exists in SQLite.
-   - Enforces Nepali business validation:
-     - 9-digit Nepali PAN/VAT number.
-     - 10-digit Nepali mobile number (must start with 98, 97, or 96).
-     - Business name and optional shop address.
-     - Local logo file selector (persisted to application documents folder).
-2. **Offline-First Archive Foundation**:
-   - Every SQLite table (`business_profiles`, `inventories`, `sales`, `sale_items`, `purchases`, `bill_metadata`) contains:
-     - `id` (UUID string)
-     - `created_at` (DateTime)
-     - `updated_at` (DateTime)
-     - `sync_status` (`pending`, `synced`, `failed`)
-     - `remote_id` (nullable string for future server sync)
-3. **BackupService Interface & Local Implementation**:
-   - Abstract `BackupService` defined with `backupNow()`, `restoreLatest()`, and `getLastBackupTime()`.
-   - `LocalBackupService` exports the SQLite database file to user-specified directories using native desktop save dialogs.
-   - Restores database files after verifying SQLite magic headers.
-4. **Bilingual Tax Invoice (PDF & QR)**:
-   - Formatted to Nepali retail billing standards ("TAX INVOICE / कर बिजक").
-   - Bilingual labels:
-     - Bill No / बिल नं.
-     - Particulars / विवरण
-     - Qty / परिमाण
-     - Rate / दर
-     - Subtotal / उप-जम्मा
-     - Discount / छुट
-     - 13% VAT / १३% भ्याट
-     - Total / कुल जम्मा
-   - Embedded QR code containing: invoice number, grand total, shop PAN, and digital verification hash.
-   - Direct export via file dialog and native print support via `printing`.
-5. **Real-Time Language Switcher**:
-   - One-click toggle between English and Nepali in the navigation rail and settings screen.

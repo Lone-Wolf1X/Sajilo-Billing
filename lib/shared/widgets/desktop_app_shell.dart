@@ -4,7 +4,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../core/localization/locale_provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../features/billing/presentation/sample_bill_screen.dart';
+import '../../features/dashboard/presentation/dashboard_screen.dart';
+import '../../features/billing/presentation/pos_billing_screen.dart';
+import '../../features/billing/presentation/sales_history_screen.dart';
+import '../../features/purchase/presentation/purchase_screen.dart';
+import '../../features/inventory/presentation/inventory_screen.dart';
 import '../../features/business/presentation/edit_business_screen.dart';
 import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -19,17 +23,29 @@ class DesktopAppShell extends ConsumerStatefulWidget {
 class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
-    SampleBillScreen(),
-    EditBusinessScreen(),
-    BackupScreen(),
-    SettingsScreen(),
-  ];
+  void _navigateToIndex(int index) {
+    setState(() => _selectedIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
+
+    final pages = [
+      DashboardScreen(
+        onNavigateToSale: () => _navigateToIndex(1),
+        onNavigateToPurchase: () => _navigateToIndex(3),
+        onNavigateToInventory: () => _navigateToIndex(4),
+      ),
+      const PosBillingScreen(),
+      const SalesHistoryScreen(),
+      const PurchaseScreen(),
+      const InventoryScreen(),
+      const EditBusinessScreen(),
+      const BackupScreen(),
+      const SettingsScreen(),
+    ];
 
     return Scaffold(
       body: Row(
@@ -37,14 +53,12 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
           // Desktop Navigation Rail
           NavigationRail(
             selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() => _selectedIndex = index);
-            },
+            onDestinationSelected: _navigateToIndex,
             extended: true,
             minExtendedWidth: 220,
             backgroundColor: Colors.white,
             leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               child: Row(
                 children: [
                   Container(
@@ -94,7 +108,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 24, left: 16, right: 16),
+                  padding: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -112,37 +126,56 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                 ),
               ),
             ),
-            destinations: [
+            destinations: const [
               NavigationRailDestination(
-                icon: const Icon(Icons.receipt_outlined),
-                selectedIcon: const Icon(Icons.receipt),
-                label: Text(l10n.sampleBilling),
+                icon: Icon(Icons.dashboard_outlined),
+                selectedIcon: Icon(Icons.dashboard),
+                label: Text('Dashboard / मुख्य पृष्ठ'),
               ),
               NavigationRailDestination(
-                icon: const Icon(Icons.business_outlined),
-                selectedIcon: const Icon(Icons.business),
-                label: Text(l10n.businessInfo),
+                icon: Icon(Icons.point_of_sale_outlined),
+                selectedIcon: Icon(Icons.point_of_sale),
+                label: Text('POS Billing (बिक्री)'),
               ),
               NavigationRailDestination(
-                icon: const Icon(Icons.backup_table_outlined),
-                selectedIcon: const Icon(Icons.backup_table),
-                label: Text(l10n.backupAndRestore),
+                icon: Icon(Icons.receipt_long_outlined),
+                selectedIcon: Icon(Icons.receipt_long),
+                label: Text('Sales Register (बिजक)'),
               ),
               NavigationRailDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
-                label: Text(l10n.settings),
+                icon: Icon(Icons.local_shipping_outlined),
+                selectedIcon: Icon(Icons.local_shipping),
+                label: Text('Purchases (खरिद)'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.inventory_2_outlined),
+                selectedIcon: Icon(Icons.inventory_2),
+                label: Text('Inventory (सामान)'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.business_outlined),
+                selectedIcon: Icon(Icons.business),
+                label: Text('Business Info (व्यापार)'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.backup_table_outlined),
+                selectedIcon: Icon(Icons.backup_table),
+                label: Text('Backup / Restore'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings),
+                label: Text('Settings (सेटिङ)'),
               ),
             ],
           ),
           const VerticalDivider(thickness: 1, width: 1, color: AppTheme.borderSubtle),
-          // Main Content View
+          // Active Page View
           Expanded(
-            child: _pages[_selectedIndex],
+            child: pages[_selectedIndex],
           ),
         ],
       ),
     );
   }
 }
-

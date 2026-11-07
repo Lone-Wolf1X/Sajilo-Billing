@@ -2,12 +2,16 @@ import 'package:drift/drift.dart';
 import 'sync_table_mixin.dart';
 
 /// Line items associated with a sale invoice.
+/// All monetary values stored as integer paisa (1 Rs = 100 Paisa).
 class SaleItems extends Table with SyncTableMixin {
   TextColumn get saleId => text()();
+  TextColumn get itemId => text()();
   TextColumn get itemName => text()();
-  RealColumn get unitPrice => real()();
-  RealColumn get quantity => real()();
-  RealColumn get amount => real()();
   TextColumn get unit => text().withDefault(const Constant('pcs'))();
+  RealColumn get quantity => real()();
+  IntColumn get ratePaisa => integer()();
+  IntColumn get discountPaisa => integer().withDefault(const Constant(0))();
+  IntColumn get taxablePaisa => integer()();
+  IntColumn get vatPaisa => integer().withDefault(const Constant(0))();
+  IntColumn get lineTotalPaisa => integer()();
 }
-

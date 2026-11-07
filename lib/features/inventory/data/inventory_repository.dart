@@ -10,134 +10,475 @@ class InventoryRepository {
 
   InventoryRepository(this._db);
 
-  /// Streams active inventory products ordered by name.
-  Stream<List<Inventory>> watchActiveInventories() {
-    return (_db.select(_db.inventories)
-          ..where((tbl) => tbl.isActive.equals(true))
+  /// Streams active (non-deleted) items with optional filtering by query, category, or low stock.
+  Stream<List<Item>> watchItems({
+    String? searchQuery,
+    String? categoryId,
+    bool lowStockOnly = false,
+  }) {
+    final query = _db.select(_db.items)
+      ..where((tbl) => tbl.isDeleted.equals(false) & tbl.isActive.equals(true));
+
+    if (categoryId != null && categoryId.isNotEmpty) {
+      query.where((tbl) => tbl.categoryId.equals(categoryId));
+    }
+
+    if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+      final clean = '%${searchQuery.trim().toLowerCase()}%';
+      query.where((tbl) =>
+          tbl.name.lower().like(clean) |
+          tbl.nepaliName.lower().like(clean) |
+          tbl.sku.lower().like(clean));
+    }
+
+    if (lowStockOnly) {
+      query.where((tbl) => tbl.stockQty.isSmallerOrEqual(tbl.lowStockThreshold));
+    }
+
+    query.orderBy([(tbl) => OrderingTerm(expression: tbl.name)]);
+    return query.watch();
+  }
+
+  /// Gets a single item by ID.
+  Future<Item?> getItem(String id) {
+    return (_db.select(_db.items)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+  }
+
+  /// Gets a single item by SKU/barcode.
+  Future<Item?> getItemBySku(String sku) {
+    return (_db.select(_db.items)
+          ..where((tbl) => tbl.sku.equals(sku) & tbl.isDeleted.equals(false)))
+        .getSingleOrNull();
+  }
+
+  /// Adds a new product item.
+  Future<Item> addItem({
+    required String name,
+    String? nepaliName,
+    required String sku,
+    String? categoryId,
+    String unit = 'pcs',
+    required int purchasePricePaisa,
+    required int sellingPricePaisa,
+    double initialStock = 0.0,
+    double lowStockThreshold = 5.0,
+  }) async {
+    final now = DateTime.now().toUtc();
+    final itemId = _uuid.v4();
+
+    return await _db.transaction(() async {
+      final companion = ItemsCompanion.insert(
+        id: itemId,
+        name: name.trim(),
+        nepaliName: Value(nepaliName?.trim().isEmpty == true ? null : nepaliName?.trim()),
+        sku: sku.trim(),
+        categoryId: Value(categoryId),
+        unit: Value(unit),
+        purchasePricePaisa: Value(purchasePricePaisa),
+        sellingPricePaisa: Value(sellingPricePaisa),
+        stockQty: Value(initialStock),
+        lowStockThreshold: Value(lowStockThreshold),
+        isActive: const Value(true),
+        createdAt: Value(now),
+        updatedAt: Value(now),
+        syncStatus: const Value(SyncStatus.pending),
+        isDeleted: const Value(false),
+      );
+
+      await _db.into(_db.items).insert(companion);
+
+      // If initial stock was provided, write initial stock ledger entry
+      if (initialStock > 0) {
+        await _db.into(_db.stockLedger).insert(
+              StockLedgerCompanion.insert(
+                id: _uuid.v4(),
+                itemId: itemId,
+                qtyChange: initialStock,
+                reason: 'INITIAL_STOCK',
+                refType: 'INITIAL_STOCK',
+                refId: itemId,
+                notes: const Value('Opening Stock on creation'),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+                isDeleted: const Value(false),
+              ),
+            );
+      }
+
+      return (await getItem(itemId))!;
+    });
+  }
+
+  /// Updates item details (prices, names, category, threshold).
+  /// Note: stock quantity is NOT editable here — stock changes only via ledger!
+  Future<void> updateItem({
+    required String id,
+    required String name,
+    String? nepaliName,
+    required String sku,
+    String? categoryId,
+    required String unit,
+    required int purchasePricePaisa,
+    required int sellingPricePaisa,
+    required double lowStockThreshold,
+    bool isActive = true,
+  }) async {
+    final existing = await getItem(id);
+    if (existing == null) throw Exception('Item not found: $id');
+
+    final updated = existing.copyWith(
+      name: name.trim(),
+      nepaliName: Value(nepaliName?.trim().isEmpty == true ? null : nepaliName?.trim()),
+      sku: sku.trim(),
+      categoryId: Value(categoryId),
+      unit: unit,
+      purchasePricePaisa: purchasePricePaisa,
+      sellingPricePaisa: sellingPricePaisa,
+      lowStockThreshold: lowStockThreshold,
+      isActive: isActive,
+      updatedAt: DateTime.now().toUtc(),
+      syncStatus: SyncStatus.pending,
+    );
+
+    await _db.update(_db.items).replace(updated);
+  }
+
+  /// Soft deletes an item. Sets isDeleted = true and syncStatus = pending.
+  Future<void> deleteItem(String id) async {
+    final existing = await getItem(id);
+    if (existing == null) return;
+
+    final updated = existing.copyWith(
+      isDeleted: true,
+      updatedAt: DateTime.now().toUtc(),
+      syncStatus: SyncStatus.pending,
+    );
+
+    await _db.update(_db.items).replace(updated);
+  }
+
+  /// Audited stock adjustment in a single Drift transaction.
+  /// Updates stock_qty cache and appends to stock_adjustments and stock_ledger.
+  Future<void> adjustStock({
+    required String itemId,
+    required double newQty,
+    required String reason,
+    String? notes,
+  }) async {
+    final now = DateTime.now().toUtc();
+    final adjustmentId = _uuid.v4();
+
+    await _db.transaction(() async {
+      final existing = await getItem(itemId);
+      if (existing == null) throw Exception('Item not found: $itemId');
+
+      final previousQty = existing.stockQty;
+      final qtyChange = newQty - previousQty;
+
+      // 1. Insert into stock_adjustments
+      await _db.into(_db.stockAdjustments).insert(
+            StockAdjustmentsCompanion.insert(
+              id: adjustmentId,
+              itemId: itemId,
+              previousQty: previousQty,
+              adjustmentQty: qtyChange,
+              newQty: newQty,
+              reason: reason.trim(),
+              notes: Value(notes?.trim()),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
+
+      // 2. Insert into stock_ledger (source of truth)
+      await _db.into(_db.stockLedger).insert(
+            StockLedgerCompanion.insert(
+              id: _uuid.v4(),
+              itemId: itemId,
+              qtyChange: qtyChange,
+              reason: 'ADJUSTMENT',
+              refType: 'STOCK_ADJUSTMENT',
+              refId: adjustmentId,
+              notes: Value(notes != null ? '$reason: $notes' : reason),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
+
+      // 3. Update cached stockQty on Items table
+      final updatedItem = existing.copyWith(
+        stockQty: newQty,
+        updatedAt: now,
+        syncStatus: SyncStatus.pending,
+      );
+      await _db.update(_db.items).replace(updatedItem);
+    });
+  }
+
+  /// Streams categories.
+  Stream<List<Category>> watchCategories() {
+    return (_db.select(_db.categories)
+          ..where((tbl) => tbl.isDeleted.equals(false))
           ..orderBy([(tbl) => OrderingTerm(expression: tbl.name)]))
         .watch();
   }
 
-  /// Searches products by name or SKU.
-  Future<List<Inventory>> searchInventories(String query) async {
-    final cleanQuery = '%${query.trim().toLowerCase()}%';
-    return (_db.select(_db.inventories)
-          ..where((tbl) =>
-              tbl.isActive.equals(true) &
-              (tbl.name.lower().like(cleanQuery) |
-                  tbl.sku.lower().like(cleanQuery)))
-          ..limit(25))
-        .get();
-  }
-
-  /// Inserts a new product into inventory.
-  Future<Inventory> addInventoryItem({
+  /// Adds a category.
+  Future<Category> addCategory({
     required String name,
-    String? sku,
-    String unit = 'pcs',
-    required double unitPrice,
-    double costPrice = 0.0,
-    double stockQuantity = 0.0,
+    String? nepaliName,
+    String? description,
   }) async {
-    final now = DateTime.now();
-    final companion = InventoriesCompanion.insert(
-      id: _uuid.v4(),
+    final now = DateTime.now().toUtc();
+    final id = _uuid.v4();
+    final comp = CategoriesCompanion.insert(
+      id: id,
       name: name.trim(),
-      sku: Value(sku?.trim().isEmpty == true ? null : sku?.trim()),
-      unit: Value(unit),
-      unitPrice: Value(unitPrice),
-      costPrice: Value(costPrice),
-      stockQuantity: Value(stockQuantity),
-      isActive: const Value(true),
+      nepaliName: Value(nepaliName?.trim()),
+      description: Value(description?.trim()),
       createdAt: Value(now),
       updatedAt: Value(now),
       syncStatus: const Value(SyncStatus.pending),
+      isDeleted: const Value(false),
     );
-
-    final id = await _db.into(_db.inventories).insert(companion);
-    return (_db.select(_db.inventories)..where((tbl) => tbl.rowId.equals(id))).getSingle();
+    await _db.into(_db.categories).insert(comp);
+    return (_db.select(_db.categories)..where((tbl) => tbl.id.equals(id))).getSingle();
   }
 
-  /// Updates an existing product.
-  Future<void> updateInventoryItem({
-    required String id,
+  /// Streams units.
+  Stream<List<Unit>> watchUnits() {
+    return (_db.select(_db.units)
+          ..where((tbl) => tbl.isDeleted.equals(false))
+          ..orderBy([(tbl) => OrderingTerm(expression: tbl.name)]))
+        .watch();
+  }
+
+  /// Adds a unit.
+  Future<Unit> addUnit({
     required String name,
-    String? sku,
-    required String unit,
-    required double unitPrice,
-    required double costPrice,
-    required double stockQuantity,
+    required String symbol,
+    String? nepaliSymbol,
+    bool isFractional = false,
   }) async {
-    final existing = await (_db.select(_db.inventories)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-    if (existing == null) return;
-
-    final updated = existing.copyWith(
+    final now = DateTime.now().toUtc();
+    final id = _uuid.v4();
+    final comp = UnitsCompanion.insert(
+      id: id,
       name: name.trim(),
-      sku: Value(sku?.trim().isEmpty == true ? null : sku?.trim()),
-      unit: unit,
-      unitPrice: unitPrice,
-      costPrice: costPrice,
-      stockQuantity: stockQuantity,
-      updatedAt: DateTime.now(),
-      syncStatus: SyncStatus.pending,
+      symbol: symbol.trim(),
+      nepaliSymbol: Value(nepaliSymbol?.trim()),
+      isFractional: Value(isFractional),
+      createdAt: Value(now),
+      updatedAt: Value(now),
+      syncStatus: const Value(SyncStatus.pending),
+      isDeleted: const Value(false),
     );
-
-    await _db.update(_db.inventories).replace(updated);
+    await _db.into(_db.units).insert(comp);
+    return (_db.select(_db.units)..where((tbl) => tbl.id.equals(id))).getSingle();
   }
 
-  /// Soft deletes an inventory item.
-  Future<void> deleteInventoryItem(String id) async {
-    final existing = await (_db.select(_db.inventories)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-    if (existing == null) return;
+  /// Seeds default categories, units, and retail products for quick dev setup.
+  Future<void> seedDevData() async {
+    final now = DateTime.now().toUtc();
 
-    final updated = existing.copyWith(
-      isActive: false,
-      updatedAt: DateTime.now(),
-      syncStatus: SyncStatus.pending,
-    );
+    // Check if items already exist
+    final existingItems = await (_db.select(_db.items)..limit(1)).get();
+    if (existingItems.isNotEmpty) return;
 
-    await _db.update(_db.inventories).replace(updated);
-  }
+    await _db.transaction(() async {
+      // 1. Seed Units
+      final defaultUnits = [
+        {'name': 'Piece', 'symbol': 'pcs', 'nepali': 'थान', 'fractional': false},
+        {'name': 'Kilogram', 'symbol': 'kg', 'nepali': 'केजी', 'fractional': true},
+        {'name': 'Liter', 'symbol': 'ltr', 'nepali': 'लिटर', 'fractional': true},
+        {'name': 'Packet', 'symbol': 'pkt', 'nepali': 'प्याकेट', 'fractional': false},
+        {'name': 'Box', 'symbol': 'box', 'nepali': 'बाकस', 'fractional': false},
+        {'name': 'Bag / Bora', 'symbol': 'bag', 'nepali': 'बोरा', 'fractional': false},
+      ];
 
-  /// Updates stock level by a delta (+ for purchase/return, - for sales).
-  Future<void> adjustStock(String id, double quantityDelta) async {
-    final existing = await (_db.select(_db.inventories)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-    if (existing == null) return;
+      for (final u in defaultUnits) {
+        await _db.into(_db.units).insert(
+              UnitsCompanion.insert(
+                id: _uuid.v4(),
+                name: u['name'] as String,
+                symbol: u['symbol'] as String,
+                nepaliSymbol: Value(u['nepali'] as String),
+                isFractional: Value(u['fractional'] as bool),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+                isDeleted: const Value(false),
+              ),
+            );
+      }
 
-    final updatedStock = (existing.stockQuantity + quantityDelta).clamp(0.0, 9999999.0);
-    final updated = existing.copyWith(
-      stockQuantity: updatedStock,
-      updatedAt: DateTime.now(),
-      syncStatus: SyncStatus.pending,
-    );
+      // 2. Seed Categories
+      final catGrainsId = _uuid.v4();
+      final catOilsId = _uuid.v4();
+      final catSnacksId = _uuid.v4();
+      final catSpicesId = _uuid.v4();
 
-    await _db.update(_db.inventories).replace(updated);
-  }
+      await _db.into(_db.categories).insert(
+            CategoriesCompanion.insert(
+              id: catGrainsId,
+              name: 'Rice, Grains & Pulses',
+              nepaliName: const Value('चामल, अन्न तथा दाल'),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
+      await _db.into(_db.categories).insert(
+            CategoriesCompanion.insert(
+              id: catOilsId,
+              name: 'Cooking Oils & Ghee',
+              nepaliName: const Value('खाने तेल तथा घ्यु'),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
+      await _db.into(_db.categories).insert(
+            CategoriesCompanion.insert(
+              id: catSnacksId,
+              name: 'Snacks & Noodles',
+              nepaliName: const Value('खाजा तथा चाउचाउ'),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
+      await _db.into(_db.categories).insert(
+            CategoriesCompanion.insert(
+              id: catSpicesId,
+              name: 'Spices & Salt',
+              nepaliName: const Value('मसला तथा नुन'),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+              syncStatus: const Value(SyncStatus.pending),
+              isDeleted: const Value(false),
+            ),
+          );
 
-  /// Seeds sample Nepali grocery / retail products for quick testing.
-  Future<void> seedDefaultNepaliProducts() async {
-    final sampleItems = [
-      {'name': 'Basmati Rice 25kg (बासमती चामल)', 'sku': 'RICE-BAS-25', 'unit': 'bag', 'price': 2550.0, 'cost': 2300.0, 'qty': 20.0},
-      {'name': 'Mustard Cooking Oil (तोरीको तेल १ लि.)', 'sku': 'OIL-MUS-1L', 'unit': 'ltr', 'price': 240.0, 'cost': 210.0, 'qty': 50.0},
-      {'name': 'Sunflower Oil 1L (सूर्यमुखी तेल)', 'sku': 'OIL-SUN-1L', 'unit': 'ltr', 'price': 225.0, 'cost': 195.0, 'qty': 45.0},
-      {'name': 'Tata Salt 1kg (आयोडिनयुक्त नुन)', 'sku': 'SALT-TATA-1', 'unit': 'pkt', 'price': 28.0, 'cost': 23.0, 'qty': 100.0},
-      {'name': 'Sugar 1kg (चिनी)', 'sku': 'SUGAR-1KG', 'unit': 'kg', 'price': 105.0, 'cost': 92.0, 'qty': 80.0},
-      {'name': 'Wai Wai Noodles (चाउचाउ कार्टुन)', 'sku': 'WW-NDL-CTN', 'unit': 'box', 'price': 620.0, 'cost': 560.0, 'qty': 15.0},
-      {'name': 'Tokla CTC Tea 500g (टोकला चियापत्ती)', 'sku': 'TEA-TOK-500', 'unit': 'pkt', 'price': 285.0, 'cost': 245.0, 'qty': 30.0},
-      {'name': 'Red Lentils / Musuro Daal (मुसुरो दाल १ केजी)', 'sku': 'DAL-MUS-1KG', 'unit': 'kg', 'price': 165.0, 'cost': 140.0, 'qty': 40.0},
-      {'name': 'Dettol Soap 75g (साबुन)', 'sku': 'DET-SOAP-75', 'unit': 'pcs', 'price': 55.0, 'cost': 45.0, 'qty': 60.0},
-    ];
+      // 3. Seed Items
+      final sampleItems = [
+        {
+          'name': 'Basmati Rice 25kg',
+          'nepali': 'बासमती चामल २५ केजी',
+          'sku': 'RICE-BAS-25',
+          'catId': catGrainsId,
+          'unit': 'bag',
+          'cost': 235000, // Rs. 2,350.00
+          'price': 255000, // Rs. 2,550.00
+          'stock': 25.0,
+          'threshold': 5.0,
+        },
+        {
+          'name': 'Mustard Oil 1L (Toriko Tel)',
+          'nepali': 'तोरीको तेल १ लिटर',
+          'sku': 'OIL-MUS-1L',
+          'catId': catOilsId,
+          'unit': 'ltr',
+          'cost': 21000, // Rs. 210.00
+          'price': 24500, // Rs. 245.00
+          'stock': 40.0,
+          'threshold': 8.0,
+        },
+        {
+          'name': 'Sunflower Cooking Oil 1L',
+          'nepali': 'सूर्यमुखी तेल १ लिटर',
+          'sku': 'OIL-SUN-1L',
+          'catId': catOilsId,
+          'unit': 'ltr',
+          'cost': 19500, // Rs. 195.00
+          'price': 22500, // Rs. 225.00
+          'stock': 35.0,
+          'threshold': 6.0,
+        },
+        {
+          'name': 'Tata Iodized Salt 1kg',
+          'nepali': 'टाटा आयोडिन नुन १ केजी',
+          'sku': 'SALT-TATA-1',
+          'catId': catSpicesId,
+          'unit': 'pkt',
+          'cost': 2300, // Rs. 23.00
+          'price': 2800, // Rs. 28.00
+          'stock': 120.0,
+          'threshold': 20.0,
+        },
+        {
+          'name': 'Wai Wai Noodles (Carton 30pcs)',
+          'nepali': 'वाइ वाइ चाउचाउ कार्टुन',
+          'sku': 'WW-NDL-CTN',
+          'catId': catSnacksId,
+          'unit': 'box',
+          'cost': 56000, // Rs. 560.00
+          'price': 63000, // Rs. 630.00
+          'stock': 18.0,
+          'threshold': 4.0,
+        },
+        {
+          'name': 'Red Lentils / Musuro Daal 1kg',
+          'nepali': 'मुसुरो दाल १ केजी',
+          'sku': 'DAL-MUS-1KG',
+          'catId': catGrainsId,
+          'unit': 'kg',
+          'cost': 14000, // Rs. 140.00
+          'price': 16500, // Rs. 165.00
+          'stock': 3.0, // Low stock trigger!
+          'threshold': 10.0,
+        },
+      ];
 
-    for (final item in sampleItems) {
-      await addInventoryItem(
-        name: item['name'] as String,
-        sku: item['sku'] as String,
-        unit: item['unit'] as String,
-        unitPrice: item['price'] as double,
-        costPrice: item['cost'] as double,
-        stockQuantity: item['qty'] as double,
-      );
-    }
+      for (final item in sampleItems) {
+        final itemId = _uuid.v4();
+        final stock = item['stock'] as double;
+
+        await _db.into(_db.items).insert(
+              ItemsCompanion.insert(
+                id: itemId,
+                name: item['name'] as String,
+                nepaliName: Value(item['nepali'] as String),
+                sku: item['sku'] as String,
+                categoryId: Value(item['catId'] as String),
+                unit: Value(item['unit'] as String),
+                purchasePricePaisa: Value(item['cost'] as int),
+                sellingPricePaisa: Value(item['price'] as int),
+                stockQty: Value(stock),
+                lowStockThreshold: Value(item['threshold'] as double),
+                isActive: const Value(true),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+                isDeleted: const Value(false),
+              ),
+            );
+
+        // Opening ledger entry
+        await _db.into(_db.stockLedger).insert(
+              StockLedgerCompanion.insert(
+                id: _uuid.v4(),
+                itemId: itemId,
+                qtyChange: stock,
+                reason: 'INITIAL_STOCK',
+                refType: 'INITIAL_STOCK',
+                refId: itemId,
+                notes: const Value('Opening Stock on seeding'),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+                isDeleted: const Value(false),
+              ),
+            );
+      }
+    });
   }
 }
-
