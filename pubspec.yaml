@@ -1,0 +1,60 @@
+name: sajilo_billing
+description: "Sajilo Billing - Desktop-first offline billing application for Nepali retail shopkeepers."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Local Database (Offline-first SQLite via Drift)
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # File dialogs for desktop export/restore and image picking
+  file_selector: ^0.9.2+8
+
+  # PDF generation & printing with Devanagari font
+  pdf: ^3.10.8
+  printing: ^5.12.0
+
+  # QR Code generation
+  qr_flutter: ^4.1.0
+
+  # Localization & utilities
+  intl: ^0.18.1
+  uuid: ^4.4.0
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+  # Code generation for Drift
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.9
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/fonts/
+
+  fonts:
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-Regular.ttf
+        - asset: assets/fonts/NotoSansDevanagari-Bold.ttf
+          weight: 700
