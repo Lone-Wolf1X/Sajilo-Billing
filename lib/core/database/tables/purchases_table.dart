@@ -10,3 +10,4 @@ class Purchases extends Table with SyncTableMixin {
   RealColumn get totalAmount => real()();
   TextColumn get remarks => text().nullable()();
 }
+

@@ -10,3 +10,4 @@ class BusinessProfiles extends Table with SyncTableMixin {
   TextColumn get logoPath => text().nullable()();
   BoolColumn get isCurrent => boolean().withDefault(const Constant(true))();
 }
+

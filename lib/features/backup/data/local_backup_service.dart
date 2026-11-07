@@ -140,3 +140,4 @@ class LocalBackupService implements BackupService {
     return true;
   }
 }
+

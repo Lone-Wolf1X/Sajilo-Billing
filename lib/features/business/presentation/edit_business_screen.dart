@@ -369,3 +369,4 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
     );
   }
 }
+

@@ -10,3 +10,4 @@ class SaleItems extends Table with SyncTableMixin {
   RealColumn get amount => real()();
   TextColumn get unit => text().withDefault(const Constant('pcs'))();
 }
+

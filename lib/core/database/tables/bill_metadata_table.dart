@@ -9,3 +9,4 @@ class BillMetadata extends Table with SyncTableMixin {
   TextColumn get qrData => text()();
   IntColumn get printCount => integer().withDefault(const Constant(1))();
 }
+

@@ -16,3 +16,4 @@ class Sales extends Table with SyncTableMixin {
   TextColumn get paymentMode => text().withDefault(const Constant('CASH'))(); // CASH, FONEPAY, CREDIT
   TextColumn get notes => text().nullable()();
 }
+

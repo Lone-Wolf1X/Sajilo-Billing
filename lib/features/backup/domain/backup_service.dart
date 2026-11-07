@@ -11,3 +11,4 @@ abstract class BackupService {
   /// Returns the timestamp of the last recorded successful backup, or null.
   Future<DateTime?> getLastBackupTime();
 }
+

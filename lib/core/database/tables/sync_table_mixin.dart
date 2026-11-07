@@ -12,3 +12,4 @@ mixin SyncTableMixin on Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+

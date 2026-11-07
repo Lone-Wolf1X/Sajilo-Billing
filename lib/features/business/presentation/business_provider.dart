@@ -22,3 +22,4 @@ final isBusinessConfiguredProvider = Provider<bool>((ref) {
     orElse: () => false,
   );
 });
+

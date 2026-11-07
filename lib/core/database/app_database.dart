@@ -60,3 +60,4 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 }
+

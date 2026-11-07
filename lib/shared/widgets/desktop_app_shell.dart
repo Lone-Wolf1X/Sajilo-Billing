@@ -145,3 +145,4 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
     );
   }
 }
+

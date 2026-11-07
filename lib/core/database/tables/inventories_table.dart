@@ -11,3 +11,4 @@ class Inventories extends Table with SyncTableMixin {
   RealColumn get stockQuantity => real().withDefault(const Constant(0.0))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
+
