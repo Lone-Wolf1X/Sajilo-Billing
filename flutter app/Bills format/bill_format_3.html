@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>नेपाली बिल प्याड - जानकारी केन्द्र (प्रा.) ली.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper-pink: #f2bac9;
+      --paper-pink-darker: #e8a6b8;
+      --ink-maroon: #561131;
+      --ink-maroon-light: #722046;
+      --ink-maroon-faded: rgba(86, 17, 49, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #2b2f3a;
+      font-family: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+      color: var(--ink-maroon);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 12px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Control Bar (Hidden when printing) */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      background: #ffffff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    .btn {
+      font-family: 'Mukta', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    .btn:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--ink-maroon);
+      color: #ffffff;
+      border-color: var(--ink-maroon);
+    }
+
+    .btn-primary:hover {
+      background: #400b23;
+    }
+
+    /* Bill Container - Physical Bill Pad Dimensions (Approx A5 portrait: 148mm x 210mm) */
+    .bill-wrapper {
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bill-card {
+      background-color: var(--paper-pink);
+      color: var(--ink-maroon);
+      padding: 24px 28px 20px 28px;
+      position: relative;
+      border: 1px solid var(--paper-pink-darker);
+      display: flex;
+      flex-direction: column;
+      min-height: 820px;
+    }
+
+    /* Subtle paper texture overlay */
+    .bill-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.03) 100%);
+      pointer-events: none;
+    }
+
+    /* Header Section */
+    .bill-header {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .phone-number {
+      text-align: right;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .company-title {
+      text-align: center;
+      font-size: 27px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .company-address {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    /* Metadata Info (Bill No, Date, PAN, Name, Address) */
+    .info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 14.5px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: baseline;
+      width: 100%;
+    }
+
+    .info-row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      width: 100%;
+    }
+
+    .field-label {
+      white-space: nowrap;
+      margin-right: 6px;
+      font-weight: 700;
+    }
+
+    .dotted-line {
+      flex: 1;
+      border-bottom: 1px dotted var(--ink-maroon);
+      min-height: 14px;
+      padding-left: 8px;
+      font-weight: 600;
+      color: #1e1018;
+    }
+
+    /* PAN Box Grid */
+    .pan-row {
+      display: flex;
+      align-items: center;
+      margin: 2px 0;
+    }
+
+    .pan-boxes {
+      display: inline-flex;
+      border: 1px solid var(--ink-maroon);
+      background: rgba(255, 255, 255, 0.05);
+      margin-left: 8px;
+    }
+
+    .pan-box {
+      width: 25px;
+      height: 25px;
+      border-right: 1px solid var(--ink-maroon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .pan-box:last-child {
+      border-right: none;
+    }
+
+    /* Main Table */
+    .bill-table-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--ink-maroon);
+      margin-top: 2px;
+      margin-bottom: 14px;
+      background: transparent;
+    }
+
+    .bill-table {
+      width: 100%;
+      border-collapse: collapse;
+      height: 100%;
+    }
+
+    .bill-table th,
+    .bill-table td {
+      border-right: 1px solid var(--ink-maroon);
+      color: var(--ink-maroon);
+      padding: 4px 6px;
+    }
+
+    .bill-table th:last-child,
+    .bill-table td:last-child {
+      border-right: none;
+    }
+
+    .bill-table thead tr {
+      border-bottom: 1px solid var(--ink-maroon);
+    }
+
+    .bill-table th {
+      font-size: 14.5px;
+      font-weight: 700;
+      text-align: center;
+      padding: 5px 4px;
+    }
+
+    /* Column Widths matching the image */
+    .col-sn {
+      width: 44px;
+      text-align: center;
+    }
+
+    .col-desc {
+      width: auto;
+      text-align: left;
+    }
+
+    .col-qty {
+      width: 66px;
+      text-align: center;
+    }
+
+    .col-rate {
+      width: 66px;
+      text-align: right;
+    }
+
+    .col-amount {
+      width: 78px;
+      text-align: right;
+    }
+
+    /* Table body lines */
+    .table-body-row {
+      height: 28px;
+    }
+
+    .table-body-row td {
+      font-size: 14px;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    /* Spacer row to push Total to bottom while maintaining vertical rules */
+    .table-spacer-row {
+      height: auto;
+    }
+
+    /* Total (जम्मा) Row */
+    .total-row {
+      border-top: 1px solid var(--ink-maroon);
+      font-weight: 800;
+      font-size: 14.5px;
+    }
+
+    .total-row td {
+      padding: 6px 6px;
+    }
+
+    .total-label {
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .total-amount {
+      text-align: right;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    /* In Words Row */
+    .in-words-row {
+      border-top: 1px solid var(--ink-maroon);
+      padding: 5px 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: baseline;
+    }
+
+    /* Footer Section */
+    .bill-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 4px;
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .terms {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .term-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .arrow-icon {
+      font-size: 11px;
+    }
+
+    .signature-area {
+      text-align: center;
+      padding-top: 28px;
+      border-top: 1px dotted var(--ink-maroon);
+      min-width: 120px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Editable inline styling */
+    [contenteditable="true"] {
+      outline: none;
+      transition: background 0.15s;
+    }
+
+    [contenteditable="true"]:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    [contenteditable="true"]:focus {
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+      }
+
+      .controls-bar {
+        display: none !important;
+      }
+
+      .bill-wrapper {
+        box-shadow: none;
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      .bill-card {
+        border: none;
+        min-height: 100vh;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls (Not printed) -->
+  <div class="controls-bar">
+    <button class="btn btn-primary" onclick="window.print()">
+      🖨️ प्रिन्ट गर्नुहोस् (Print Bill)
+    </button>
+    <button class="btn" onclick="populateSampleData()">
+      ✏️ नमुना डाटा भर्नुहोस् (Fill Sample)
+    </button>
+    <button class="btn" onclick="clearBill()">
+      🗑️ खाली गर्नुहोस् (Blank Pad)
+    </button>
+  </div>
+
+  <!-- Bill Pad Container -->
+  <div class="bill-wrapper">
+    <div class="bill-card" id="billPad">
+
+      <!-- Header -->
+      <div class="bill-header">
+        <div class="phone-number" contenteditable="true" id="phoneField">मो. ९८०५६७८४५६</div>
+        <div class="company-title" contenteditable="true" id="companyField">जानकारी केन्द्र (प्रा.) ली.</div>
+        <div class="company-address" contenteditable="true" id="addressField">पुतलीसडक, काठमाडौँ</div>
+      </div>
+
+      <!-- Info Meta -->
+      <div class="info-grid">
+        <div class="info-row-between">
+          <div class="info-row" style="flex: 0 0 45%;">
+            <span class="field-label">बिल नं. :</span>
+            <span class="dotted-line" contenteditable="true" id="billNoField"></span>
+          </div>
+          <div class="info-row" style="flex: 0 0 50%;">
+            <span class="field-label">मिति :</span>
+            <span class="dotted-line" contenteditable="true" id="dateField"></span>
+          </div>
+        </div>
+
+        <!-- 9-Digit PAN Row -->
+        <div class="pan-row">
+          <span class="field-label">पान नं.</span>
+          <div class="pan-boxes" id="panContainer">
+            <span class="pan-box" contenteditable="true">६</span>
+            <span class="pan-box" contenteditable="true">९</span>
+            <span class="pan-box" contenteditable="true">४</span>
+            <span class="pan-box" contenteditable="true">८</span>
+            <span class="pan-box" contenteditable="true">०</span>
+            <span class="pan-box" contenteditable="true">७</span>
+            <span class="pan-box" contenteditable="true">६</span>
+            <span class="pan-box" contenteditable="true">३</span>
+            <span class="pan-box" contenteditable="true">८</span>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <span class="field-label">नाम :</span>
+          <span class="dotted-line" contenteditable="true" id="customerNameField"></span>
+        </div>
+
+        <div class="info-row">
+          <span class="field-label">ठेगाना :</span>
+          <span class="dotted-line" contenteditable="true" id="customerAddressField"></span>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div class="bill-table-container">
+        <table class="bill-table">
+          <thead>
+            <tr>
+              <th class="col-sn">क्र.स</th>
+              <th class="col-desc">विवरण</th>
+              <th class="col-qty">परिमाण</th>
+              <th class="col-rate">दर</th>
+              <th class="col-amount">रकम</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Row 1 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 2 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 3 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 4 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 5 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 6 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 7 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 8 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Row 9 -->
+            <tr class="table-body-row">
+              <td class="col-sn" contenteditable="true"></td>
+              <td class="col-desc" contenteditable="true"></td>
+              <td class="col-qty" contenteditable="true"></td>
+              <td class="col-rate" contenteditable="true"></td>
+              <td class="col-amount" contenteditable="true"></td>
+            </tr>
+            <!-- Spacer to preserve ruled vertical pad lines -->
+            <tr class="table-spacer-row" style="height: 120px;">
+              <td class="col-sn"></td>
+              <td class="col-desc"></td>
+              <td class="col-qty"></td>
+              <td class="col-rate"></td>
+              <td class="col-amount"></td>
+            </tr>
+            <!-- Total Row -->
+            <tr class="total-row">
+              <td colspan="3" style="border-right: 1px solid var(--ink-maroon);"></td>
+              <td class="total-label">जम्मा</td>
+              <td class="total-amount" contenteditable="true" id="totalAmountField"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- In Words row at the bottom of the grid table -->
+        <div class="in-words-row">
+          <span class="field-label">अक्षरेपी :</span>
+          <span class="dotted-line" contenteditable="true" id="inWordsField"></span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="bill-footer">
+        <div class="terms">
+          <div class="term-item">
+            <span class="arrow-icon">➤</span>
+            <span>भूलचुक लिने दिने ।</span>
+          </div>
+          <div class="term-item">
+            <span class="arrow-icon">➤</span>
+            <span>बिक्री भएको सामान फिर्ता हुने छैन ।</span>
+          </div>
+        </div>
+
+        <div class="signature-area">
+          हस्ताक्षर
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Quick Sample Data for Preview
+    function populateSampleData() {
+      document.getElementById('billNoField').innerText = '१०५४';
+      document.getElementById('dateField').innerText = '२०८१/०७/२४';
+      document.getElementById('customerNameField').innerText = 'राम श्रेष्ठ';
+      document.getElementById('customerAddressField').innerText = 'नयाँ बानेश्वर, काठमाडौँ';
+
+      const rows = [
+        ['१', 'खाता / रजिस्टर', '२ थान', '३५०/-', '७००/-'],
+        ['२', 'डटपेन (कालो/नीलो)', '५ थान', '२५/-', '१२५/-'],
+        ['३', 'A4 फोटोकपी पेपर रिम', '१ रिम', '६५०/-', '६५०/-']
+      ];
+
+      const tbody = document.getElementById('tableBody');
+      const tableRows = tbody.querySelectorAll('.table-body-row');
+
+      rows.forEach((data, idx) => {
+        if (tableRows[idx]) {
+          const cells = tableRows[idx].querySelectorAll('td');
+          cells[0].innerText = data[0];
+          cells[1].innerText = data[1];
+          cells[2].innerText = data[2];
+          cells[3].innerText = data[3];
+          cells[4].innerText = data[4];
+        }
+      });
+
+      document.getElementById('totalAmountField').innerText = '१,४७५/-';
+      document.getElementById('inWordsField').innerText = 'एक हजार चार सय पचहत्तर रुपैयाँ मात्र ।';
+    }
+
+    function clearBill() {
+      document.getElementById('billNoField').innerText = '';
+      document.getElementById('dateField').innerText = '';
+      document.getElementById('customerNameField').innerText = '';
+      document.getElementById('customerAddressField').innerText = '';
+      document.getElementById('totalAmountField').innerText = '';
+      document.getElementById('inWordsField').innerText = '';
+
+      const tbody = document.getElementById('tableBody');
+      const tableRows = tbody.querySelectorAll('.table-body-row');
+      tableRows.forEach(row => {
+        row.querySelectorAll('td').forEach(cell => cell.innerText = '');
+      });
+    }
+  </script>
+</body>
+</html>

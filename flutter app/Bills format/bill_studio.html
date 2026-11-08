@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>सजिलो बिलिङ - Bill Format Studio (Nepali & English)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Mukta:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: 'Inter', 'Mukta', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Top Studio Bar */
+    .studio-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .studio-header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .studio-header p {
+      font-size: 13.5px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Selector Controls Bar */
+    .selector-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      background: #1e293b;
+      padding: 10px 16px;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      margin-bottom: 24px;
+      max-width: 900px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .tab-btn {
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      background: #0f172a;
+      color: #94a3b8;
+    }
+
+    .tab-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #60a5fa;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 28px;
+      background: #334155;
+      margin: 0 4px;
+    }
+
+    .action-btn {
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+
+    .action-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+
+    .action-btn-primary {
+      background: #10b981;
+      border-color: #10b981;
+      color: #ffffff;
+    }
+
+    .action-btn-primary:hover {
+      background: #059669;
+    }
+
+    /* Iframe preview container */
+    .preview-container {
+      width: 100%;
+      max-width: 680px;
+      height: 980px;
+      background: #1e293b;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      padding: 10px 18px;
+      border-bottom: 1px solid #334155;
+      font-size: 12.5px;
+      color: #94a3b8;
+    }
+
+    .preview-bar span strong {
+      color: #e2e8f0;
+    }
+
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #0f172a;
+    }
+
+    /* Direct Links Card */
+    .direct-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 24px;
+    }
+
+    .link-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .link-card:hover {
+      background: #334155;
+      border-color: #64748b;
+      transform: translateY(-2px);
+    }
+
+    .badge-icon {
+      font-size: 24px;
+    }
+
+    .link-info h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .link-info p {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 650px) {
+      .preview-container {
+        height: 750px;
+      }
+      .divider-v {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Studio Header -->
+  <div class="studio-header">
+    <h1>📋 Sajilo Billing - Bill Template Studio</h1>
+    <p>नेपाली र अङ्ग्रेजी ढाँचा (White & Red + Pink Carbon Formats)</p>
+  </div>
+
+  <!-- Selector Controls Bar -->
+  <div class="selector-bar">
+    <button class="tab-btn active" onclick="loadTemplate('nepali_bill_pad.html', this)">
+      🌸 नेपाली (Pink Pad)
+    </button>
+    <button class="tab-btn" onclick="loadTemplate('nepali_bill_white_red.html', this)">
+      🔴 नेपाली (White & Red)
+    </button>
+    <div class="divider-v"></div>
+    <button class="tab-btn" onclick="loadTemplate('english_bill_white_red.html', this)">
+      🔴 English (White & Red)
+    </button>
+    <button class="tab-btn" onclick="loadTemplate('english_bill_pad.html', this)">
+      🌸 English (Pink Pad)
+    </button>
+    <div class="divider-v"></div>
+    <button class="action-btn action-btn-primary" onclick="printActiveFrame()">
+      🖨️ Print Active Bill
+    </button>
+    <button class="action-btn" onclick="openActiveNewTab()">
+      ↗️ Open in New Tab
+    </button>
+  </div>
+
+  <!-- Iframe Preview -->
+  <div class="preview-container">
+    <div class="preview-bar">
+      <span>Active Template: <strong id="activeTemplateName">nepali_bill_pad.html</strong></span>
+      <span>Double click inside to edit text directly</span>
+    </div>
+    <iframe id="billFrame" class="preview-iframe" src="nepali_bill_pad.html"></iframe>
+  </div>
+
+  <!-- Direct Standalone Files -->
+  <div class="direct-links-grid">
+    <a href="nepali_bill_pad.html" target="_blank" class="link-card">
+      <span class="badge-icon">🌸</span>
+      <div class="link-info">
+        <h4>nepali_bill_pad.html</h4>
+        <p>Nepali Carbon Copy Pink Bill</p>
+      </div>
+    </a>
+    <a href="nepali_bill_white_red.html" target="_blank" class="link-card">
+      <span class="badge-icon">🔴</span>
+      <div class="link-info">
+        <h4>nepali_bill_white_red.html</h4>
+        <p>Nepali Modern White & Red Bill</p>
+      </div>
+    </a>
+    <a href="english_bill_white_red.html" target="_blank" class="link-card">
+      <span class="badge-icon">⚪</span>
+      <div class="link-info">
+        <h4>english_bill_white_red.html</h4>
+        <p>English Retail White & Red Bill</p>
+      </div>
+    </a>
+    <a href="english_bill_pad.html" target="_blank" class="link-card">
+      <span class="badge-icon">📑</span>
+      <div class="link-info">
+        <h4>english_bill_pad.html</h4>
+        <p>English Classic Pink Bill Pad</p>
+      </div>
+    </a>
+  </div>
+
+  <script>
+    let currentSrc = 'nepali_bill_pad.html';
+
+    function loadTemplate(filename, btnElement) {
+      currentSrc = filename;
+      document.getElementById('billFrame').src = filename;
+      document.getElementById('activeTemplateName').innerText = filename;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (btnElement) {
+        btnElement.classList.add('active');
+      }
+    }
+
+    function printActiveFrame() {
+      const frame = document.getElementById('billFrame');
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }
+    }
+
+    function openActiveNewTab() {
+      window.open(currentSrc, '_blank');
+    }
+  </script>
+</body>
+</html>
