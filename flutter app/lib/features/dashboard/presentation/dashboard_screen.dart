@@ -354,6 +354,9 @@ class DashboardScreen extends ConsumerWidget {
                 onPressed: () => _backupNow(context, ref),
                 icon: const Icon(Icons.download, size: 16),
                 label: const Text('Export SQLite Backup'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(160, 40),
+                ),
               );
 
               if (isCompact) {
