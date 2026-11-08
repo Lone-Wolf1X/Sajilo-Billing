@@ -146,5 +146,16 @@
   "statusFailed": "Failed",
   "statusInProgress": "In Progress",
   "driveFolderInfo": "Backups are stored in your private 'Sajilo Billing Backups' folder on Google Drive.",
-  "oauthSetupHelp": "Google OAuth credentials can be passed via --dart-define=GOOGLE_CLIENT_ID or configured in Settings."
+  "oauthSetupHelp": "Google OAuth credentials can be passed via --dart-define=GOOGLE_CLIENT_ID or configured in Settings.",
+  "khata": "Khata (Credit Ledger)",
+  "khataSubtitle": "Track customer credit, supplier payables, and issue payment receipts",
+  "customerKhata": "Customer Khata",
+  "supplierKhata": "Supplier Khata",
+  "totalCustomerDue": "Total Customer Due (Receivable)",
+  "totalSupplierDue": "Total Supplier Due (Payable)",
+  "receivePayment": "Receive Payment",
+  "paySupplier": "Pay Supplier",
+  "ledgerStatement": "Ledger Statement",
+  "whatsAppReminder": "WhatsApp Reminder",
+  "moneyReceipt": "Money Receipt"
 }

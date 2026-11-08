@@ -320,6 +320,69 @@ class SalesRepository {
             );
       }
 
+      // Step 6: If credit sale, automatically post to Customer Khata (Party Ledger)
+      if (paymentMode.toUpperCase() == 'CREDIT') {
+        String effectiveCustId = customerId ?? '';
+        if (effectiveCustId.isEmpty &&
+            (customerName.trim().isNotEmpty || (customerPhone != null && customerPhone.trim().isNotEmpty))) {
+          Customer? existingCust;
+          if (customerPhone != null && customerPhone.trim().isNotEmpty) {
+            existingCust = await (_db.select(_db.customers)
+                  ..where((tbl) => tbl.phone.equals(customerPhone.trim()) & tbl.isDeleted.equals(false))
+                  ..limit(1))
+                .getSingleOrNull();
+          }
+          if (existingCust == null &&
+              customerName.trim().isNotEmpty &&
+              customerName.trim() != 'Cash Customer / नगद ग्राहक') {
+            final newCustId = _uuid.v4();
+            await _db.into(_db.customers).insert(
+                  CustomersCompanion(
+                    id: Value(newCustId),
+                    name: Value(customerName.trim()),
+                    phone: Value(customerPhone?.trim()),
+                    panVat: Value(customerPan?.trim()),
+                    createdAt: Value(now),
+                    updatedAt: Value(now),
+                    syncStatus: const Value(SyncStatus.pending),
+                  ),
+                );
+            effectiveCustId = newCustId;
+          } else if (existingCust != null) {
+            effectiveCustId = existingCust.id;
+          }
+        }
+
+        if (effectiveCustId.isNotEmpty) {
+          final lastLedger = await (_db.select(_db.partyLedger)
+                ..where((tbl) => tbl.partyId.equals(effectiveCustId) & tbl.isDeleted.equals(false))
+                ..orderBy([(tbl) => OrderingTerm.desc(tbl.entryDate), (tbl) => OrderingTerm.desc(tbl.createdAt)])
+                ..limit(1))
+              .getSingleOrNull();
+
+          final currentBal = lastLedger?.balanceAfterPaisa ?? 0;
+          final newBal = currentBal + totalPaisa;
+
+          await _db.into(_db.partyLedger).insert(
+                PartyLedgerCompanion(
+                  id: Value(_uuid.v4()),
+                  partyType: const Value('customer'),
+                  partyId: Value(effectiveCustId),
+                  entryType: const Value('sale_credit'),
+                  amountPaisa: Value(totalPaisa),
+                  balanceAfterPaisa: Value(newBal),
+                  refId: Value(saleId),
+                  refNumber: Value(invoiceNumber),
+                  notes: Value('Credit Sale / उधारो बिक्री ($invoiceNumber)'),
+                  entryDate: Value(saleDate),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
+                ),
+              );
+        }
+      }
+
       return (await (_db.select(_db.sales)..where((tbl) => tbl.id.equals(saleId))).getSingle());
     });
   }
@@ -376,6 +439,36 @@ class SalesRepository {
               syncStatus: SyncStatus.pending,
             ),
           );
+
+      // 3. If it was a credit sale, reverse the customer ledger balance
+      if (details.sale.paymentMode.toUpperCase() == 'CREDIT' && details.sale.customerId != null) {
+        final lastLedger = await (_db.select(_db.partyLedger)
+              ..where((tbl) => tbl.partyId.equals(details.sale.customerId!) & tbl.isDeleted.equals(false))
+              ..orderBy([(tbl) => OrderingTerm.desc(tbl.entryDate), (tbl) => OrderingTerm.desc(tbl.createdAt)])
+              ..limit(1))
+            .getSingleOrNull();
+
+        final currentBal = lastLedger?.balanceAfterPaisa ?? 0;
+        final newBal = currentBal - details.sale.totalPaisa;
+
+        await _db.into(_db.partyLedger).insert(
+              PartyLedgerCompanion(
+                id: Value(_uuid.v4()),
+                partyType: const Value('customer'),
+                partyId: Value(details.sale.customerId!),
+                entryType: const Value('adjustment'),
+                amountPaisa: Value(details.sale.totalPaisa),
+                balanceAfterPaisa: Value(newBal),
+                refId: Value(details.sale.id),
+                refNumber: Value('VOID-${details.sale.invoiceNumber}'),
+                notes: Value('Reversal for voided bill ${details.sale.invoiceNumber}: ${reason ?? "Bill voided"}'),
+                entryDate: Value(now),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+              ),
+            );
+      }
     });
   }
 

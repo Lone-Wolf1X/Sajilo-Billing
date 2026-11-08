@@ -128,5 +128,16 @@
   "statusFailed": "असफल",
   "statusInProgress": "प्रक्रियामा...",
   "driveFolderInfo": "ब्याकअप फाइलहरू तपाईंको गुगल ड्राइभको 'Sajilo Billing Backups' फोल्डरमा सुरक्षित रहन्छन्।",
-  "oauthSetupHelp": "गुगल क्लाउड क्रेडेन्सियल docs/google_setup.md अनुसार मिलाउनुहोस्।"
+  "oauthSetupHelp": "गुगल क्लाउड क्रेडेन्सियल docs/google_setup.md अनुसार मिलाउनुहोस्।",
+  "khata": "उधारो खाता हिसाब",
+  "khataSubtitle": "ग्राहक उधारो, आपूर्तिकर्ता बाँकी, र भुक्तानी रसिद व्यवस्थापन",
+  "customerKhata": "ग्राहक उधारो खाता",
+  "supplierKhata": "आपूर्तिकर्ता हिसाब खाता",
+  "totalCustomerDue": "कुल लिन बाँकी (उठाउनुपर्ने)",
+  "totalSupplierDue": "कुल तिर्न बाँकी",
+  "receivePayment": "रकम असुली / जम्मा",
+  "paySupplier": "भुक्तानी गर्नुहोस्",
+  "ledgerStatement": "हिसाब स्टेटमेन्ट",
+  "whatsAppReminder": "ह्वार्ट्सएप रिमाइन्डर",
+  "moneyReceipt": "रकम भुक्तानी रसिद"
 }

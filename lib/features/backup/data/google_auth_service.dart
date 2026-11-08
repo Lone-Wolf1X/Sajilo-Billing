@@ -39,7 +39,10 @@ class GoogleAuthService {
   static const String _kEmailKey = 'google_account_email';
   static const String _kNameKey = 'google_account_name';
 
-  static const String defaultClientId = String.fromEnvironment('GOOGLE_CLIENT_ID');
+  static const String defaultClientId = String.fromEnvironment(
+    'GOOGLE_CLIENT_ID',
+    defaultValue: '612120463137-ft0pdu8j2d00tef1birjtb0r3djlfdpg.apps.googleusercontent.com',
+  );
   static const String defaultClientSecret = String.fromEnvironment('GOOGLE_CLIENT_SECRET');
 
   static const List<String> requiredScopes = [
@@ -375,3 +378,4 @@ class GoogleAuthService {
     }
   }
 }
+

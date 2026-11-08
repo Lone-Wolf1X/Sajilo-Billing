@@ -10346,6 +10346,1435 @@ class BackupLogsCompanion extends UpdateCompanion<BackupLog> {
   }
 }
 
+class $PartyLedgerTable extends PartyLedger
+    with TableInfo<$PartyLedgerTable, PartyLedgerData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PartyLedgerTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _syncStatusMeta =
+      const VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus, String> syncStatus =
+      GeneratedColumn<String>('sync_status', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(SyncStatus.pending.name))
+          .withConverter<SyncStatus>($PartyLedgerTable.$convertersyncStatus);
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _partyTypeMeta =
+      const VerificationMeta('partyType');
+  @override
+  late final GeneratedColumn<String> partyType = GeneratedColumn<String>(
+      'party_type', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _partyIdMeta =
+      const VerificationMeta('partyId');
+  @override
+  late final GeneratedColumn<String> partyId = GeneratedColumn<String>(
+      'party_id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _entryTypeMeta =
+      const VerificationMeta('entryType');
+  @override
+  late final GeneratedColumn<String> entryType = GeneratedColumn<String>(
+      'entry_type', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 32),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _amountPaisaMeta =
+      const VerificationMeta('amountPaisa');
+  @override
+  late final GeneratedColumn<int> amountPaisa = GeneratedColumn<int>(
+      'amount_paisa', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _balanceAfterPaisaMeta =
+      const VerificationMeta('balanceAfterPaisa');
+  @override
+  late final GeneratedColumn<int> balanceAfterPaisa = GeneratedColumn<int>(
+      'balance_after_paisa', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _refIdMeta = const VerificationMeta('refId');
+  @override
+  late final GeneratedColumn<String> refId = GeneratedColumn<String>(
+      'ref_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _refNumberMeta =
+      const VerificationMeta('refNumber');
+  @override
+  late final GeneratedColumn<String> refNumber = GeneratedColumn<String>(
+      'ref_number', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _entryDateMeta =
+      const VerificationMeta('entryDate');
+  @override
+  late final GeneratedColumn<DateTime> entryDate = GeneratedColumn<DateTime>(
+      'entry_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        createdAt,
+        updatedAt,
+        syncStatus,
+        remoteId,
+        isDeleted,
+        partyType,
+        partyId,
+        entryType,
+        amountPaisa,
+        balanceAfterPaisa,
+        refId,
+        refNumber,
+        notes,
+        entryDate
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'party_ledger';
+  @override
+  VerificationContext validateIntegrity(Insertable<PartyLedgerData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    context.handle(_syncStatusMeta, const VerificationResult.success());
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('party_type')) {
+      context.handle(_partyTypeMeta,
+          partyType.isAcceptableOrUnknown(data['party_type']!, _partyTypeMeta));
+    } else if (isInserting) {
+      context.missing(_partyTypeMeta);
+    }
+    if (data.containsKey('party_id')) {
+      context.handle(_partyIdMeta,
+          partyId.isAcceptableOrUnknown(data['party_id']!, _partyIdMeta));
+    } else if (isInserting) {
+      context.missing(_partyIdMeta);
+    }
+    if (data.containsKey('entry_type')) {
+      context.handle(_entryTypeMeta,
+          entryType.isAcceptableOrUnknown(data['entry_type']!, _entryTypeMeta));
+    } else if (isInserting) {
+      context.missing(_entryTypeMeta);
+    }
+    if (data.containsKey('amount_paisa')) {
+      context.handle(
+          _amountPaisaMeta,
+          amountPaisa.isAcceptableOrUnknown(
+              data['amount_paisa']!, _amountPaisaMeta));
+    } else if (isInserting) {
+      context.missing(_amountPaisaMeta);
+    }
+    if (data.containsKey('balance_after_paisa')) {
+      context.handle(
+          _balanceAfterPaisaMeta,
+          balanceAfterPaisa.isAcceptableOrUnknown(
+              data['balance_after_paisa']!, _balanceAfterPaisaMeta));
+    } else if (isInserting) {
+      context.missing(_balanceAfterPaisaMeta);
+    }
+    if (data.containsKey('ref_id')) {
+      context.handle(
+          _refIdMeta, refId.isAcceptableOrUnknown(data['ref_id']!, _refIdMeta));
+    }
+    if (data.containsKey('ref_number')) {
+      context.handle(_refNumberMeta,
+          refNumber.isAcceptableOrUnknown(data['ref_number']!, _refNumberMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('entry_date')) {
+      context.handle(_entryDateMeta,
+          entryDate.isAcceptableOrUnknown(data['entry_date']!, _entryDateMeta));
+    } else if (isInserting) {
+      context.missing(_entryDateMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PartyLedgerData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PartyLedgerData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      syncStatus: $PartyLedgerTable.$convertersyncStatus.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}sync_status'])!),
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      partyType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}party_type'])!,
+      partyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}party_id'])!,
+      entryType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}entry_type'])!,
+      amountPaisa: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}amount_paisa'])!,
+      balanceAfterPaisa: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}balance_after_paisa'])!,
+      refId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}ref_id']),
+      refNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}ref_number']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      entryDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}entry_date'])!,
+    );
+  }
+
+  @override
+  $PartyLedgerTable createAlias(String alias) {
+    return $PartyLedgerTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+}
+
+class PartyLedgerData extends DataClass implements Insertable<PartyLedgerData> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final SyncStatus syncStatus;
+  final String? remoteId;
+  final bool isDeleted;
+
+  /// 'customer' or 'supplier'
+  final String partyType;
+
+  /// Reference to Customers.id or Suppliers.id
+  final String partyId;
+
+  /// Transaction type: 'sale_credit', 'purchase_credit', 'payment_received', 'payment_made', 'opening_balance', 'adjustment'
+  final String entryType;
+
+  /// Transaction amount in integer paisa (always positive)
+  final int amountPaisa;
+
+  /// Running balance in integer paisa immediately after this transaction.
+  /// For customers: positive means customer owes shopkeeper (Receivable / लिन बाँकी).
+  /// For suppliers: positive means shopkeeper owes supplier (Payable / तिर्न बाँकी).
+  final int balanceAfterPaisa;
+
+  /// Reference to Sales.id, Purchases.id, or PartyPayments.id
+  final String? refId;
+
+  /// Reference bill number or receipt number (e.g. 'SB-2082-0001', 'REC-001')
+  final String? refNumber;
+
+  /// Optional remarks or notes (कैफियत)
+  final String? notes;
+
+  /// Date and time of the transaction (stored in UTC)
+  final DateTime entryDate;
+  const PartyLedgerData(
+      {required this.id,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.syncStatus,
+      this.remoteId,
+      required this.isDeleted,
+      required this.partyType,
+      required this.partyId,
+      required this.entryType,
+      required this.amountPaisa,
+      required this.balanceAfterPaisa,
+      this.refId,
+      this.refNumber,
+      this.notes,
+      required this.entryDate});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    {
+      map['sync_status'] = Variable<String>(
+          $PartyLedgerTable.$convertersyncStatus.toSql(syncStatus));
+    }
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['party_type'] = Variable<String>(partyType);
+    map['party_id'] = Variable<String>(partyId);
+    map['entry_type'] = Variable<String>(entryType);
+    map['amount_paisa'] = Variable<int>(amountPaisa);
+    map['balance_after_paisa'] = Variable<int>(balanceAfterPaisa);
+    if (!nullToAbsent || refId != null) {
+      map['ref_id'] = Variable<String>(refId);
+    }
+    if (!nullToAbsent || refNumber != null) {
+      map['ref_number'] = Variable<String>(refNumber);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['entry_date'] = Variable<DateTime>(entryDate);
+    return map;
+  }
+
+  PartyLedgerCompanion toCompanion(bool nullToAbsent) {
+    return PartyLedgerCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDeleted: Value(isDeleted),
+      partyType: Value(partyType),
+      partyId: Value(partyId),
+      entryType: Value(entryType),
+      amountPaisa: Value(amountPaisa),
+      balanceAfterPaisa: Value(balanceAfterPaisa),
+      refId:
+          refId == null && nullToAbsent ? const Value.absent() : Value(refId),
+      refNumber: refNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(refNumber),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      entryDate: Value(entryDate),
+    );
+  }
+
+  factory PartyLedgerData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PartyLedgerData(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: $PartyLedgerTable.$convertersyncStatus
+          .fromJson(serializer.fromJson<String>(json['syncStatus'])),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      partyType: serializer.fromJson<String>(json['partyType']),
+      partyId: serializer.fromJson<String>(json['partyId']),
+      entryType: serializer.fromJson<String>(json['entryType']),
+      amountPaisa: serializer.fromJson<int>(json['amountPaisa']),
+      balanceAfterPaisa: serializer.fromJson<int>(json['balanceAfterPaisa']),
+      refId: serializer.fromJson<String?>(json['refId']),
+      refNumber: serializer.fromJson<String?>(json['refNumber']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      entryDate: serializer.fromJson<DateTime>(json['entryDate']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<String>(
+          $PartyLedgerTable.$convertersyncStatus.toJson(syncStatus)),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'partyType': serializer.toJson<String>(partyType),
+      'partyId': serializer.toJson<String>(partyId),
+      'entryType': serializer.toJson<String>(entryType),
+      'amountPaisa': serializer.toJson<int>(amountPaisa),
+      'balanceAfterPaisa': serializer.toJson<int>(balanceAfterPaisa),
+      'refId': serializer.toJson<String?>(refId),
+      'refNumber': serializer.toJson<String?>(refNumber),
+      'notes': serializer.toJson<String?>(notes),
+      'entryDate': serializer.toJson<DateTime>(entryDate),
+    };
+  }
+
+  PartyLedgerData copyWith(
+          {String? id,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          SyncStatus? syncStatus,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDeleted,
+          String? partyType,
+          String? partyId,
+          String? entryType,
+          int? amountPaisa,
+          int? balanceAfterPaisa,
+          Value<String?> refId = const Value.absent(),
+          Value<String?> refNumber = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          DateTime? entryDate}) =>
+      PartyLedgerData(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        syncStatus: syncStatus ?? this.syncStatus,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDeleted: isDeleted ?? this.isDeleted,
+        partyType: partyType ?? this.partyType,
+        partyId: partyId ?? this.partyId,
+        entryType: entryType ?? this.entryType,
+        amountPaisa: amountPaisa ?? this.amountPaisa,
+        balanceAfterPaisa: balanceAfterPaisa ?? this.balanceAfterPaisa,
+        refId: refId.present ? refId.value : this.refId,
+        refNumber: refNumber.present ? refNumber.value : this.refNumber,
+        notes: notes.present ? notes.value : this.notes,
+        entryDate: entryDate ?? this.entryDate,
+      );
+  PartyLedgerData copyWithCompanion(PartyLedgerCompanion data) {
+    return PartyLedgerData(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      partyType: data.partyType.present ? data.partyType.value : this.partyType,
+      partyId: data.partyId.present ? data.partyId.value : this.partyId,
+      entryType: data.entryType.present ? data.entryType.value : this.entryType,
+      amountPaisa:
+          data.amountPaisa.present ? data.amountPaisa.value : this.amountPaisa,
+      balanceAfterPaisa: data.balanceAfterPaisa.present
+          ? data.balanceAfterPaisa.value
+          : this.balanceAfterPaisa,
+      refId: data.refId.present ? data.refId.value : this.refId,
+      refNumber: data.refNumber.present ? data.refNumber.value : this.refNumber,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      entryDate: data.entryDate.present ? data.entryDate.value : this.entryDate,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PartyLedgerData(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('entryType: $entryType, ')
+          ..write('amountPaisa: $amountPaisa, ')
+          ..write('balanceAfterPaisa: $balanceAfterPaisa, ')
+          ..write('refId: $refId, ')
+          ..write('refNumber: $refNumber, ')
+          ..write('notes: $notes, ')
+          ..write('entryDate: $entryDate')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      createdAt,
+      updatedAt,
+      syncStatus,
+      remoteId,
+      isDeleted,
+      partyType,
+      partyId,
+      entryType,
+      amountPaisa,
+      balanceAfterPaisa,
+      refId,
+      refNumber,
+      notes,
+      entryDate);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PartyLedgerData &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.isDeleted == this.isDeleted &&
+          other.partyType == this.partyType &&
+          other.partyId == this.partyId &&
+          other.entryType == this.entryType &&
+          other.amountPaisa == this.amountPaisa &&
+          other.balanceAfterPaisa == this.balanceAfterPaisa &&
+          other.refId == this.refId &&
+          other.refNumber == this.refNumber &&
+          other.notes == this.notes &&
+          other.entryDate == this.entryDate);
+}
+
+class PartyLedgerCompanion extends UpdateCompanion<PartyLedgerData> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<SyncStatus> syncStatus;
+  final Value<String?> remoteId;
+  final Value<bool> isDeleted;
+  final Value<String> partyType;
+  final Value<String> partyId;
+  final Value<String> entryType;
+  final Value<int> amountPaisa;
+  final Value<int> balanceAfterPaisa;
+  final Value<String?> refId;
+  final Value<String?> refNumber;
+  final Value<String?> notes;
+  final Value<DateTime> entryDate;
+  final Value<int> rowid;
+  const PartyLedgerCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.partyType = const Value.absent(),
+    this.partyId = const Value.absent(),
+    this.entryType = const Value.absent(),
+    this.amountPaisa = const Value.absent(),
+    this.balanceAfterPaisa = const Value.absent(),
+    this.refId = const Value.absent(),
+    this.refNumber = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.entryDate = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PartyLedgerCompanion.insert({
+    required String id,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required String partyType,
+    required String partyId,
+    required String entryType,
+    required int amountPaisa,
+    required int balanceAfterPaisa,
+    this.refId = const Value.absent(),
+    this.refNumber = const Value.absent(),
+    this.notes = const Value.absent(),
+    required DateTime entryDate,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        partyType = Value(partyType),
+        partyId = Value(partyId),
+        entryType = Value(entryType),
+        amountPaisa = Value(amountPaisa),
+        balanceAfterPaisa = Value(balanceAfterPaisa),
+        entryDate = Value(entryDate);
+  static Insertable<PartyLedgerData> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<bool>? isDeleted,
+    Expression<String>? partyType,
+    Expression<String>? partyId,
+    Expression<String>? entryType,
+    Expression<int>? amountPaisa,
+    Expression<int>? balanceAfterPaisa,
+    Expression<String>? refId,
+    Expression<String>? refNumber,
+    Expression<String>? notes,
+    Expression<DateTime>? entryDate,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (partyType != null) 'party_type': partyType,
+      if (partyId != null) 'party_id': partyId,
+      if (entryType != null) 'entry_type': entryType,
+      if (amountPaisa != null) 'amount_paisa': amountPaisa,
+      if (balanceAfterPaisa != null) 'balance_after_paisa': balanceAfterPaisa,
+      if (refId != null) 'ref_id': refId,
+      if (refNumber != null) 'ref_number': refNumber,
+      if (notes != null) 'notes': notes,
+      if (entryDate != null) 'entry_date': entryDate,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PartyLedgerCompanion copyWith(
+      {Value<String>? id,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<SyncStatus>? syncStatus,
+      Value<String?>? remoteId,
+      Value<bool>? isDeleted,
+      Value<String>? partyType,
+      Value<String>? partyId,
+      Value<String>? entryType,
+      Value<int>? amountPaisa,
+      Value<int>? balanceAfterPaisa,
+      Value<String?>? refId,
+      Value<String?>? refNumber,
+      Value<String?>? notes,
+      Value<DateTime>? entryDate,
+      Value<int>? rowid}) {
+    return PartyLedgerCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      partyType: partyType ?? this.partyType,
+      partyId: partyId ?? this.partyId,
+      entryType: entryType ?? this.entryType,
+      amountPaisa: amountPaisa ?? this.amountPaisa,
+      balanceAfterPaisa: balanceAfterPaisa ?? this.balanceAfterPaisa,
+      refId: refId ?? this.refId,
+      refNumber: refNumber ?? this.refNumber,
+      notes: notes ?? this.notes,
+      entryDate: entryDate ?? this.entryDate,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+          $PartyLedgerTable.$convertersyncStatus.toSql(syncStatus.value));
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (partyType.present) {
+      map['party_type'] = Variable<String>(partyType.value);
+    }
+    if (partyId.present) {
+      map['party_id'] = Variable<String>(partyId.value);
+    }
+    if (entryType.present) {
+      map['entry_type'] = Variable<String>(entryType.value);
+    }
+    if (amountPaisa.present) {
+      map['amount_paisa'] = Variable<int>(amountPaisa.value);
+    }
+    if (balanceAfterPaisa.present) {
+      map['balance_after_paisa'] = Variable<int>(balanceAfterPaisa.value);
+    }
+    if (refId.present) {
+      map['ref_id'] = Variable<String>(refId.value);
+    }
+    if (refNumber.present) {
+      map['ref_number'] = Variable<String>(refNumber.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (entryDate.present) {
+      map['entry_date'] = Variable<DateTime>(entryDate.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PartyLedgerCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('entryType: $entryType, ')
+          ..write('amountPaisa: $amountPaisa, ')
+          ..write('balanceAfterPaisa: $balanceAfterPaisa, ')
+          ..write('refId: $refId, ')
+          ..write('refNumber: $refNumber, ')
+          ..write('notes: $notes, ')
+          ..write('entryDate: $entryDate, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PartyPaymentsTable extends PartyPayments
+    with TableInfo<$PartyPaymentsTable, PartyPayment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PartyPaymentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _syncStatusMeta =
+      const VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus, String> syncStatus =
+      GeneratedColumn<String>('sync_status', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(SyncStatus.pending.name))
+          .withConverter<SyncStatus>($PartyPaymentsTable.$convertersyncStatus);
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _partyTypeMeta =
+      const VerificationMeta('partyType');
+  @override
+  late final GeneratedColumn<String> partyType = GeneratedColumn<String>(
+      'party_type', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 20),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _partyIdMeta =
+      const VerificationMeta('partyId');
+  @override
+  late final GeneratedColumn<String> partyId = GeneratedColumn<String>(
+      'party_id', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _amountPaisaMeta =
+      const VerificationMeta('amountPaisa');
+  @override
+  late final GeneratedColumn<int> amountPaisa = GeneratedColumn<int>(
+      'amount_paisa', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _paymentModeMeta =
+      const VerificationMeta('paymentMode');
+  @override
+  late final GeneratedColumn<String> paymentMode = GeneratedColumn<String>(
+      'payment_mode', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 32),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _receiptNumberMeta =
+      const VerificationMeta('receiptNumber');
+  @override
+  late final GeneratedColumn<String> receiptNumber = GeneratedColumn<String>(
+      'receipt_number', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 64),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _paymentDateMeta =
+      const VerificationMeta('paymentDate');
+  @override
+  late final GeneratedColumn<DateTime> paymentDate = GeneratedColumn<DateTime>(
+      'payment_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        createdAt,
+        updatedAt,
+        syncStatus,
+        remoteId,
+        isDeleted,
+        partyType,
+        partyId,
+        amountPaisa,
+        paymentMode,
+        receiptNumber,
+        paymentDate,
+        notes
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'party_payments';
+  @override
+  VerificationContext validateIntegrity(Insertable<PartyPayment> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    context.handle(_syncStatusMeta, const VerificationResult.success());
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('party_type')) {
+      context.handle(_partyTypeMeta,
+          partyType.isAcceptableOrUnknown(data['party_type']!, _partyTypeMeta));
+    } else if (isInserting) {
+      context.missing(_partyTypeMeta);
+    }
+    if (data.containsKey('party_id')) {
+      context.handle(_partyIdMeta,
+          partyId.isAcceptableOrUnknown(data['party_id']!, _partyIdMeta));
+    } else if (isInserting) {
+      context.missing(_partyIdMeta);
+    }
+    if (data.containsKey('amount_paisa')) {
+      context.handle(
+          _amountPaisaMeta,
+          amountPaisa.isAcceptableOrUnknown(
+              data['amount_paisa']!, _amountPaisaMeta));
+    } else if (isInserting) {
+      context.missing(_amountPaisaMeta);
+    }
+    if (data.containsKey('payment_mode')) {
+      context.handle(
+          _paymentModeMeta,
+          paymentMode.isAcceptableOrUnknown(
+              data['payment_mode']!, _paymentModeMeta));
+    } else if (isInserting) {
+      context.missing(_paymentModeMeta);
+    }
+    if (data.containsKey('receipt_number')) {
+      context.handle(
+          _receiptNumberMeta,
+          receiptNumber.isAcceptableOrUnknown(
+              data['receipt_number']!, _receiptNumberMeta));
+    } else if (isInserting) {
+      context.missing(_receiptNumberMeta);
+    }
+    if (data.containsKey('payment_date')) {
+      context.handle(
+          _paymentDateMeta,
+          paymentDate.isAcceptableOrUnknown(
+              data['payment_date']!, _paymentDateMeta));
+    } else if (isInserting) {
+      context.missing(_paymentDateMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PartyPayment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PartyPayment(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      syncStatus: $PartyPaymentsTable.$convertersyncStatus.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}sync_status'])!),
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      partyType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}party_type'])!,
+      partyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}party_id'])!,
+      amountPaisa: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}amount_paisa'])!,
+      paymentMode: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payment_mode'])!,
+      receiptNumber: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}receipt_number'])!,
+      paymentDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}payment_date'])!,
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+    );
+  }
+
+  @override
+  $PartyPaymentsTable createAlias(String alias) {
+    return $PartyPaymentsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+}
+
+class PartyPayment extends DataClass implements Insertable<PartyPayment> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final SyncStatus syncStatus;
+  final String? remoteId;
+  final bool isDeleted;
+
+  /// 'customer' (received from customer) or 'supplier' (paid to supplier)
+  final String partyType;
+
+  /// Reference to Customers.id or Suppliers.id
+  final String partyId;
+
+  /// Amount settled in integer paisa
+  final int amountPaisa;
+
+  /// Payment mode: 'cash', 'fonepay', 'bank_transfer', 'cheque'
+  final String paymentMode;
+
+  /// Unique serial receipt number (e.g. 'REC-2082-0001')
+  final String receiptNumber;
+
+  /// Transaction timestamp (stored in UTC)
+  final DateTime paymentDate;
+
+  /// Optional remarks or notes
+  final String? notes;
+  const PartyPayment(
+      {required this.id,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.syncStatus,
+      this.remoteId,
+      required this.isDeleted,
+      required this.partyType,
+      required this.partyId,
+      required this.amountPaisa,
+      required this.paymentMode,
+      required this.receiptNumber,
+      required this.paymentDate,
+      this.notes});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    {
+      map['sync_status'] = Variable<String>(
+          $PartyPaymentsTable.$convertersyncStatus.toSql(syncStatus));
+    }
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['party_type'] = Variable<String>(partyType);
+    map['party_id'] = Variable<String>(partyId);
+    map['amount_paisa'] = Variable<int>(amountPaisa);
+    map['payment_mode'] = Variable<String>(paymentMode);
+    map['receipt_number'] = Variable<String>(receiptNumber);
+    map['payment_date'] = Variable<DateTime>(paymentDate);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    return map;
+  }
+
+  PartyPaymentsCompanion toCompanion(bool nullToAbsent) {
+    return PartyPaymentsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDeleted: Value(isDeleted),
+      partyType: Value(partyType),
+      partyId: Value(partyId),
+      amountPaisa: Value(amountPaisa),
+      paymentMode: Value(paymentMode),
+      receiptNumber: Value(receiptNumber),
+      paymentDate: Value(paymentDate),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+    );
+  }
+
+  factory PartyPayment.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PartyPayment(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: $PartyPaymentsTable.$convertersyncStatus
+          .fromJson(serializer.fromJson<String>(json['syncStatus'])),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      partyType: serializer.fromJson<String>(json['partyType']),
+      partyId: serializer.fromJson<String>(json['partyId']),
+      amountPaisa: serializer.fromJson<int>(json['amountPaisa']),
+      paymentMode: serializer.fromJson<String>(json['paymentMode']),
+      receiptNumber: serializer.fromJson<String>(json['receiptNumber']),
+      paymentDate: serializer.fromJson<DateTime>(json['paymentDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<String>(
+          $PartyPaymentsTable.$convertersyncStatus.toJson(syncStatus)),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'partyType': serializer.toJson<String>(partyType),
+      'partyId': serializer.toJson<String>(partyId),
+      'amountPaisa': serializer.toJson<int>(amountPaisa),
+      'paymentMode': serializer.toJson<String>(paymentMode),
+      'receiptNumber': serializer.toJson<String>(receiptNumber),
+      'paymentDate': serializer.toJson<DateTime>(paymentDate),
+      'notes': serializer.toJson<String?>(notes),
+    };
+  }
+
+  PartyPayment copyWith(
+          {String? id,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          SyncStatus? syncStatus,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDeleted,
+          String? partyType,
+          String? partyId,
+          int? amountPaisa,
+          String? paymentMode,
+          String? receiptNumber,
+          DateTime? paymentDate,
+          Value<String?> notes = const Value.absent()}) =>
+      PartyPayment(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        syncStatus: syncStatus ?? this.syncStatus,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDeleted: isDeleted ?? this.isDeleted,
+        partyType: partyType ?? this.partyType,
+        partyId: partyId ?? this.partyId,
+        amountPaisa: amountPaisa ?? this.amountPaisa,
+        paymentMode: paymentMode ?? this.paymentMode,
+        receiptNumber: receiptNumber ?? this.receiptNumber,
+        paymentDate: paymentDate ?? this.paymentDate,
+        notes: notes.present ? notes.value : this.notes,
+      );
+  PartyPayment copyWithCompanion(PartyPaymentsCompanion data) {
+    return PartyPayment(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      partyType: data.partyType.present ? data.partyType.value : this.partyType,
+      partyId: data.partyId.present ? data.partyId.value : this.partyId,
+      amountPaisa:
+          data.amountPaisa.present ? data.amountPaisa.value : this.amountPaisa,
+      paymentMode:
+          data.paymentMode.present ? data.paymentMode.value : this.paymentMode,
+      receiptNumber: data.receiptNumber.present
+          ? data.receiptNumber.value
+          : this.receiptNumber,
+      paymentDate:
+          data.paymentDate.present ? data.paymentDate.value : this.paymentDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PartyPayment(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('amountPaisa: $amountPaisa, ')
+          ..write('paymentMode: $paymentMode, ')
+          ..write('receiptNumber: $receiptNumber, ')
+          ..write('paymentDate: $paymentDate, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      createdAt,
+      updatedAt,
+      syncStatus,
+      remoteId,
+      isDeleted,
+      partyType,
+      partyId,
+      amountPaisa,
+      paymentMode,
+      receiptNumber,
+      paymentDate,
+      notes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PartyPayment &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.isDeleted == this.isDeleted &&
+          other.partyType == this.partyType &&
+          other.partyId == this.partyId &&
+          other.amountPaisa == this.amountPaisa &&
+          other.paymentMode == this.paymentMode &&
+          other.receiptNumber == this.receiptNumber &&
+          other.paymentDate == this.paymentDate &&
+          other.notes == this.notes);
+}
+
+class PartyPaymentsCompanion extends UpdateCompanion<PartyPayment> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<SyncStatus> syncStatus;
+  final Value<String?> remoteId;
+  final Value<bool> isDeleted;
+  final Value<String> partyType;
+  final Value<String> partyId;
+  final Value<int> amountPaisa;
+  final Value<String> paymentMode;
+  final Value<String> receiptNumber;
+  final Value<DateTime> paymentDate;
+  final Value<String?> notes;
+  final Value<int> rowid;
+  const PartyPaymentsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.partyType = const Value.absent(),
+    this.partyId = const Value.absent(),
+    this.amountPaisa = const Value.absent(),
+    this.paymentMode = const Value.absent(),
+    this.receiptNumber = const Value.absent(),
+    this.paymentDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PartyPaymentsCompanion.insert({
+    required String id,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required String partyType,
+    required String partyId,
+    required int amountPaisa,
+    required String paymentMode,
+    required String receiptNumber,
+    required DateTime paymentDate,
+    this.notes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        partyType = Value(partyType),
+        partyId = Value(partyId),
+        amountPaisa = Value(amountPaisa),
+        paymentMode = Value(paymentMode),
+        receiptNumber = Value(receiptNumber),
+        paymentDate = Value(paymentDate);
+  static Insertable<PartyPayment> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<bool>? isDeleted,
+    Expression<String>? partyType,
+    Expression<String>? partyId,
+    Expression<int>? amountPaisa,
+    Expression<String>? paymentMode,
+    Expression<String>? receiptNumber,
+    Expression<DateTime>? paymentDate,
+    Expression<String>? notes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (partyType != null) 'party_type': partyType,
+      if (partyId != null) 'party_id': partyId,
+      if (amountPaisa != null) 'amount_paisa': amountPaisa,
+      if (paymentMode != null) 'payment_mode': paymentMode,
+      if (receiptNumber != null) 'receipt_number': receiptNumber,
+      if (paymentDate != null) 'payment_date': paymentDate,
+      if (notes != null) 'notes': notes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PartyPaymentsCompanion copyWith(
+      {Value<String>? id,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<SyncStatus>? syncStatus,
+      Value<String?>? remoteId,
+      Value<bool>? isDeleted,
+      Value<String>? partyType,
+      Value<String>? partyId,
+      Value<int>? amountPaisa,
+      Value<String>? paymentMode,
+      Value<String>? receiptNumber,
+      Value<DateTime>? paymentDate,
+      Value<String?>? notes,
+      Value<int>? rowid}) {
+    return PartyPaymentsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      partyType: partyType ?? this.partyType,
+      partyId: partyId ?? this.partyId,
+      amountPaisa: amountPaisa ?? this.amountPaisa,
+      paymentMode: paymentMode ?? this.paymentMode,
+      receiptNumber: receiptNumber ?? this.receiptNumber,
+      paymentDate: paymentDate ?? this.paymentDate,
+      notes: notes ?? this.notes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+          $PartyPaymentsTable.$convertersyncStatus.toSql(syncStatus.value));
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (partyType.present) {
+      map['party_type'] = Variable<String>(partyType.value);
+    }
+    if (partyId.present) {
+      map['party_id'] = Variable<String>(partyId.value);
+    }
+    if (amountPaisa.present) {
+      map['amount_paisa'] = Variable<int>(amountPaisa.value);
+    }
+    if (paymentMode.present) {
+      map['payment_mode'] = Variable<String>(paymentMode.value);
+    }
+    if (receiptNumber.present) {
+      map['receipt_number'] = Variable<String>(receiptNumber.value);
+    }
+    if (paymentDate.present) {
+      map['payment_date'] = Variable<DateTime>(paymentDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PartyPaymentsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('partyType: $partyType, ')
+          ..write('partyId: $partyId, ')
+          ..write('amountPaisa: $amountPaisa, ')
+          ..write('paymentMode: $paymentMode, ')
+          ..write('receiptNumber: $receiptNumber, ')
+          ..write('paymentDate: $paymentDate, ')
+          ..write('notes: $notes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10367,6 +11796,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BillMetadataTable billMetadata = $BillMetadataTable(this);
   late final $BillSequenceTable billSequence = $BillSequenceTable(this);
   late final $BackupLogsTable backupLogs = $BackupLogsTable(this);
+  late final $PartyLedgerTable partyLedger = $PartyLedgerTable(this);
+  late final $PartyPaymentsTable partyPayments = $PartyPaymentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -10387,7 +11818,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         saleItems,
         billMetadata,
         billSequence,
-        backupLogs
+        backupLogs,
+        partyLedger,
+        partyPayments
       ];
 }
 
@@ -14485,6 +15918,554 @@ class $$BackupLogsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$PartyLedgerTableCreateCompanionBuilder = PartyLedgerCompanion
+    Function({
+  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  required String partyType,
+  required String partyId,
+  required String entryType,
+  required int amountPaisa,
+  required int balanceAfterPaisa,
+  Value<String?> refId,
+  Value<String?> refNumber,
+  Value<String?> notes,
+  required DateTime entryDate,
+  Value<int> rowid,
+});
+typedef $$PartyLedgerTableUpdateCompanionBuilder = PartyLedgerCompanion
+    Function({
+  Value<String> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<String> partyType,
+  Value<String> partyId,
+  Value<String> entryType,
+  Value<int> amountPaisa,
+  Value<int> balanceAfterPaisa,
+  Value<String?> refId,
+  Value<String?> refNumber,
+  Value<String?> notes,
+  Value<DateTime> entryDate,
+  Value<int> rowid,
+});
+
+class $$PartyLedgerTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PartyLedgerTable,
+    PartyLedgerData,
+    $$PartyLedgerTableFilterComposer,
+    $$PartyLedgerTableOrderingComposer,
+    $$PartyLedgerTableCreateCompanionBuilder,
+    $$PartyLedgerTableUpdateCompanionBuilder> {
+  $$PartyLedgerTableTableManager(_$AppDatabase db, $PartyLedgerTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$PartyLedgerTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$PartyLedgerTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> partyType = const Value.absent(),
+            Value<String> partyId = const Value.absent(),
+            Value<String> entryType = const Value.absent(),
+            Value<int> amountPaisa = const Value.absent(),
+            Value<int> balanceAfterPaisa = const Value.absent(),
+            Value<String?> refId = const Value.absent(),
+            Value<String?> refNumber = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<DateTime> entryDate = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PartyLedgerCompanion(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            partyType: partyType,
+            partyId: partyId,
+            entryType: entryType,
+            amountPaisa: amountPaisa,
+            balanceAfterPaisa: balanceAfterPaisa,
+            refId: refId,
+            refNumber: refNumber,
+            notes: notes,
+            entryDate: entryDate,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String partyType,
+            required String partyId,
+            required String entryType,
+            required int amountPaisa,
+            required int balanceAfterPaisa,
+            Value<String?> refId = const Value.absent(),
+            Value<String?> refNumber = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            required DateTime entryDate,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PartyLedgerCompanion.insert(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            partyType: partyType,
+            partyId: partyId,
+            entryType: entryType,
+            amountPaisa: amountPaisa,
+            balanceAfterPaisa: balanceAfterPaisa,
+            refId: refId,
+            refNumber: refNumber,
+            notes: notes,
+            entryDate: entryDate,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$PartyLedgerTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $PartyLedgerTable> {
+  $$PartyLedgerTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<SyncStatus, SyncStatus, String>
+      get syncStatus => $state.composableBuilder(
+          column: $state.table.syncStatus,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get partyType => $state.composableBuilder(
+      column: $state.table.partyType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get partyId => $state.composableBuilder(
+      column: $state.table.partyId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get entryType => $state.composableBuilder(
+      column: $state.table.entryType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get amountPaisa => $state.composableBuilder(
+      column: $state.table.amountPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get balanceAfterPaisa => $state.composableBuilder(
+      column: $state.table.balanceAfterPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get refId => $state.composableBuilder(
+      column: $state.table.refId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get refNumber => $state.composableBuilder(
+      column: $state.table.refNumber,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get entryDate => $state.composableBuilder(
+      column: $state.table.entryDate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$PartyLedgerTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $PartyLedgerTable> {
+  $$PartyLedgerTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get syncStatus => $state.composableBuilder(
+      column: $state.table.syncStatus,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get partyType => $state.composableBuilder(
+      column: $state.table.partyType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get partyId => $state.composableBuilder(
+      column: $state.table.partyId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get entryType => $state.composableBuilder(
+      column: $state.table.entryType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get amountPaisa => $state.composableBuilder(
+      column: $state.table.amountPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get balanceAfterPaisa => $state.composableBuilder(
+      column: $state.table.balanceAfterPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get refId => $state.composableBuilder(
+      column: $state.table.refId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get refNumber => $state.composableBuilder(
+      column: $state.table.refNumber,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get entryDate => $state.composableBuilder(
+      column: $state.table.entryDate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$PartyPaymentsTableCreateCompanionBuilder = PartyPaymentsCompanion
+    Function({
+  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  required String partyType,
+  required String partyId,
+  required int amountPaisa,
+  required String paymentMode,
+  required String receiptNumber,
+  required DateTime paymentDate,
+  Value<String?> notes,
+  Value<int> rowid,
+});
+typedef $$PartyPaymentsTableUpdateCompanionBuilder = PartyPaymentsCompanion
+    Function({
+  Value<String> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<String> partyType,
+  Value<String> partyId,
+  Value<int> amountPaisa,
+  Value<String> paymentMode,
+  Value<String> receiptNumber,
+  Value<DateTime> paymentDate,
+  Value<String?> notes,
+  Value<int> rowid,
+});
+
+class $$PartyPaymentsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PartyPaymentsTable,
+    PartyPayment,
+    $$PartyPaymentsTableFilterComposer,
+    $$PartyPaymentsTableOrderingComposer,
+    $$PartyPaymentsTableCreateCompanionBuilder,
+    $$PartyPaymentsTableUpdateCompanionBuilder> {
+  $$PartyPaymentsTableTableManager(_$AppDatabase db, $PartyPaymentsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$PartyPaymentsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$PartyPaymentsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> partyType = const Value.absent(),
+            Value<String> partyId = const Value.absent(),
+            Value<int> amountPaisa = const Value.absent(),
+            Value<String> paymentMode = const Value.absent(),
+            Value<String> receiptNumber = const Value.absent(),
+            Value<DateTime> paymentDate = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PartyPaymentsCompanion(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            partyType: partyType,
+            partyId: partyId,
+            amountPaisa: amountPaisa,
+            paymentMode: paymentMode,
+            receiptNumber: receiptNumber,
+            paymentDate: paymentDate,
+            notes: notes,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String partyType,
+            required String partyId,
+            required int amountPaisa,
+            required String paymentMode,
+            required String receiptNumber,
+            required DateTime paymentDate,
+            Value<String?> notes = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PartyPaymentsCompanion.insert(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            partyType: partyType,
+            partyId: partyId,
+            amountPaisa: amountPaisa,
+            paymentMode: paymentMode,
+            receiptNumber: receiptNumber,
+            paymentDate: paymentDate,
+            notes: notes,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$PartyPaymentsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $PartyPaymentsTable> {
+  $$PartyPaymentsTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<SyncStatus, SyncStatus, String>
+      get syncStatus => $state.composableBuilder(
+          column: $state.table.syncStatus,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get partyType => $state.composableBuilder(
+      column: $state.table.partyType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get partyId => $state.composableBuilder(
+      column: $state.table.partyId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get amountPaisa => $state.composableBuilder(
+      column: $state.table.amountPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get paymentMode => $state.composableBuilder(
+      column: $state.table.paymentMode,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get receiptNumber => $state.composableBuilder(
+      column: $state.table.receiptNumber,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get paymentDate => $state.composableBuilder(
+      column: $state.table.paymentDate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$PartyPaymentsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $PartyPaymentsTable> {
+  $$PartyPaymentsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get syncStatus => $state.composableBuilder(
+      column: $state.table.syncStatus,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get partyType => $state.composableBuilder(
+      column: $state.table.partyType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get partyId => $state.composableBuilder(
+      column: $state.table.partyId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get amountPaisa => $state.composableBuilder(
+      column: $state.table.amountPaisa,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get paymentMode => $state.composableBuilder(
+      column: $state.table.paymentMode,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get receiptNumber => $state.composableBuilder(
+      column: $state.table.receiptNumber,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get paymentDate => $state.composableBuilder(
+      column: $state.table.paymentDate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get notes => $state.composableBuilder(
+      column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -14520,4 +16501,8 @@ class $AppDatabaseManager {
       $$BillSequenceTableTableManager(_db, _db.billSequence);
   $$BackupLogsTableTableManager get backupLogs =>
       $$BackupLogsTableTableManager(_db, _db.backupLogs);
+  $$PartyLedgerTableTableManager get partyLedger =>
+      $$PartyLedgerTableTableManager(_db, _db.partyLedger);
+  $$PartyPaymentsTableTableManager get partyPayments =>
+      $$PartyPaymentsTableTableManager(_db, _db.partyPayments);
 }

@@ -9,6 +9,7 @@ import '../../features/billing/presentation/pos_billing_screen.dart';
 import '../../features/billing/presentation/sales_history_screen.dart';
 import '../../features/purchase/presentation/purchase_screen.dart';
 import '../../features/inventory/presentation/inventory_screen.dart';
+import '../../features/khata/presentation/khata_screen.dart';
 import '../../features/business/presentation/edit_business_screen.dart';
 import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -42,6 +43,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
       const SalesHistoryScreen(),
       const PurchaseScreen(),
       const InventoryScreen(),
+      const KhataScreen(),
       const EditBusinessScreen(),
       const BackupScreen(),
       const SettingsScreen(),
@@ -151,6 +153,11 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                 icon: Icon(Icons.inventory_2_outlined),
                 selectedIcon: Icon(Icons.inventory_2),
                 label: Text('Inventory (सामान)'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.menu_book_outlined),
+                selectedIcon: Icon(Icons.menu_book),
+                label: Text('Khata (उधारो खाता)'),
               ),
               NavigationRailDestination(
                 icon: Icon(Icons.business_outlined),

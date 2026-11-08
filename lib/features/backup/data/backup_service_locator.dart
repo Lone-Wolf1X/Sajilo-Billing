@@ -125,3 +125,4 @@ final recentBackupLogsProvider = StreamProvider.autoDispose((ref) {
   final repo = ref.watch(backupRepositoryProvider);
   return repo.watchRecentLogs(limit: 20);
 });
+

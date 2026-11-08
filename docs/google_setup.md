@@ -114,3 +114,4 @@ The app's `GoogleAuthService` first checks `--dart-define` values; if omitted, i
    - The `refresh_token` is stored exclusively in OS keychain / encrypted storage via `flutter_secure_storage`.
    - It is never stored in SQLite, log files, or plaintext settings.
    - The `access_token` is kept in volatile in-memory cache and automatically refreshed 5 minutes before expiry.
+

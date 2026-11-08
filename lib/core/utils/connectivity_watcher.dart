@@ -49,3 +49,4 @@ final isOnlineFutureProvider = FutureProvider<bool>((ref) async {
   final watcher = ref.watch(connectivityWatcherProvider);
   return await watcher.isConnected();
 });
+

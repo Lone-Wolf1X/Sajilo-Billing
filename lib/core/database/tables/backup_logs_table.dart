@@ -27,3 +27,4 @@ class BackupLogs extends Table with SyncTableMixin {
   /// Connected Google account email if location is 'drive'.
   TextColumn get googleAccountEmail => text().nullable()();
 }
+

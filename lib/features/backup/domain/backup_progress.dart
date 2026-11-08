@@ -29,3 +29,4 @@ class BackupProgress {
   @override
   String toString() => 'BackupProgress($step, ${(percentage * 100).toStringAsFixed(0)}%, $message)';
 }
+

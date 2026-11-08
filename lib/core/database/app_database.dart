@@ -21,6 +21,8 @@ import 'tables/sale_items_table.dart';
 import 'tables/bill_metadata_table.dart';
 import 'tables/bill_sequence_table.dart';
 import 'tables/backup_logs_table.dart';
+import 'tables/party_ledger_table.dart';
+import 'tables/party_payments_table.dart';
 
 part 'app_database.g.dart';
 
@@ -41,12 +43,14 @@ part 'app_database.g.dart';
   BillMetadata,
   BillSequence,
   BackupLogs,
+  PartyLedger,
+  PartyPayments,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +79,10 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 3) {
             await m.createTable(backupLogs);
+          }
+          if (from < 4) {
+            await m.createTable(partyLedger);
+            await m.createTable(partyPayments);
           }
         },
         beforeOpen: (details) async {

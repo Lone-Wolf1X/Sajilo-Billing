@@ -115,6 +115,7 @@ class PurchaseRepository {
     DateTime? purchaseDate,
     required List<PurchaseLineInput> lines,
     String? remarks,
+    bool isCredit = false,
   }) async {
     if (lines.isEmpty) {
       throw Exception('Purchase must contain at least one line item');
@@ -216,6 +217,63 @@ class PurchaseRepository {
                   purchasePricePaisa: line.ratePaisa, // update latest cost
                   updatedAt: now,
                   syncStatus: SyncStatus.pending,
+                ),
+              );
+        }
+      }
+
+      // 3. If credit purchase, record in Supplier Khata (Party Ledger)
+      if (isCredit) {
+        String effectiveSupplierId = supplierId ?? '';
+        if (effectiveSupplierId.isEmpty && supplierName.trim().isNotEmpty) {
+          final existing = await (_db.select(_db.suppliers)
+                ..where((tbl) => tbl.name.equals(supplierName.trim()) & tbl.isDeleted.equals(false))
+                ..limit(1))
+              .getSingleOrNull();
+
+          if (existing == null) {
+            final newId = _uuid.v4();
+            await _db.into(_db.suppliers).insert(
+                  SuppliersCompanion(
+                    id: Value(newId),
+                    name: Value(supplierName.trim()),
+                    panVat: Value(supplierPan?.trim()),
+                    createdAt: Value(now),
+                    updatedAt: Value(now),
+                    syncStatus: const Value(SyncStatus.pending),
+                  ),
+                );
+            effectiveSupplierId = newId;
+          } else {
+            effectiveSupplierId = existing.id;
+          }
+        }
+
+        if (effectiveSupplierId.isNotEmpty) {
+          final lastLedger = await (_db.select(_db.partyLedger)
+                ..where((tbl) => tbl.partyId.equals(effectiveSupplierId) & tbl.isDeleted.equals(false))
+                ..orderBy([(tbl) => OrderingTerm.desc(tbl.entryDate), (tbl) => OrderingTerm.desc(tbl.createdAt)])
+                ..limit(1))
+              .getSingleOrNull();
+
+          final currentBal = lastLedger?.balanceAfterPaisa ?? 0;
+          final newBal = currentBal + totalPaisa;
+
+          await _db.into(_db.partyLedger).insert(
+                PartyLedgerCompanion(
+                  id: Value(_uuid.v4()),
+                  partyType: const Value('supplier'),
+                  partyId: Value(effectiveSupplierId),
+                  entryType: const Value('purchase_credit'),
+                  amountPaisa: Value(totalPaisa),
+                  balanceAfterPaisa: Value(newBal),
+                  refId: Value(purchaseId),
+                  refNumber: Value(billNumber ?? purchaseId),
+                  notes: Value('Credit Purchase / उधारो खरिद (${billNumber ?? purchaseId})'),
+                  entryDate: Value(pDate),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
                 ),
               );
         }
