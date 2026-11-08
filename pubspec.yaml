@@ -24,6 +24,14 @@ dependencies:
   # File dialogs for desktop export/restore and image picking
   file_selector: ^0.9.2+8
 
+  # Networking & Auth for Google Drive Backup
+  http: ^1.2.0
+  url_launcher: ^6.2.6
+  flutter_secure_storage: ^9.0.0
+  connectivity_plus: ^6.0.3
+  archive: ^3.4.10
+  crypto: ^3.0.3
+
   # PDF generation & printing with Devanagari font
   pdf: ^3.10.8
   printing: ^5.12.0

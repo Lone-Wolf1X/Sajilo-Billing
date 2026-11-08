@@ -20,6 +20,7 @@ import 'tables/sales_table.dart';
 import 'tables/sale_items_table.dart';
 import 'tables/bill_metadata_table.dart';
 import 'tables/bill_sequence_table.dart';
+import 'tables/backup_logs_table.dart';
 
 part 'app_database.g.dart';
 
@@ -39,12 +40,13 @@ part 'app_database.g.dart';
   SaleItems,
   BillMetadata,
   BillSequence,
+  BackupLogs,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -70,6 +72,9 @@ class AppDatabase extends _$AppDatabase {
             try {
               await m.addColumn(billMetadata, billMetadata.isDeleted);
             } catch (_) {}
+          }
+          if (from < 3) {
+            await m.createTable(backupLogs);
           }
         },
         beforeOpen: (details) async {

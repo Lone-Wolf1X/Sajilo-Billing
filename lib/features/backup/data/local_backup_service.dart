@@ -7,13 +7,15 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/database/app_database.dart';
 import '../domain/backup_service.dart';
+import 'backup_repository.dart';
 
 /// Desktop-first local SQLite database backup and restoration service.
 /// Uses file_selector to let shopkeepers export and restore their database archives safely.
 class LocalBackupService implements BackupService {
   final AppDatabase _db;
+  final BackupRepository? _backupRepo;
 
-  LocalBackupService(this._db);
+  LocalBackupService(this._db, [this._backupRepo]);
 
   /// Resolves the metadata file that tracks backup timestamps.
   Future<File> _getMetaFile() async {
@@ -88,8 +90,26 @@ class LocalBackupService implements BackupService {
       await destinationFile.parent.create(recursive: true);
     }
 
-    await dbFile.copy(destinationPath);
-    await _recordBackupTime(DateTime.now(), destinationPath);
+    final repo = _backupRepo;
+    String? logId;
+    if (repo != null) {
+      logId = await repo.logStart(location: 'local', fileName: p.basename(destinationPath));
+    }
+
+    try {
+      await dbFile.copy(destinationPath);
+      await _recordBackupTime(DateTime.now(), destinationPath);
+
+      if (logId != null && repo != null) {
+        final size = await File(destinationPath).length();
+        await repo.logSuccess(id: logId, sizeBytes: size);
+      }
+    } catch (e) {
+      if (logId != null && repo != null) {
+        await repo.logFailure(id: logId, errorMessage: e.toString());
+      }
+      rethrow;
+    }
 
     return destinationPath;
   }

@@ -119,5 +119,32 @@
   "totalSales": "Total Sales",
   "invoiceNumber": "Invoice #",
   "viewBill": "View & Print Bill",
-  "noSalesYet": "No sales recorded yet"
+  "noSalesYet": "No sales recorded yet",
+  "googleDriveBackup": "Google Drive Backup",
+  "localBackup": "Local File Backup",
+  "backupDestination": "Backup Destination",
+  "connectGoogleDrive": "Connect Google Drive",
+  "disconnectGoogleDrive": "Disconnect Google Drive",
+  "googleConnectedAs": "Connected as: {email}",
+  "@googleConnectedAs": {
+    "placeholders": {
+      "email": { "type": "String" }
+    }
+  },
+  "googleNotConnected": "Google account not connected",
+  "offlineModeActive": "Offline Mode is active. Your data is 100% stored safely on this device.",
+  "backupHistory": "Backup History & Audit Log",
+  "noBackupLogs": "No backup operations logged yet.",
+  "restoreFromDrive": "Restore from Google Drive",
+  "restoreFromLocal": "Restore from Local File",
+  "confirmRestoreTitle": "Confirm Database Restore",
+  "confirmRestoreMessage": "Restoring will replace the current local database with records from the backup archive. A pre-restore safety copy will be automatically saved.",
+  "confirmRestoreCheckbox": "I understand that local records will be replaced with backup data",
+  "backupTimestamp": "Backup Timestamp",
+  "backupSize": "Backup File Size",
+  "statusSuccess": "Success",
+  "statusFailed": "Failed",
+  "statusInProgress": "In Progress",
+  "driveFolderInfo": "Backups are stored in your private 'Sajilo Billing Backups' folder on Google Drive.",
+  "oauthSetupHelp": "Google OAuth credentials can be passed via --dart-define=GOOGLE_CLIENT_ID or configured in Settings."
 }

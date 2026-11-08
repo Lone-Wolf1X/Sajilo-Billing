@@ -9626,6 +9626,726 @@ class BillSequenceCompanion extends UpdateCompanion<BillSequenceData> {
   }
 }
 
+class $BackupLogsTable extends BackupLogs
+    with TableInfo<$BackupLogsTable, BackupLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BackupLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _syncStatusMeta =
+      const VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus, String> syncStatus =
+      GeneratedColumn<String>('sync_status', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(SyncStatus.pending.name))
+          .withConverter<SyncStatus>($BackupLogsTable.$convertersyncStatus);
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _finishedAtMeta =
+      const VerificationMeta('finishedAt');
+  @override
+  late final GeneratedColumn<DateTime> finishedAt = GeneratedColumn<DateTime>(
+      'finished_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 32),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _locationMeta =
+      const VerificationMeta('location');
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+      'location', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 32),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _fileNameMeta =
+      const VerificationMeta('fileName');
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+      'file_name', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 255),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _sizeBytesMeta =
+      const VerificationMeta('sizeBytes');
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+      'size_bytes', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _errorMessageMeta =
+      const VerificationMeta('errorMessage');
+  @override
+  late final GeneratedColumn<String> errorMessage = GeneratedColumn<String>(
+      'error_message', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _googleAccountEmailMeta =
+      const VerificationMeta('googleAccountEmail');
+  @override
+  late final GeneratedColumn<String> googleAccountEmail =
+      GeneratedColumn<String>('google_account_email', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        createdAt,
+        updatedAt,
+        syncStatus,
+        remoteId,
+        isDeleted,
+        startedAt,
+        finishedAt,
+        status,
+        location,
+        fileName,
+        sizeBytes,
+        errorMessage,
+        googleAccountEmail
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'backup_logs';
+  @override
+  VerificationContext validateIntegrity(Insertable<BackupLog> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    context.handle(_syncStatusMeta, const VerificationResult.success());
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('finished_at')) {
+      context.handle(
+          _finishedAtMeta,
+          finishedAt.isAcceptableOrUnknown(
+              data['finished_at']!, _finishedAtMeta));
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('location')) {
+      context.handle(_locationMeta,
+          location.isAcceptableOrUnknown(data['location']!, _locationMeta));
+    } else if (isInserting) {
+      context.missing(_locationMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(_fileNameMeta,
+          fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta));
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(_sizeBytesMeta,
+          sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta));
+    }
+    if (data.containsKey('error_message')) {
+      context.handle(
+          _errorMessageMeta,
+          errorMessage.isAcceptableOrUnknown(
+              data['error_message']!, _errorMessageMeta));
+    }
+    if (data.containsKey('google_account_email')) {
+      context.handle(
+          _googleAccountEmailMeta,
+          googleAccountEmail.isAcceptableOrUnknown(
+              data['google_account_email']!, _googleAccountEmailMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BackupLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BackupLog(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      syncStatus: $BackupLogsTable.$convertersyncStatus.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}sync_status'])!),
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
+      finishedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}finished_at']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      location: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}location'])!,
+      fileName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}file_name'])!,
+      sizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size_bytes'])!,
+      errorMessage: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}error_message']),
+      googleAccountEmail: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}google_account_email']),
+    );
+  }
+
+  @override
+  $BackupLogsTable createAlias(String alias) {
+    return $BackupLogsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+}
+
+class BackupLog extends DataClass implements Insertable<BackupLog> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final SyncStatus syncStatus;
+  final String? remoteId;
+  final bool isDeleted;
+
+  /// When the backup/restore operation was initiated.
+  final DateTime startedAt;
+
+  /// When the backup/restore operation completed (or failed).
+  final DateTime? finishedAt;
+
+  /// Status of the operation: 'success', 'failed', 'in_progress', etc.
+  final String status;
+
+  /// Destination / source: 'local' or 'drive'.
+  final String location;
+
+  /// Filename of the backup archive (e.g. sajilo_backup_20261108_120000.zip).
+  final String fileName;
+
+  /// Size of the backup archive in bytes.
+  final int sizeBytes;
+
+  /// Human-readable error message if operation failed.
+  final String? errorMessage;
+
+  /// Connected Google account email if location is 'drive'.
+  final String? googleAccountEmail;
+  const BackupLog(
+      {required this.id,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.syncStatus,
+      this.remoteId,
+      required this.isDeleted,
+      required this.startedAt,
+      this.finishedAt,
+      required this.status,
+      required this.location,
+      required this.fileName,
+      required this.sizeBytes,
+      this.errorMessage,
+      this.googleAccountEmail});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    {
+      map['sync_status'] = Variable<String>(
+          $BackupLogsTable.$convertersyncStatus.toSql(syncStatus));
+    }
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || finishedAt != null) {
+      map['finished_at'] = Variable<DateTime>(finishedAt);
+    }
+    map['status'] = Variable<String>(status);
+    map['location'] = Variable<String>(location);
+    map['file_name'] = Variable<String>(fileName);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    if (!nullToAbsent || errorMessage != null) {
+      map['error_message'] = Variable<String>(errorMessage);
+    }
+    if (!nullToAbsent || googleAccountEmail != null) {
+      map['google_account_email'] = Variable<String>(googleAccountEmail);
+    }
+    return map;
+  }
+
+  BackupLogsCompanion toCompanion(bool nullToAbsent) {
+    return BackupLogsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDeleted: Value(isDeleted),
+      startedAt: Value(startedAt),
+      finishedAt: finishedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(finishedAt),
+      status: Value(status),
+      location: Value(location),
+      fileName: Value(fileName),
+      sizeBytes: Value(sizeBytes),
+      errorMessage: errorMessage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(errorMessage),
+      googleAccountEmail: googleAccountEmail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(googleAccountEmail),
+    );
+  }
+
+  factory BackupLog.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BackupLog(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: $BackupLogsTable.$convertersyncStatus
+          .fromJson(serializer.fromJson<String>(json['syncStatus'])),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      finishedAt: serializer.fromJson<DateTime?>(json['finishedAt']),
+      status: serializer.fromJson<String>(json['status']),
+      location: serializer.fromJson<String>(json['location']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      errorMessage: serializer.fromJson<String?>(json['errorMessage']),
+      googleAccountEmail:
+          serializer.fromJson<String?>(json['googleAccountEmail']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<String>(
+          $BackupLogsTable.$convertersyncStatus.toJson(syncStatus)),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'finishedAt': serializer.toJson<DateTime?>(finishedAt),
+      'status': serializer.toJson<String>(status),
+      'location': serializer.toJson<String>(location),
+      'fileName': serializer.toJson<String>(fileName),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'errorMessage': serializer.toJson<String?>(errorMessage),
+      'googleAccountEmail': serializer.toJson<String?>(googleAccountEmail),
+    };
+  }
+
+  BackupLog copyWith(
+          {String? id,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          SyncStatus? syncStatus,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDeleted,
+          DateTime? startedAt,
+          Value<DateTime?> finishedAt = const Value.absent(),
+          String? status,
+          String? location,
+          String? fileName,
+          int? sizeBytes,
+          Value<String?> errorMessage = const Value.absent(),
+          Value<String?> googleAccountEmail = const Value.absent()}) =>
+      BackupLog(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        syncStatus: syncStatus ?? this.syncStatus,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDeleted: isDeleted ?? this.isDeleted,
+        startedAt: startedAt ?? this.startedAt,
+        finishedAt: finishedAt.present ? finishedAt.value : this.finishedAt,
+        status: status ?? this.status,
+        location: location ?? this.location,
+        fileName: fileName ?? this.fileName,
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        errorMessage:
+            errorMessage.present ? errorMessage.value : this.errorMessage,
+        googleAccountEmail: googleAccountEmail.present
+            ? googleAccountEmail.value
+            : this.googleAccountEmail,
+      );
+  BackupLog copyWithCompanion(BackupLogsCompanion data) {
+    return BackupLog(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      finishedAt:
+          data.finishedAt.present ? data.finishedAt.value : this.finishedAt,
+      status: data.status.present ? data.status.value : this.status,
+      location: data.location.present ? data.location.value : this.location,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      errorMessage: data.errorMessage.present
+          ? data.errorMessage.value
+          : this.errorMessage,
+      googleAccountEmail: data.googleAccountEmail.present
+          ? data.googleAccountEmail.value
+          : this.googleAccountEmail,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BackupLog(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('finishedAt: $finishedAt, ')
+          ..write('status: $status, ')
+          ..write('location: $location, ')
+          ..write('fileName: $fileName, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('errorMessage: $errorMessage, ')
+          ..write('googleAccountEmail: $googleAccountEmail')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      createdAt,
+      updatedAt,
+      syncStatus,
+      remoteId,
+      isDeleted,
+      startedAt,
+      finishedAt,
+      status,
+      location,
+      fileName,
+      sizeBytes,
+      errorMessage,
+      googleAccountEmail);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BackupLog &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.isDeleted == this.isDeleted &&
+          other.startedAt == this.startedAt &&
+          other.finishedAt == this.finishedAt &&
+          other.status == this.status &&
+          other.location == this.location &&
+          other.fileName == this.fileName &&
+          other.sizeBytes == this.sizeBytes &&
+          other.errorMessage == this.errorMessage &&
+          other.googleAccountEmail == this.googleAccountEmail);
+}
+
+class BackupLogsCompanion extends UpdateCompanion<BackupLog> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<SyncStatus> syncStatus;
+  final Value<String?> remoteId;
+  final Value<bool> isDeleted;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> finishedAt;
+  final Value<String> status;
+  final Value<String> location;
+  final Value<String> fileName;
+  final Value<int> sizeBytes;
+  final Value<String?> errorMessage;
+  final Value<String?> googleAccountEmail;
+  final Value<int> rowid;
+  const BackupLogsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.finishedAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.location = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.errorMessage = const Value.absent(),
+    this.googleAccountEmail = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BackupLogsCompanion.insert({
+    required String id,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required DateTime startedAt,
+    this.finishedAt = const Value.absent(),
+    required String status,
+    required String location,
+    required String fileName,
+    this.sizeBytes = const Value.absent(),
+    this.errorMessage = const Value.absent(),
+    this.googleAccountEmail = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        startedAt = Value(startedAt),
+        status = Value(status),
+        location = Value(location),
+        fileName = Value(fileName);
+  static Insertable<BackupLog> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<bool>? isDeleted,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? finishedAt,
+    Expression<String>? status,
+    Expression<String>? location,
+    Expression<String>? fileName,
+    Expression<int>? sizeBytes,
+    Expression<String>? errorMessage,
+    Expression<String>? googleAccountEmail,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (startedAt != null) 'started_at': startedAt,
+      if (finishedAt != null) 'finished_at': finishedAt,
+      if (status != null) 'status': status,
+      if (location != null) 'location': location,
+      if (fileName != null) 'file_name': fileName,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (errorMessage != null) 'error_message': errorMessage,
+      if (googleAccountEmail != null)
+        'google_account_email': googleAccountEmail,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BackupLogsCompanion copyWith(
+      {Value<String>? id,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<SyncStatus>? syncStatus,
+      Value<String?>? remoteId,
+      Value<bool>? isDeleted,
+      Value<DateTime>? startedAt,
+      Value<DateTime?>? finishedAt,
+      Value<String>? status,
+      Value<String>? location,
+      Value<String>? fileName,
+      Value<int>? sizeBytes,
+      Value<String?>? errorMessage,
+      Value<String?>? googleAccountEmail,
+      Value<int>? rowid}) {
+    return BackupLogsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      startedAt: startedAt ?? this.startedAt,
+      finishedAt: finishedAt ?? this.finishedAt,
+      status: status ?? this.status,
+      location: location ?? this.location,
+      fileName: fileName ?? this.fileName,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      errorMessage: errorMessage ?? this.errorMessage,
+      googleAccountEmail: googleAccountEmail ?? this.googleAccountEmail,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+          $BackupLogsTable.$convertersyncStatus.toSql(syncStatus.value));
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (finishedAt.present) {
+      map['finished_at'] = Variable<DateTime>(finishedAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (errorMessage.present) {
+      map['error_message'] = Variable<String>(errorMessage.value);
+    }
+    if (googleAccountEmail.present) {
+      map['google_account_email'] = Variable<String>(googleAccountEmail.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BackupLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('finishedAt: $finishedAt, ')
+          ..write('status: $status, ')
+          ..write('location: $location, ')
+          ..write('fileName: $fileName, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('errorMessage: $errorMessage, ')
+          ..write('googleAccountEmail: $googleAccountEmail, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -9646,6 +10366,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SaleItemsTable saleItems = $SaleItemsTable(this);
   late final $BillMetadataTable billMetadata = $BillMetadataTable(this);
   late final $BillSequenceTable billSequence = $BillSequenceTable(this);
+  late final $BackupLogsTable backupLogs = $BackupLogsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -9665,7 +10386,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         sales,
         saleItems,
         billMetadata,
-        billSequence
+        billSequence,
+        backupLogs
       ];
 }
 
@@ -13491,6 +14213,278 @@ class $$BillSequenceTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$BackupLogsTableCreateCompanionBuilder = BackupLogsCompanion Function({
+  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  required DateTime startedAt,
+  Value<DateTime?> finishedAt,
+  required String status,
+  required String location,
+  required String fileName,
+  Value<int> sizeBytes,
+  Value<String?> errorMessage,
+  Value<String?> googleAccountEmail,
+  Value<int> rowid,
+});
+typedef $$BackupLogsTableUpdateCompanionBuilder = BackupLogsCompanion Function({
+  Value<String> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<DateTime> startedAt,
+  Value<DateTime?> finishedAt,
+  Value<String> status,
+  Value<String> location,
+  Value<String> fileName,
+  Value<int> sizeBytes,
+  Value<String?> errorMessage,
+  Value<String?> googleAccountEmail,
+  Value<int> rowid,
+});
+
+class $$BackupLogsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $BackupLogsTable,
+    BackupLog,
+    $$BackupLogsTableFilterComposer,
+    $$BackupLogsTableOrderingComposer,
+    $$BackupLogsTableCreateCompanionBuilder,
+    $$BackupLogsTableUpdateCompanionBuilder> {
+  $$BackupLogsTableTableManager(_$AppDatabase db, $BackupLogsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$BackupLogsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$BackupLogsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<DateTime?> finishedAt = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<String> location = const Value.absent(),
+            Value<String> fileName = const Value.absent(),
+            Value<int> sizeBytes = const Value.absent(),
+            Value<String?> errorMessage = const Value.absent(),
+            Value<String?> googleAccountEmail = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BackupLogsCompanion(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            startedAt: startedAt,
+            finishedAt: finishedAt,
+            status: status,
+            location: location,
+            fileName: fileName,
+            sizeBytes: sizeBytes,
+            errorMessage: errorMessage,
+            googleAccountEmail: googleAccountEmail,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required DateTime startedAt,
+            Value<DateTime?> finishedAt = const Value.absent(),
+            required String status,
+            required String location,
+            required String fileName,
+            Value<int> sizeBytes = const Value.absent(),
+            Value<String?> errorMessage = const Value.absent(),
+            Value<String?> googleAccountEmail = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BackupLogsCompanion.insert(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            startedAt: startedAt,
+            finishedAt: finishedAt,
+            status: status,
+            location: location,
+            fileName: fileName,
+            sizeBytes: sizeBytes,
+            errorMessage: errorMessage,
+            googleAccountEmail: googleAccountEmail,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$BackupLogsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $BackupLogsTable> {
+  $$BackupLogsTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<SyncStatus, SyncStatus, String>
+      get syncStatus => $state.composableBuilder(
+          column: $state.table.syncStatus,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get startedAt => $state.composableBuilder(
+      column: $state.table.startedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get finishedAt => $state.composableBuilder(
+      column: $state.table.finishedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get status => $state.composableBuilder(
+      column: $state.table.status,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get location => $state.composableBuilder(
+      column: $state.table.location,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get fileName => $state.composableBuilder(
+      column: $state.table.fileName,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get sizeBytes => $state.composableBuilder(
+      column: $state.table.sizeBytes,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get errorMessage => $state.composableBuilder(
+      column: $state.table.errorMessage,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get googleAccountEmail => $state.composableBuilder(
+      column: $state.table.googleAccountEmail,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$BackupLogsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $BackupLogsTable> {
+  $$BackupLogsTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get syncStatus => $state.composableBuilder(
+      column: $state.table.syncStatus,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get startedAt => $state.composableBuilder(
+      column: $state.table.startedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get finishedAt => $state.composableBuilder(
+      column: $state.table.finishedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get status => $state.composableBuilder(
+      column: $state.table.status,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get location => $state.composableBuilder(
+      column: $state.table.location,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get fileName => $state.composableBuilder(
+      column: $state.table.fileName,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get sizeBytes => $state.composableBuilder(
+      column: $state.table.sizeBytes,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get errorMessage => $state.composableBuilder(
+      column: $state.table.errorMessage,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get googleAccountEmail => $state.composableBuilder(
+      column: $state.table.googleAccountEmail,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -13524,4 +14518,6 @@ class $AppDatabaseManager {
       $$BillMetadataTableTableManager(_db, _db.billMetadata);
   $$BillSequenceTableTableManager get billSequence =>
       $$BillSequenceTableTableManager(_db, _db.billSequence);
+  $$BackupLogsTableTableManager get backupLogs =>
+      $$BackupLogsTableTableManager(_db, _db.backupLogs);
 }

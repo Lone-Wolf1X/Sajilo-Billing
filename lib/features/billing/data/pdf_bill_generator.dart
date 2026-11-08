@@ -491,7 +491,7 @@ class PdfBillGenerator {
             pw.Row(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                Expanded(
+                pw.Expanded(
                   flex: 6,
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -513,7 +513,7 @@ class PdfBillGenerator {
                   ),
                 ),
                 pw.SizedBox(width: 14),
-                Expanded(
+                pw.Expanded(
                   flex: 4,
                   child: pw.Table(
                     border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),

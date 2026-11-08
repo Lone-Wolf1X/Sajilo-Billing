@@ -52,6 +52,36 @@
 
 ---
 
+## Google Sign-In & Google Drive Backup Architecture (Step 3)
+
+### 1. 100% Offline-Safe & Strictly Opt-In
+- If no internet is present or no Google account is connected, Sajilo Billing functions 100% offline as a local retail system.
+- No network requests touch Google until the shopkeeper explicitly clicks **"Connect Google Drive"** in Settings.
+- The app prominently displays an **"Offline Mode is active"** status banner when disconnected or offline.
+
+### 2. Desktop PKCE OAuth 2.0 Loopback Flow
+- Designed specifically for Flutter Desktop (Windows, macOS, Linux).
+- Uses standard installed-app loopback URI (`http://127.0.0.1:<random_port>`).
+- Enforces cryptographic **PKCE (S256)** with a cryptographically secure `code_verifier` (RFC 7636) and SHA-256 `code_challenge`.
+- Minimal scope: strictly requests `https://www.googleapis.com/auth/drive.file` (per-app files created by Sajilo Billing only). Never requests or accesses full Drive files.
+- `refresh_token` is stored exclusively in OS keychain / encrypted storage via `flutter_secure_storage`. It is never stored in SQLite, log files, or plaintext settings.
+
+### 3. Backup Package & Retention
+- **Archive Format**: Compressed ZIP archive containing `database.sqlite` (checkpointed SQLite database) and `settings.json` (metadata: schema version, app version, timestamp, business profile).
+- **Dedicated Folder**: Automatically resolves or creates a dedicated `Sajilo Billing Backups` folder in the shopkeeper's Google Drive.
+- **14-Day Retention**: Retains the last 14 backups, automatically pruning older archives to conserve user storage quota.
+- **Safe Restoration**:
+  1. Validates schema version compatibility against current app version.
+  2. Generates an immediate pre-restore local safety copy: `restored-overwrite-<timestamp>.sqlite`.
+  3. Displays a confirmation dialog with backup details, shop info, and mandatory checkbox before overwriting.
+
+### 4. Audit Logging & Schema Migration (v2 -> v3)
+- Schema upgraded to v3 with a new `backup_logs` table (extends `SyncTableMixin`).
+- Tracks all operations: `started_at`, `finished_at`, `status` (`success`, `failed`, `in_progress`), `location` (`local`, `drive`), `file_name`, `size_bytes`, `error_message`, and `google_account_email`.
+- Displayed in real-time in the **Backup History & Audit Log** list.
+
+---
+
 ## Project Structure
 
 ```
