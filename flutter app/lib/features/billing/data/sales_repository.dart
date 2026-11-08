@@ -71,17 +71,22 @@ class SalesRepository {
 
   SalesRepository(this._db);
 
-  /// Streams sales with optional date filter and search query.
+  /// Streams sales with optional date filter, search query, and status.
   Stream<List<Sale>> watchSales({
     DateTime? startDate,
     DateTime? endDate,
     String? query,
     bool includeVoided = false,
+    String? status,
   }) {
     final q = _db.select(_db.sales);
 
     if (!includeVoided) {
       q.where((tbl) => tbl.isVoided.equals(false) & tbl.isDeleted.equals(false));
+    }
+
+    if (status != null && status.isNotEmpty) {
+      q.where((tbl) => tbl.status.equals(status));
     }
 
     if (startDate != null) {
@@ -102,6 +107,14 @@ class SalesRepository {
 
     q.orderBy([(tbl) => OrderingTerm(expression: tbl.invoiceDate, mode: OrderingMode.desc)]);
     return q.watch();
+  }
+
+  /// Streams pending draft sales
+  Stream<List<Sale>> watchDraftSales() {
+    return (_db.select(_db.sales)
+          ..where((tbl) => tbl.status.equals('DRAFT') & tbl.isDeleted.equals(false))
+          ..orderBy([(tbl) => OrderingTerm.desc(tbl.createdAt)]))
+        .watch();
   }
 
   /// Gets single sale with line items and customer info.
@@ -215,12 +228,18 @@ class SalesRepository {
     }
   }
 
-  /// Creates a sale and tax invoice in ONE single atomic transaction:
-  /// 1. Validates stock availability for every line item.
-  /// 2. Generates gapless sequential bill number.
-  /// 3. Inserts into sales and sale_items.
-  /// 4. Appends negative entries to stock_ledger.
-  /// 5. Decrements items stockQty cache.
+  /// Creates a sale and tax invoice in ONE atomic transaction:
+  /// - If status is 'VERIFIED' (default):
+  ///   1. Validates stock availability.
+  ///   2. Generates gapless sequential bill number.
+  ///   3. Inserts into sales and sale_items.
+  ///   4. Appends negative entries to stock_ledger.
+  ///   5. Decrements items stockQty cache.
+  /// - If status is 'DRAFT':
+  ///   1. Validates item existence.
+  ///   2. Assigns a temporary draft number (DFT-XXXXX).
+  ///   3. Inserts into sales and sale_items with status 'DRAFT'.
+  ///   4. Leaves stock intact until finalized/verified.
   Future<Sale> createSale({
     String? customerId,
     String customerName = 'Cash Customer / नगद ग्राहक',
@@ -232,17 +251,19 @@ class SalesRepository {
     int tenderedPaisa = 0,
     String paymentMode = 'CASH',
     String? notes,
+    String status = 'VERIFIED',
   }) async {
     if (lines.isEmpty) {
       throw Exception('Invoice must contain at least one line item');
     }
 
+    final isDraft = status.toUpperCase() == 'DRAFT';
     final now = DateTime.now().toUtc();
     final saleDate = (invoiceDate ?? DateTime.now()).toUtc();
     final saleId = _uuid.v4();
 
     return await _db.transaction(() async {
-      // Step 1: Pre-validate stock availability for all items
+      // Step 1: Pre-validate items
       for (final line in lines) {
         final item = await (_db.select(_db.items)
               ..where((tbl) => tbl.id.equals(line.itemId) & tbl.isDeleted.equals(false)))
@@ -252,7 +273,8 @@ class SalesRepository {
           throw Exception('Item "${line.itemName}" no longer exists in inventory');
         }
 
-        if (item.stockQty < line.quantity) {
+        // For verified bills, strictly ensure available stock
+        if (!isDraft && item.stockQty < line.quantity) {
           throw Exception(
             'Insufficient stock for "${item.name}". Required: ${line.quantity} ${item.unit}, Available: ${item.stockQty} ${item.unit}',
           );
@@ -260,7 +282,9 @@ class SalesRepository {
       }
 
       // Step 2: Generate unique bill number atomically
-      final invoiceNumber = await _generateNextBillNumber(saleDate);
+      final invoiceNumber = isDraft
+          ? 'DFT-${DateTime.now().millisecondsSinceEpoch % 100000}'
+          : await _generateNextBillNumber(saleDate);
 
       // Step 3: Compute totals
       var subtotalPaisa = 0;
@@ -304,6 +328,7 @@ class SalesRepository {
         changePaisa: Value(changePaisa),
         paymentMode: Value(paymentMode),
         notes: Value(notes?.trim()),
+        status: Value(isDraft ? 'DRAFT' : 'VERIFIED'),
         isVoided: const Value(false),
         createdAt: Value(now),
         updatedAt: Value(now),
@@ -313,7 +338,7 @@ class SalesRepository {
 
       await _db.into(_db.sales).insert(saleCompanion);
 
-      // Step 5: Insert sale items & ledger entries & decrement stock
+      // Step 5: Insert sale items & ledger entries (ledger only for verified)
       for (final line in lines) {
         final lineItemId = _uuid.v4();
 
@@ -337,40 +362,42 @@ class SalesRepository {
               ),
             );
 
-        // Append negative stock ledger entry
-        await _db.into(_db.stockLedger).insert(
-              StockLedgerCompanion.insert(
-                id: _uuid.v4(),
-                itemId: line.itemId,
-                qtyChange: -line.quantity,
-                reason: 'SALE',
-                refType: 'SALE',
-                refId: saleId,
-                notes: Value('Invoice: $invoiceNumber'),
-                createdAt: Value(now),
-                updatedAt: Value(now),
-                syncStatus: const Value(SyncStatus.pending),
-                isDeleted: const Value(false),
-              ),
-            );
+        if (!isDraft) {
+          // Append negative stock ledger entry
+          await _db.into(_db.stockLedger).insert(
+                StockLedgerCompanion.insert(
+                  id: _uuid.v4(),
+                  itemId: line.itemId,
+                  qtyChange: -line.quantity,
+                  reason: 'SALE',
+                  refType: 'SALE',
+                  refId: saleId,
+                  notes: Value('Invoice: $invoiceNumber'),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
+                  isDeleted: const Value(false),
+                ),
+              );
 
-        // Update cached item stock
-        final currentItem = await (_db.select(_db.items)
-              ..where((tbl) => tbl.id.equals(line.itemId)))
-            .getSingle();
+          // Update cached item stock
+          final currentItem = await (_db.select(_db.items)
+                ..where((tbl) => tbl.id.equals(line.itemId)))
+              .getSingle();
 
-        final updatedStock = (currentItem.stockQty - line.quantity).clamp(0.0, 9999999.0);
-        await _db.update(_db.items).replace(
-              currentItem.copyWith(
-                stockQty: updatedStock,
-                updatedAt: now,
-                syncStatus: SyncStatus.pending,
-              ),
-            );
+          final updatedStock = (currentItem.stockQty - line.quantity).clamp(0.0, 9999999.0);
+          await _db.update(_db.items).replace(
+                currentItem.copyWith(
+                  stockQty: updatedStock,
+                  updatedAt: now,
+                  syncStatus: SyncStatus.pending,
+                ),
+              );
+        }
       }
 
-      // Step 6: If credit sale, automatically post to Customer Khata (Party Ledger)
-      if (paymentMode.toUpperCase() == 'CREDIT') {
+      // Step 6: If verified credit sale, automatically post to Customer Khata (Party Ledger)
+      if (!isDraft && paymentMode.toUpperCase() == 'CREDIT') {
         String effectiveCustId = customerId ?? '';
         if (effectiveCustId.isEmpty &&
             (customerName.trim().isNotEmpty || (customerPhone != null && customerPhone.trim().isNotEmpty))) {
@@ -433,6 +460,139 @@ class SalesRepository {
       }
 
       return (await (_db.select(_db.sales)..where((tbl) => tbl.id.equals(saleId))).getSingle());
+    });
+  }
+
+  /// Convenience helper to save bill in DRAFT state
+  Future<Sale> saveDraftSale({
+    String? customerId,
+    String customerName = 'Cash Customer / नगद ग्राहक',
+    String? customerPhone,
+    String? customerPan,
+    DateTime? invoiceDate,
+    required List<SaleLineInput> lines,
+    int billDiscountPaisa = 0,
+    int tenderedPaisa = 0,
+    String paymentMode = 'CASH',
+    String? notes,
+  }) async {
+    return createSale(
+      customerId: customerId,
+      customerName: customerName,
+      customerPhone: customerPhone,
+      customerPan: customerPan,
+      invoiceDate: invoiceDate,
+      lines: lines,
+      billDiscountPaisa: billDiscountPaisa,
+      tenderedPaisa: tenderedPaisa,
+      paymentMode: paymentMode,
+      notes: notes,
+      status: 'DRAFT',
+    );
+  }
+
+  /// Validates and converts a DRAFT sale into a final VERIFIED official sale.
+  /// Assigns sequential invoice number, updates stock ledger, and posts to party ledger if credit.
+  Future<Sale> verifyDraftSale(String saleId) async {
+    return await _db.transaction(() async {
+      final sale = await (_db.select(_db.sales)..where((tbl) => tbl.id.equals(saleId))).getSingleOrNull();
+      if (sale == null) {
+        throw Exception('Draft bill not found');
+      }
+
+      if (sale.status == 'VERIFIED') {
+        return sale; // Already verified
+      }
+
+      final items = await (_db.select(_db.saleItems)..where((tbl) => tbl.saleId.equals(saleId))).get();
+      if (items.isEmpty) {
+        throw Exception('Draft bill has no line items');
+      }
+
+      // 1. Stock validation
+      for (final line in items) {
+        final item = await (_db.select(_db.items)..where((tbl) => tbl.id.equals(line.itemId))).getSingleOrNull();
+        if (item == null) {
+          throw Exception('Item "${line.itemName}" no longer exists in catalog');
+        }
+        if (item.stockQty < line.quantity) {
+          throw Exception(
+            'Insufficient stock for "${item.name}". Required: ${line.quantity} ${item.unit}, Available: ${item.stockQty} ${item.unit}',
+          );
+        }
+      }
+
+      final now = DateTime.now().toUtc();
+      final officialInvoiceNumber = await _generateNextBillNumber(sale.invoiceDate);
+
+      // 2. Deduct inventory & record stock ledger
+      for (final line in items) {
+        await _db.into(_db.stockLedger).insert(
+              StockLedgerCompanion.insert(
+                id: _uuid.v4(),
+                itemId: line.itemId,
+                qtyChange: -line.quantity,
+                reason: 'SALE',
+                refType: 'SALE',
+                refId: saleId,
+                notes: Value('Invoice: $officialInvoiceNumber'),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+                isDeleted: const Value(false),
+              ),
+            );
+
+        final currentItem = await (_db.select(_db.items)..where((tbl) => tbl.id.equals(line.itemId))).getSingle();
+        final updatedStock = (currentItem.stockQty - line.quantity).clamp(0.0, 9999999.0);
+        await _db.update(_db.items).replace(
+              currentItem.copyWith(
+                stockQty: updatedStock,
+                updatedAt: now,
+                syncStatus: SyncStatus.pending,
+              ),
+            );
+      }
+
+      // 3. Post to customer khata if credit
+      if (sale.paymentMode.toUpperCase() == 'CREDIT' && sale.customerId != null) {
+        final lastLedger = await (_db.select(_db.partyLedger)
+              ..where((tbl) => tbl.partyId.equals(sale.customerId!) & tbl.isDeleted.equals(false))
+              ..orderBy([(tbl) => OrderingTerm.desc(tbl.entryDate), (tbl) => OrderingTerm.desc(tbl.createdAt)])
+              ..limit(1))
+            .getSingleOrNull();
+
+        final currentBal = lastLedger?.balanceAfterPaisa ?? 0;
+        final newBal = currentBal + sale.totalPaisa;
+
+        await _db.into(_db.partyLedger).insert(
+              PartyLedgerCompanion(
+                id: Value(_uuid.v4()),
+                partyType: const Value('customer'),
+                partyId: Value(sale.customerId!),
+                entryType: const Value('sale_credit'),
+                amountPaisa: Value(sale.totalPaisa),
+                balanceAfterPaisa: Value(newBal),
+                refId: Value(saleId),
+                refNumber: Value(officialInvoiceNumber),
+                notes: Value('Credit Sale / उधारो बिक्री ($officialInvoiceNumber)'),
+                entryDate: Value(sale.invoiceDate),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+              ),
+            );
+      }
+
+      // 4. Update sales record status to VERIFIED with official invoice number
+      final updatedSale = sale.copyWith(
+        invoiceNumber: officialInvoiceNumber,
+        status: 'VERIFIED',
+        updatedAt: now,
+        syncStatus: SyncStatus.pending,
+      );
+      await _db.update(_db.sales).replace(updatedSale);
+      return updatedSale;
     });
   }
 

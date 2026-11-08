@@ -19,5 +19,6 @@ class Sales extends Table with SyncTableMixin {
   IntColumn get changePaisa => integer().withDefault(const Constant(0))();
   TextColumn get paymentMode => text().withDefault(const Constant('CASH'))(); // CASH, FONEPAY, CREDIT
   TextColumn get notes => text().nullable()();
+  TextColumn get status => text().withDefault(const Constant('VERIFIED'))(); // 'DRAFT', 'VERIFIED'
   BoolColumn get isVoided => boolean().withDefault(const Constant(false))();
 }

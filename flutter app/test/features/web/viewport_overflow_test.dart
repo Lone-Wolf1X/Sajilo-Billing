@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sajilo_billing/core/database/app_database.dart';
 import 'package:sajilo_billing/core/database/database_provider.dart';
 import 'package:sajilo_billing/features/billing/presentation/pos_billing_screen.dart';
+import 'package:sajilo_billing/features/billing/presentation/sales_provider.dart';
+import 'package:sajilo_billing/features/business/presentation/business_provider.dart';
 import 'package:sajilo_billing/features/dashboard/data/dashboard_repository.dart';
 import 'package:sajilo_billing/features/dashboard/presentation/dashboard_provider.dart';
 import 'package:sajilo_billing/features/dashboard/presentation/dashboard_screen.dart';
@@ -31,6 +33,8 @@ Widget createViewportTestApp({
       databaseProvider.overrideWithValue(testDb),
       dashboardMetricsProvider.overrideWith((ref) => Future.value(mockMetrics)),
       itemsStreamProvider.overrideWith((ref) => Stream.value([])),
+      customersStreamProvider.overrideWith((ref) => Stream.value([])),
+      businessProfileStreamProvider.overrideWith((ref) => Stream.value(null)),
     ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -87,6 +91,8 @@ void main() {
 
         // Assert no exception was thrown during layout
         expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
       });
 
       testWidgets('POS Billing Screen renders with 0 overflow errors at ${size.width.toInt()}x${size.height.toInt()}', (tester) async {
@@ -105,6 +111,8 @@ void main() {
 
         // Assert no exception was thrown during layout
         expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
       });
     }
   });

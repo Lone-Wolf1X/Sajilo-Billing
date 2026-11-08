@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/paisa_helper.dart';
 import '../../../business/presentation/business_provider.dart';
+import '../../data/html_bill_generator.dart';
 import '../../data/sales_repository.dart';
 import '../../domain/bill_model.dart';
 import '../sales_provider.dart';
@@ -25,6 +27,65 @@ class SaleDetailDialog extends ConsumerStatefulWidget {
 
 class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
   bool _isProcessing = false;
+  late Future<SaleWithItems?> _saleDetailsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDetails();
+  }
+
+  void _loadDetails() {
+    _saleDetailsFuture = ref.read(salesRepositoryProvider).getSaleDetails(widget.saleId);
+  }
+
+  Future<void> _verifyDraft() async {
+    setState(() => _isProcessing = true);
+    try {
+      final salesRepo = ref.read(salesRepositoryProvider);
+      final verifiedSale = await salesRepo.verifyDraftSale(widget.saleId);
+      ref.invalidate(salesStreamProvider);
+      if (mounted) {
+        setState(() {
+          _loadDetails();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invoice ${verifiedSale.invoiceNumber} verified & issued!'),
+            backgroundColor: AppTheme.accentTeal,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to verify bill: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _printHtmlBill(SaleWithItems data, BillTemplateStyle style) async {
+    final profile = await ref.read(businessRepositoryProvider).getCurrentProfile();
+    if (profile != null) {
+      Uint8List? logoBytes;
+      if (!kIsWeb && profile.logoPath != null) {
+        try {
+          final f = File(profile.logoPath!);
+          if (await f.exists()) logoBytes = await f.readAsBytes();
+        } catch (_) {}
+      }
+      final billData = BillData.fromSaleRecord(
+        profile: profile,
+        sale: data.sale,
+        saleItems: data.items,
+        logoBytes: logoBytes,
+      );
+      await HtmlBillGenerator.printOrPreviewHtml(billData, style: style);
+    }
+  }
 
   Future<void> _voidSale(String invoiceNumber) async {
     final confirmed = await showDialog<bool>(
@@ -110,7 +171,6 @@ class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final salesRepo = ref.watch(salesRepositoryProvider);
     final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
     return Dialog(
@@ -118,7 +178,7 @@ class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720, maxHeight: 660),
         child: FutureBuilder<SaleWithItems?>(
-          future: salesRepo.getSaleDetails(widget.saleId),
+          future: _saleDetailsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox(
@@ -252,23 +312,64 @@ class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
+                          if (s.status == 'DRAFT') ...[
+                            ElevatedButton.icon(
+                              onPressed: _isProcessing ? null : _verifyDraft,
+                              icon: const Icon(Icons.check_circle_outline, size: 16),
+                              label: const Text('Validate & Issue Bill'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.accentTeal,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
                           if (!s.isVoided) ...[
                             OutlinedButton.icon(
                               onPressed: _isProcessing ? null : () => _voidSale(s.invoiceNumber),
                               icon: const Icon(Icons.cancel_outlined, color: Colors.redAccent, size: 16),
-                              label: const Text('Void Sale / रद्द गर्नुहोस्', style: TextStyle(color: Colors.redAccent)),
+                              label: const Text('Void Sale / रद्द', style: TextStyle(color: Colors.redAccent)),
                             ),
-                            const SizedBox(width: 10),
                           ],
+                          // HTML Print Options
+                          PopupMenuButton<BillTemplateStyle>(
+                            tooltip: 'Print HTML Bill / नयाँ बिल ढाँचा',
+                            onSelected: (style) => _printHtmlBill(data, style),
+                            itemBuilder: (ctx) => BillTemplateStyle.values.map((style) {
+                              return PopupMenuItem(
+                                value: style,
+                                child: Text(style.label),
+                              );
+                            }).toList(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF561131),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.print_outlined, color: Colors.white, size: 16),
+                                  SizedBox(width: 6),
+                                  Text('HTML Bill', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  SizedBox(width: 4),
+                                  Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
+                                ],
+                              ),
+                            ),
+                          ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               ElevatedButton.icon(
                                 onPressed: () => _reprintBill(data),
                                 icon: const Icon(Icons.print, size: 16),
-                                label: const Text('Reprint Bill'),
+                                label: const Text('Reprint'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppTheme.primaryBlue,
                                   foregroundColor: Colors.white,
@@ -284,7 +385,7 @@ class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
                                 ),
                                 child: PopupMenuButton<PrintFormat>(
                                   icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                                  tooltip: 'Select Reprint Format',
+                                  tooltip: 'Select Format',
                                   onSelected: (fmt) => _reprintBill(data, fmt),
                                   itemBuilder: (ctx) => [
                                     const PopupMenuItem(

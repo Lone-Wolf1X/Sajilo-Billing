@@ -7155,6 +7155,13 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
       'notes', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('VERIFIED'));
   static const VerificationMeta _isVoidedMeta =
       const VerificationMeta('isVoided');
   @override
@@ -7188,6 +7195,7 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
         changePaisa,
         paymentMode,
         notes,
+        status,
         isVoided
       ];
   @override
@@ -7316,6 +7324,10 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
       context.handle(
           _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
     }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
     if (data.containsKey('is_voided')) {
       context.handle(_isVoidedMeta,
           isVoided.isAcceptableOrUnknown(data['is_voided']!, _isVoidedMeta));
@@ -7372,6 +7384,8 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
           .read(DriftSqlType.string, data['${effectivePrefix}payment_mode'])!,
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
       isVoided: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_voided'])!,
     );
@@ -7408,6 +7422,7 @@ class Sale extends DataClass implements Insertable<Sale> {
   final int changePaisa;
   final String paymentMode;
   final String? notes;
+  final String status;
   final bool isVoided;
   const Sale(
       {required this.id,
@@ -7431,6 +7446,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       required this.changePaisa,
       required this.paymentMode,
       this.notes,
+      required this.status,
       required this.isVoided});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -7469,6 +7485,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
+    map['status'] = Variable<String>(status);
     map['is_voided'] = Variable<bool>(isVoided);
     return map;
   }
@@ -7505,6 +7522,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       paymentMode: Value(paymentMode),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      status: Value(status),
       isVoided: Value(isVoided),
     );
   }
@@ -7535,6 +7553,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       changePaisa: serializer.fromJson<int>(json['changePaisa']),
       paymentMode: serializer.fromJson<String>(json['paymentMode']),
       notes: serializer.fromJson<String?>(json['notes']),
+      status: serializer.fromJson<String>(json['status']),
       isVoided: serializer.fromJson<bool>(json['isVoided']),
     );
   }
@@ -7564,6 +7583,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       'changePaisa': serializer.toJson<int>(changePaisa),
       'paymentMode': serializer.toJson<String>(paymentMode),
       'notes': serializer.toJson<String?>(notes),
+      'status': serializer.toJson<String>(status),
       'isVoided': serializer.toJson<bool>(isVoided),
     };
   }
@@ -7590,6 +7610,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           int? changePaisa,
           String? paymentMode,
           Value<String?> notes = const Value.absent(),
+          String? status,
           bool? isVoided}) =>
       Sale(
         id: id ?? this.id,
@@ -7614,6 +7635,7 @@ class Sale extends DataClass implements Insertable<Sale> {
         changePaisa: changePaisa ?? this.changePaisa,
         paymentMode: paymentMode ?? this.paymentMode,
         notes: notes.present ? notes.value : this.notes,
+        status: status ?? this.status,
         isVoided: isVoided ?? this.isVoided,
       );
   Sale copyWithCompanion(SalesCompanion data) {
@@ -7660,6 +7682,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       paymentMode:
           data.paymentMode.present ? data.paymentMode.value : this.paymentMode,
       notes: data.notes.present ? data.notes.value : this.notes,
+      status: data.status.present ? data.status.value : this.status,
       isVoided: data.isVoided.present ? data.isVoided.value : this.isVoided,
     );
   }
@@ -7688,6 +7711,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           ..write('changePaisa: $changePaisa, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('notes: $notes, ')
+          ..write('status: $status, ')
           ..write('isVoided: $isVoided')
           ..write(')'))
         .toString();
@@ -7716,6 +7740,7 @@ class Sale extends DataClass implements Insertable<Sale> {
         changePaisa,
         paymentMode,
         notes,
+        status,
         isVoided
       ]);
   @override
@@ -7743,6 +7768,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           other.changePaisa == this.changePaisa &&
           other.paymentMode == this.paymentMode &&
           other.notes == this.notes &&
+          other.status == this.status &&
           other.isVoided == this.isVoided);
 }
 
@@ -7768,6 +7794,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
   final Value<int> changePaisa;
   final Value<String> paymentMode;
   final Value<String?> notes;
+  final Value<String> status;
   final Value<bool> isVoided;
   final Value<int> rowid;
   const SalesCompanion({
@@ -7792,6 +7819,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.changePaisa = const Value.absent(),
     this.paymentMode = const Value.absent(),
     this.notes = const Value.absent(),
+    this.status = const Value.absent(),
     this.isVoided = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -7817,6 +7845,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.changePaisa = const Value.absent(),
     this.paymentMode = const Value.absent(),
     this.notes = const Value.absent(),
+    this.status = const Value.absent(),
     this.isVoided = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -7846,6 +7875,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     Expression<int>? changePaisa,
     Expression<String>? paymentMode,
     Expression<String>? notes,
+    Expression<String>? status,
     Expression<bool>? isVoided,
     Expression<int>? rowid,
   }) {
@@ -7871,6 +7901,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       if (changePaisa != null) 'change_paisa': changePaisa,
       if (paymentMode != null) 'payment_mode': paymentMode,
       if (notes != null) 'notes': notes,
+      if (status != null) 'status': status,
       if (isVoided != null) 'is_voided': isVoided,
       if (rowid != null) 'rowid': rowid,
     });
@@ -7898,6 +7929,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       Value<int>? changePaisa,
       Value<String>? paymentMode,
       Value<String?>? notes,
+      Value<String>? status,
       Value<bool>? isVoided,
       Value<int>? rowid}) {
     return SalesCompanion(
@@ -7922,6 +7954,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       changePaisa: changePaisa ?? this.changePaisa,
       paymentMode: paymentMode ?? this.paymentMode,
       notes: notes ?? this.notes,
+      status: status ?? this.status,
       isVoided: isVoided ?? this.isVoided,
       rowid: rowid ?? this.rowid,
     );
@@ -7994,6 +8027,9 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
     if (isVoided.present) {
       map['is_voided'] = Variable<bool>(isVoided.value);
     }
@@ -8027,6 +8063,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
           ..write('changePaisa: $changePaisa, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('notes: $notes, ')
+          ..write('status: $status, ')
           ..write('isVoided: $isVoided, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -16411,6 +16448,7 @@ typedef $$SalesTableCreateCompanionBuilder = SalesCompanion Function({
   Value<int> changePaisa,
   Value<String> paymentMode,
   Value<String?> notes,
+  Value<String> status,
   Value<bool> isVoided,
   Value<int> rowid,
 });
@@ -16436,6 +16474,7 @@ typedef $$SalesTableUpdateCompanionBuilder = SalesCompanion Function({
   Value<int> changePaisa,
   Value<String> paymentMode,
   Value<String?> notes,
+  Value<String> status,
   Value<bool> isVoided,
   Value<int> rowid,
 });
@@ -16478,6 +16517,7 @@ class $$SalesTableTableManager extends RootTableManager<
             Value<int> changePaisa = const Value.absent(),
             Value<String> paymentMode = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            Value<String> status = const Value.absent(),
             Value<bool> isVoided = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -16503,6 +16543,7 @@ class $$SalesTableTableManager extends RootTableManager<
             changePaisa: changePaisa,
             paymentMode: paymentMode,
             notes: notes,
+            status: status,
             isVoided: isVoided,
             rowid: rowid,
           ),
@@ -16528,6 +16569,7 @@ class $$SalesTableTableManager extends RootTableManager<
             Value<int> changePaisa = const Value.absent(),
             Value<String> paymentMode = const Value.absent(),
             Value<String?> notes = const Value.absent(),
+            Value<String> status = const Value.absent(),
             Value<bool> isVoided = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -16553,6 +16595,7 @@ class $$SalesTableTableManager extends RootTableManager<
             changePaisa: changePaisa,
             paymentMode: paymentMode,
             notes: notes,
+            status: status,
             isVoided: isVoided,
             rowid: rowid,
           ),
@@ -16669,6 +16712,11 @@ class $$SalesTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<String> get status => $state.composableBuilder(
+      column: $state.table.status,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<bool> get isVoided => $state.composableBuilder(
       column: $state.table.isVoided,
       builder: (column, joinBuilders) =>
@@ -16780,6 +16828,11 @@ class $$SalesTableOrderingComposer
 
   ColumnOrderings<String> get notes => $state.composableBuilder(
       column: $state.table.notes,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get status => $state.composableBuilder(
+      column: $state.table.status,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

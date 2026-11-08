@@ -10,7 +10,7 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
 
       // Verify tables and schema version
-      expect(db.schemaVersion, equals(6));
+      expect(db.schemaVersion, equals(7));
 
       // Test insertion into business profile
       await db.into(db.businessProfiles).insert(

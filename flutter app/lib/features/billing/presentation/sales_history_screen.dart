@@ -16,6 +16,7 @@ class SalesHistoryScreen extends ConsumerStatefulWidget {
 
 class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
   final _searchController = TextEditingController();
+  String _statusFilter = 'ALL'; // 'ALL', 'VERIFIED', 'DRAFT'
 
   @override
   void dispose() {
@@ -27,6 +28,70 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
     showDialog(
       context: context,
       builder: (ctx) => SaleDetailDialog(saleId: saleId),
+    );
+  }
+
+  Future<void> _verifyDraft(String saleId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Validate & Issue Bill / बिल प्रमाणीकरण'),
+        content: const Text(
+          'This will validate item stock, assign an official sequential fiscal invoice number, and record deductions in the stock ledger.\n\nDo you want to verify this draft bill now?',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, foregroundColor: Colors.white),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Verify & Issue Bill'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final repo = ref.read(salesRepositoryProvider);
+        final verifiedSale = await repo.verifyDraftSale(saleId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Invoice ${verifiedSale.invoiceNumber} successfully verified & issued!'),
+              backgroundColor: AppTheme.accentTeal,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to verify bill: $e'), backgroundColor: Colors.redAccent),
+          );
+        }
+      }
+    }
+  }
+
+  Widget _buildFilterChip(String status, String label) {
+    final isSelected = _statusFilter == status;
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => setState(() => _statusFilter = status),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryBlue : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : AppTheme.textMuted,
+          ),
+        ),
+      ),
     );
   }
 
@@ -128,6 +193,23 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                         },
                       ),
                     ),
+                    const SizedBox(width: 14),
+                    // Status Filter Segment
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundLight,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppTheme.borderSubtle),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildFilterChip('ALL', 'All / सबै'),
+                          _buildFilterChip('VERIFIED', 'Verified / प्रमाणित'),
+                          _buildFilterChip('DRAFT', 'Drafts / ड्राफ्ट'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -140,7 +222,12 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text('Error loading invoices: $e')),
                 data: (sales) {
-                  if (sales.isEmpty) {
+                  final filteredSales = sales.where((s) {
+                    if (_statusFilter == 'ALL') return true;
+                    return s.status == _statusFilter;
+                  }).toList();
+
+                  if (filteredSales.isEmpty) {
                     return const Card(
                       child: Center(
                         child: Column(
@@ -148,7 +235,7 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                           children: [
                             Icon(Icons.receipt_long_outlined, size: 54, color: AppTheme.textMuted),
                             SizedBox(height: 12),
-                            Text('No sales invoices found', style: TextStyle(fontSize: 15, color: AppTheme.textMuted)),
+                            Text('No sales invoices found matching filter', style: TextStyle(fontSize: 15, color: AppTheme.textMuted)),
                           ],
                         ),
                       ),
@@ -173,13 +260,33 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                             DataColumn(label: Text('Sync', style: TextStyle(fontWeight: FontWeight.bold))),
                             DataColumn(label: Text('Action', style: TextStyle(fontWeight: FontWeight.bold))),
                           ],
-                          rows: sales.map((s) {
+                          rows: filteredSales.map((s) {
                             final localDate = s.invoiceDate.toLocal();
+                            final isDraft = s.status == 'DRAFT';
 
                             return DataRow(
                               cells: [
                                 DataCell(Text(dateFormat.format(localDate), style: const TextStyle(fontSize: 12))),
-                                DataCell(Text(s.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+                                DataCell(
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isDraft)
+                                        const Padding(
+                                          padding: EdgeInsets.only(right: 4.0),
+                                          child: Icon(Icons.edit_note, size: 16, color: Colors.orange),
+                                        ),
+                                      Text(
+                                        s.invoiceNumber,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: isDraft ? Colors.deepOrange : AppTheme.textDark,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 DataCell(
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,15 +309,19 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: s.isVoided ? Colors.red.withOpacity(0.12) : AppTheme.accentTeal.withOpacity(0.12),
+                                      color: s.isVoided
+                                          ? Colors.red.withOpacity(0.12)
+                                          : (isDraft ? Colors.orange.withOpacity(0.15) : AppTheme.accentTeal.withOpacity(0.12)),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      s.isVoided ? 'VOIDED' : 'ISSUED',
+                                      s.isVoided ? 'VOIDED' : (isDraft ? 'DRAFT' : 'VERIFIED'),
                                       style: TextStyle(
-                                        color: s.isVoided ? Colors.redAccent : AppTheme.accentTeal,
+                                        color: s.isVoided
+                                            ? Colors.redAccent
+                                            : (isDraft ? Colors.deepOrange : AppTheme.accentTeal),
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 10,
+                                        fontSize: 10.5,
                                       ),
                                     ),
                                   ),
@@ -222,11 +333,22 @@ class _SalesHistoryScreenState extends ConsumerState<SalesHistoryScreen> {
                                   ),
                                 ),
                                 DataCell(
-                                  IconButton(
-                                    icon: const Icon(Icons.receipt_outlined, size: 18),
-                                    tooltip: 'View & Reprint Bill',
-                                    color: AppTheme.primaryBlue,
-                                    onPressed: () => _openDetail(s.id),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isDraft)
+                                        IconButton(
+                                          icon: const Icon(Icons.check_circle_outline, size: 20, color: AppTheme.accentTeal),
+                                          tooltip: 'Validate & Verify (प्रमाणीकरण गर्नुहोस्)',
+                                          onPressed: () => _verifyDraft(s.id),
+                                        ),
+                                      IconButton(
+                                        icon: const Icon(Icons.receipt_outlined, size: 18),
+                                        tooltip: 'View & Reprint Bill',
+                                        color: AppTheme.primaryBlue,
+                                        onPressed: () => _openDetail(s.id),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
