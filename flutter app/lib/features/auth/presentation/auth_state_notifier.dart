@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../backup/data/backup_service_locator.dart';
 import '../data/google_auth_service.dart';
 import '../data/local_auth_repository.dart';
+import '../../inventory/data/inventory_repository.dart';
+import '../../inventory/presentation/inventory_provider.dart';
 
 enum AuthStatus {
   splash,
@@ -49,15 +51,24 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final LocalAuthRepository _localRepo;
   final GoogleAuthService _googleAuth;
+  final InventoryRepository? _inventoryRepo;
 
   AuthNotifier({
     required LocalAuthRepository localRepo,
     required GoogleAuthService googleAuth,
+    InventoryRepository? inventoryRepo,
   })  : _localRepo = localRepo,
         _googleAuth = googleAuth,
+        _inventoryRepo = inventoryRepo,
         super(const AuthState(status: AuthStatus.splash));
 
   Future<void> checkInitialSession() async {
+    // 0. Seed default test credentials (admin / admin123) and demo inventory if empty
+    try {
+      await _localRepo.seedDefaultTestAccount();
+      await _inventoryRepo?.seedDevData();
+    } catch (_) {}
+
     // 1. Check persistent local session
     final hasSession = await _localRepo.hasActiveSession();
     if (hasSession) {
@@ -193,5 +204,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final localRepo = ref.watch(localAuthRepositoryProvider);
   final googleAuth = ref.watch(googleAuthServiceProvider);
-  return AuthNotifier(localRepo: localRepo, googleAuth: googleAuth);
+  final inventoryRepo = ref.watch(inventoryRepositoryProvider);
+  return AuthNotifier(
+    localRepo: localRepo,
+    googleAuth: googleAuth,
+    inventoryRepo: inventoryRepo,
+  );
 });

@@ -20,8 +20,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
 
   // Local login form state
   final _loginFormKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(text: 'admin');
+  final _passwordController = TextEditingController(text: 'admin123');
   bool _obscurePassword = true;
 
   // Register form state
@@ -337,7 +337,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
 
                   // Tab Bar View content
                   SizedBox(
-                    height: _isRegisterMode ? 460 : 310,
+                    height: _isRegisterMode ? 460 : 365,
                     child: TabBarView(
                       controller: _tabController,
                       children: [
@@ -378,6 +378,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.key, size: 16, color: AppTheme.primaryBlue),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Demo Login: admin / admin123',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.primaryBlue,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _usernameController.text = 'admin';
+                      _passwordController.text = 'admin123';
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'Auto-Fill',
+                      style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           TextFormField(
             controller: _usernameController,
             decoration: InputDecoration(

@@ -57,6 +57,20 @@ class LocalAuthRepository {
     return (count.read(_db.localAuth.id.count()) ?? 0) > 0;
   }
 
+  /// Seeds default test credentials (admin / admin123) if no local account exists yet.
+  Future<LocalAuthData?> seedDefaultTestAccount() async {
+    final hasAccount = await hasLocalAccount();
+    if (hasAccount) return null;
+
+    return await createLocalAccount(
+      username: 'admin',
+      password: 'admin123',
+      securityQuestion: 'What is your shop name?',
+      securityAnswer: 'Electronics',
+      displayName: 'Admin (व्यवस्थापक)',
+    );
+  }
+
   /// Creates a new local credentials account.
   Future<LocalAuthData> createLocalAccount({
     required String username,

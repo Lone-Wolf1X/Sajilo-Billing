@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/database/sync_status.dart';
+import 'default_products_data.dart';
 
 class InventoryRepository {
   final AppDatabase _db;
@@ -282,203 +284,187 @@ class InventoryRepository {
     return (_db.select(_db.units)..where((tbl) => tbl.id.equals(id))).getSingle();
   }
 
-  /// Seeds default categories, units, and retail products for quick dev setup.
-  Future<void> seedDevData() async {
+  /// Imports products catalog from JSON string (supports products.json structure).
+  /// Returns the number of items successfully processed.
+  Future<int> importProductsFromJson(String jsonContent) async {
+    final Map<String, dynamic> parsed = json.decode(jsonContent) as Map<String, dynamic>;
+    final shopName = parsed['shopName'] as String? ?? 'Electronics & Watch Center';
+    final productList = parsed['products'] as List<dynamic>? ?? [];
+
     final now = DateTime.now().toUtc();
 
-    // Check if items already exist
-    final existingItems = await (_db.select(_db.items)..limit(1)).get();
-    if (existingItems.isNotEmpty) return;
+    return await _db.transaction(() async {
+      // 1. Ensure business profile exists if none configured
+      final profileCount = await (_db.selectOnly(_db.businessProfiles)
+            ..addColumns([_db.businessProfiles.id.count()]))
+          .getSingle();
+      final hasProfile = (profileCount.read(_db.businessProfiles.id.count()) ?? 0) > 0;
+      if (!hasProfile) {
+        await _db.into(_db.businessProfiles).insert(
+              BusinessProfilesCompanion.insert(
+                id: _uuid.v4(),
+                businessName: shopName,
+                businessNameNepali: const Value('इलेक्ट्रोनिक्स एण्ड वाच सेन्टर'),
+                panVatNumber: '601234567',
+                contactNumber: '9841234567',
+                shopAddress: const Value('New Road, Kathmandu'),
+                isCurrent: const Value(true),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+                syncStatus: const Value(SyncStatus.pending),
+              ),
+            );
+      }
 
-    await _db.transaction(() async {
-      // 1. Seed Units
-      final defaultUnits = [
+      // 2. Ensure default units exist
+      final existingUnits = await _db.select(_db.units).get();
+      final unitMap = {for (final u in existingUnits) u.symbol.toLowerCase(): u.id};
+
+      final standardUnits = [
         {'name': 'Piece', 'symbol': 'pcs', 'nepali': 'थान', 'fractional': false},
+        {'name': 'Service', 'symbol': 'service', 'nepali': 'सेवा', 'fractional': false},
         {'name': 'Kilogram', 'symbol': 'kg', 'nepali': 'केजी', 'fractional': true},
         {'name': 'Liter', 'symbol': 'ltr', 'nepali': 'लिटर', 'fractional': true},
         {'name': 'Packet', 'symbol': 'pkt', 'nepali': 'प्याकेट', 'fractional': false},
         {'name': 'Box', 'symbol': 'box', 'nepali': 'बाकस', 'fractional': false},
-        {'name': 'Bag / Bora', 'symbol': 'bag', 'nepali': 'बोरा', 'fractional': false},
       ];
 
-      for (final u in defaultUnits) {
-        await _db.into(_db.units).insert(
-              UnitsCompanion.insert(
-                id: _uuid.v4(),
-                name: u['name'] as String,
-                symbol: u['symbol'] as String,
-                nepaliSymbol: Value(u['nepali'] as String),
-                isFractional: Value(u['fractional'] as bool),
-                createdAt: Value(now),
-                updatedAt: Value(now),
-                syncStatus: const Value(SyncStatus.pending),
-                isDeleted: const Value(false),
-              ),
-            );
+      for (final u in standardUnits) {
+        final sym = (u['symbol'] as String).toLowerCase();
+        if (!unitMap.containsKey(sym)) {
+          final id = _uuid.v4();
+          await _db.into(_db.units).insert(
+                UnitsCompanion.insert(
+                  id: id,
+                  name: u['name'] as String,
+                  symbol: u['symbol'] as String,
+                  nepaliSymbol: Value(u['nepali'] as String),
+                  isFractional: Value(u['fractional'] as bool),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
+                  isDeleted: const Value(false),
+                ),
+              );
+          unitMap[sym] = id;
+        }
       }
 
-      // 2. Seed Categories
-      final catGrainsId = _uuid.v4();
-      final catOilsId = _uuid.v4();
-      final catSnacksId = _uuid.v4();
-      final catSpicesId = _uuid.v4();
+      // 3. Ensure categories from JSON exist
+      final existingCats = await _db.select(_db.categories).get();
+      final catMap = {for (final c in existingCats) c.name.toLowerCase(): c.id};
 
-      await _db.into(_db.categories).insert(
-            CategoriesCompanion.insert(
-              id: catGrainsId,
-              name: 'Rice, Grains & Pulses',
-              nepaliName: const Value('चामल, अन्न तथा दाल'),
-              createdAt: Value(now),
-              updatedAt: Value(now),
-              syncStatus: const Value(SyncStatus.pending),
-              isDeleted: const Value(false),
-            ),
-          );
-      await _db.into(_db.categories).insert(
-            CategoriesCompanion.insert(
-              id: catOilsId,
-              name: 'Cooking Oils & Ghee',
-              nepaliName: const Value('खाने तेल तथा घ्यु'),
-              createdAt: Value(now),
-              updatedAt: Value(now),
-              syncStatus: const Value(SyncStatus.pending),
-              isDeleted: const Value(false),
-            ),
-          );
-      await _db.into(_db.categories).insert(
-            CategoriesCompanion.insert(
-              id: catSnacksId,
-              name: 'Snacks & Noodles',
-              nepaliName: const Value('खाजा तथा चाउचाउ'),
-              createdAt: Value(now),
-              updatedAt: Value(now),
-              syncStatus: const Value(SyncStatus.pending),
-              isDeleted: const Value(false),
-            ),
-          );
-      await _db.into(_db.categories).insert(
-            CategoriesCompanion.insert(
-              id: catSpicesId,
-              name: 'Spices & Salt',
-              nepaliName: const Value('मसला तथा नुन'),
-              createdAt: Value(now),
-              updatedAt: Value(now),
-              syncStatus: const Value(SyncStatus.pending),
-              isDeleted: const Value(false),
-            ),
-          );
+      const categoryNepaliTranslations = {
+        'watches': 'घडीहरू',
+        'electronics': 'इलेक्ट्रोनिक्स',
+        'mobile phones': 'मोबाइल फोन',
+        'mobile accessories': 'मोबाइल सामानहरू',
+        'mobile parts': 'मोबाइल पार्टपुर्जा',
+        'storage accessories': 'मेमोरी तथा स्टोरेज',
+        'radios': 'रेडियो',
+        'radio parts': 'रेडियो पार्टपुर्जा',
+        'watch parts': 'घडी पार्टपुर्जा',
+        'watch repair': 'घडी मर्मत',
+        'torches': 'टर्च / बत्ती',
+      };
 
-      // 3. Seed Items
-      final sampleItems = [
-        {
-          'name': 'Basmati Rice 25kg',
-          'nepali': 'बासमती चामल २५ केजी',
-          'sku': 'RICE-BAS-25',
-          'catId': catGrainsId,
-          'unit': 'bag',
-          'cost': 235000, // Rs. 2,350.00
-          'price': 255000, // Rs. 2,550.00
-          'stock': 25.0,
-          'threshold': 5.0,
-        },
-        {
-          'name': 'Mustard Oil 1L (Toriko Tel)',
-          'nepali': 'तोरीको तेल १ लिटर',
-          'sku': 'OIL-MUS-1L',
-          'catId': catOilsId,
-          'unit': 'ltr',
-          'cost': 21000, // Rs. 210.00
-          'price': 24500, // Rs. 245.00
-          'stock': 40.0,
-          'threshold': 8.0,
-        },
-        {
-          'name': 'Sunflower Cooking Oil 1L',
-          'nepali': 'सूर्यमुखी तेल १ लिटर',
-          'sku': 'OIL-SUN-1L',
-          'catId': catOilsId,
-          'unit': 'ltr',
-          'cost': 19500, // Rs. 195.00
-          'price': 22500, // Rs. 225.00
-          'stock': 35.0,
-          'threshold': 6.0,
-        },
-        {
-          'name': 'Tata Iodized Salt 1kg',
-          'nepali': 'टाटा आयोडिन नुन १ केजी',
-          'sku': 'SALT-TATA-1',
-          'catId': catSpicesId,
-          'unit': 'pkt',
-          'cost': 2300, // Rs. 23.00
-          'price': 2800, // Rs. 28.00
-          'stock': 120.0,
-          'threshold': 20.0,
-        },
-        {
-          'name': 'Wai Wai Noodles (Carton 30pcs)',
-          'nepali': 'वाइ वाइ चाउचाउ कार्टुन',
-          'sku': 'WW-NDL-CTN',
-          'catId': catSnacksId,
-          'unit': 'box',
-          'cost': 56000, // Rs. 560.00
-          'price': 63000, // Rs. 630.00
-          'stock': 18.0,
-          'threshold': 4.0,
-        },
-        {
-          'name': 'Red Lentils / Musuro Daal 1kg',
-          'nepali': 'मुसुरो दाल १ केजी',
-          'sku': 'DAL-MUS-1KG',
-          'catId': catGrainsId,
-          'unit': 'kg',
-          'cost': 14000, // Rs. 140.00
-          'price': 16500, // Rs. 165.00
-          'stock': 3.0, // Low stock trigger!
-          'threshold': 10.0,
-        },
-      ];
-
-      for (final item in sampleItems) {
-        final itemId = _uuid.v4();
-        final stock = item['stock'] as double;
-
-        await _db.into(_db.items).insert(
-              ItemsCompanion.insert(
-                id: itemId,
-                name: item['name'] as String,
-                nepaliName: Value(item['nepali'] as String),
-                sku: item['sku'] as String,
-                categoryId: Value(item['catId'] as String),
-                unit: Value(item['unit'] as String),
-                purchasePricePaisa: Value(item['cost'] as int),
-                sellingPricePaisa: Value(item['price'] as int),
-                stockQty: Value(stock),
-                lowStockThreshold: Value(item['threshold'] as double),
-                isActive: const Value(true),
-                createdAt: Value(now),
-                updatedAt: Value(now),
-                syncStatus: const Value(SyncStatus.pending),
-                isDeleted: const Value(false),
-              ),
-            );
-
-        // Opening ledger entry
-        await _db.into(_db.stockLedger).insert(
-              StockLedgerCompanion.insert(
-                id: _uuid.v4(),
-                itemId: itemId,
-                qtyChange: stock,
-                reason: 'INITIAL_STOCK',
-                refType: 'INITIAL_STOCK',
-                refId: itemId,
-                notes: const Value('Opening Stock on seeding'),
-                createdAt: Value(now),
-                updatedAt: Value(now),
-                syncStatus: const Value(SyncStatus.pending),
-                isDeleted: const Value(false),
-              ),
-            );
+      for (final raw in productList) {
+        final catName = (raw['category'] as String? ?? 'General').trim();
+        final catKey = catName.toLowerCase();
+        if (!catMap.containsKey(catKey)) {
+          final catId = _uuid.v4();
+          final nepali = categoryNepaliTranslations[catKey] ?? catName;
+          await _db.into(_db.categories).insert(
+                CategoriesCompanion.insert(
+                  id: catId,
+                  name: catName,
+                  nepaliName: Value(nepali),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
+                  isDeleted: const Value(false),
+                ),
+              );
+          catMap[catKey] = catId;
+        }
       }
+
+      // 4. Insert items and stock ledger
+      int count = 0;
+      for (final raw in productList) {
+        final id = raw['id'];
+        final name = (raw['productName'] as String).trim();
+        final catName = (raw['category'] as String? ?? 'General').trim();
+        final catId = catMap[catName.toLowerCase()];
+        final priceNum = (raw['price'] as num?) ?? 0;
+        final qtyNum = (raw['quantity'] as num?) ?? 0;
+        final rawUnit = (raw['unit'] as String? ?? 'piece').toLowerCase().trim();
+        final unitSymbol = (rawUnit == 'piece') ? 'pcs' : rawUnit;
+
+        final sku = 'SKU-${id.toString().padLeft(4, '0')}';
+        final sellingPaisa = (priceNum * 100).round();
+        final purchasePaisa = (priceNum * 0.75 * 100).round();
+        final initialStock = qtyNum.toDouble();
+
+        final existing = await (_db.select(_db.items)
+              ..where((tbl) => tbl.sku.equals(sku) & tbl.isDeleted.equals(false)))
+            .getSingleOrNull();
+
+        if (existing == null) {
+          final itemId = _uuid.v4();
+          await _db.into(_db.items).insert(
+                ItemsCompanion.insert(
+                  id: itemId,
+                  name: name,
+                  sku: sku,
+                  categoryId: Value(catId),
+                  unit: Value(unitSymbol),
+                  purchasePricePaisa: Value(purchasePaisa),
+                  sellingPricePaisa: Value(sellingPaisa),
+                  stockQty: Value(initialStock),
+                  lowStockThreshold: const Value(3.0),
+                  isActive: const Value(true),
+                  createdAt: Value(now),
+                  updatedAt: Value(now),
+                  syncStatus: const Value(SyncStatus.pending),
+                  isDeleted: const Value(false),
+                ),
+              );
+
+          if (initialStock > 0) {
+            await _db.into(_db.stockLedger).insert(
+                  StockLedgerCompanion.insert(
+                    id: _uuid.v4(),
+                    itemId: itemId,
+                    qtyChange: initialStock,
+                    reason: 'INITIAL_STOCK',
+                    refType: 'INITIAL_STOCK',
+                    refId: itemId,
+                    notes: const Value('Opening stock from products.json'),
+                    createdAt: Value(now),
+                    updatedAt: Value(now),
+                    syncStatus: const Value(SyncStatus.pending),
+                    isDeleted: const Value(false),
+                  ),
+                );
+          }
+        }
+        count++;
+      }
+
+      return count;
     });
+  }
+
+  /// Seeds demo data using products.json catalog if items table is empty.
+  Future<void> seedDevData({String? jsonOverride}) async {
+    final existingItems = await (_db.select(_db.items)
+          ..where((tbl) => tbl.isDeleted.equals(false))
+          ..limit(1))
+        .get();
+    if (existingItems.isNotEmpty) return;
+
+    final content = jsonOverride ?? bundledProductsJson;
+    await importProductsFromJson(content);
   }
 }
