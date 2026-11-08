@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: saisa-accounting
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/saisa_dev
+    username: ${DB_USERNAME:abhisekpaswan}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
