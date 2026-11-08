@@ -55,7 +55,7 @@ class _SampleBillScreenState extends ConsumerState<SampleBillScreen> {
       setState(() {
         _currentBillData = billData;
         _pdfBytes = bytes;
-        _savedDocPath = savedFile.path;
+        _savedDocPath = savedFile?.path;
       });
     } catch (e) {
       if (mounted) {

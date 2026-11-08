@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:syntech_nepali_calendar/syntech_nepali_calendar.dart';
 
 import '../domain/bill_model.dart';
@@ -620,35 +622,62 @@ class PdfBillGenerator {
     );
   }
 
-  /// Saves PDF bytes to application documents folder.
-  static Future<File> saveToAppDocuments(BillData data, Uint8List bytes) async {
-    final docsDir = await getApplicationDocumentsDirectory();
-    final billsDir = Directory(p.join(docsDir.path, 'SajiloBilling', 'bills'));
-    if (!await billsDir.exists()) {
-      await billsDir.create(recursive: true);
+  /// Saves PDF bytes to application documents folder (Desktop/Mobile only).
+  /// Safe against web and missing plugins so sale completion is never blocked.
+  static Future<File?> saveToAppDocuments(BillData data, Uint8List bytes) async {
+    if (kIsWeb) return null;
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      final billsDir = Directory(p.join(docsDir.path, 'SajiloBilling', 'bills'));
+      if (!await billsDir.exists()) {
+        await billsDir.create(recursive: true);
+      }
+      final file = File(p.join(billsDir.path, '${data.invoiceNumber}.pdf'));
+      await file.writeAsBytes(bytes);
+      return file;
+    } catch (e) {
+      debugPrint('Could not archive bill PDF locally: $e');
+      return null;
     }
-    final file = File(p.join(billsDir.path, '${data.invoiceNumber}.pdf'));
-    await file.writeAsBytes(bytes);
-    return file;
   }
 
-  /// Prompts user to export PDF via native desktop save dialog.
+  /// Prompts user to export PDF via native desktop save dialog or browser download on Web.
   static Future<String?> exportPdf(BillData data, Uint8List bytes) async {
     final suggestedName = '${data.invoiceNumber}.pdf';
-    final location = await getSaveLocation(
-      suggestedName: suggestedName,
-      acceptedTypeGroups: const [
-        XTypeGroup(
-          label: 'PDF Document',
-          extensions: ['pdf'],
-        )
-      ],
-    );
+    if (kIsWeb) {
+      try {
+        await Printing.sharePdf(bytes: bytes, filename: suggestedName);
+        return suggestedName;
+      } catch (e) {
+        debugPrint('Web PDF export failed: $e');
+        return null;
+      }
+    }
 
-    if (location == null) return null;
+    try {
+      final location = await getSaveLocation(
+        suggestedName: suggestedName,
+        acceptedTypeGroups: const [
+          XTypeGroup(
+            label: 'PDF Document',
+            extensions: ['pdf'],
+          )
+        ],
+      );
 
-    final targetFile = File(location.path);
-    await targetFile.writeAsBytes(bytes);
-    return targetFile.path;
+      if (location == null) return null;
+
+      final targetFile = File(location.path);
+      await targetFile.writeAsBytes(bytes);
+      return targetFile.path;
+    } catch (e) {
+      debugPrint('Desktop file_selector export failed, falling back to Printing: $e');
+      try {
+        await Printing.sharePdf(bytes: bytes, filename: suggestedName);
+        return suggestedName;
+      } catch (_) {
+        return null;
+      }
+    }
   }
 }

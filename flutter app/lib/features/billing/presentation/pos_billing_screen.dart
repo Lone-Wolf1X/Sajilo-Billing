@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -180,9 +181,13 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
         final details = await salesRepo.getSaleDetails(sale.id);
         if (details != null) {
           Uint8List? logoBytes;
-          if (profile.logoPath != null) {
-            final f = File(profile.logoPath!);
-            if (await f.exists()) logoBytes = await f.readAsBytes();
+          if (!kIsWeb && profile.logoPath != null) {
+            try {
+              final f = File(profile.logoPath!);
+              if (await f.exists()) logoBytes = await f.readAsBytes();
+            } catch (_) {
+              // Ignore logo loading error
+            }
           }
 
           final billData = BillData.fromSaleRecord(
@@ -192,10 +197,14 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
             logoBytes: logoBytes,
           );
 
-          final pdfDoc = await PdfBillGenerator.generateDocument(billData);
-          final pdfBytes = await pdfDoc.save();
-
-          await PdfBillGenerator.saveToAppDocuments(billData, pdfBytes);
+          Uint8List? pdfBytes;
+          try {
+            final pdfDoc = await PdfBillGenerator.generateDocument(billData);
+            pdfBytes = await pdfDoc.save();
+            await PdfBillGenerator.saveToAppDocuments(billData, pdfBytes);
+          } catch (pdfErr) {
+            debugPrint('Non-fatal: Bill PDF caching failed: $pdfErr');
+          }
 
           // Check for auto-print thermal receipt configuration
           try {
@@ -219,7 +228,7 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
           }
 
           if (mounted) {
-            _showInvoiceSuccessModal(billData, pdfBytes);
+            _showInvoiceSuccessModal(billData, pdfBytes ?? Uint8List(0));
             _clearCart();
           }
         }
