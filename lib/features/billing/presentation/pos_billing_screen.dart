@@ -751,3 +751,4 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
     );
   }
 }
+

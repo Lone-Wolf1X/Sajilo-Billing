@@ -56,3 +56,4 @@ final todaySalesSummaryProvider = FutureProvider<DailySalesSummary>((ref) {
   final repo = ref.watch(salesRepositoryProvider);
   return repo.getTodaySalesSummary();
 });
+

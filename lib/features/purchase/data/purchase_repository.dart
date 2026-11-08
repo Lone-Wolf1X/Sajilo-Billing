@@ -315,3 +315,4 @@ class PurchaseRepository {
     return (_db.select(_db.suppliers)..where((tbl) => tbl.id.equals(id))).getSingle();
   }
 }
+

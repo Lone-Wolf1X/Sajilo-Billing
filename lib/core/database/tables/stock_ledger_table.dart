@@ -12,3 +12,4 @@ class StockLedger extends Table with SyncTableMixin {
   TextColumn get refId => text()();
   TextColumn get notes => text().nullable()();
 }
+

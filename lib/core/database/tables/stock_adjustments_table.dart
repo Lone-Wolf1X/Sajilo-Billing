@@ -10,3 +10,4 @@ class StockAdjustments extends Table with SyncTableMixin {
   TextColumn get reason => text()(); // e.g. 'Physical Count Discrepancy', 'Damaged', 'Expired'
   TextColumn get notes => text().nullable()();
 }
+

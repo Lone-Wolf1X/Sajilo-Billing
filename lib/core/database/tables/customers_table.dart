@@ -8,3 +8,4 @@ class Customers extends Table with SyncTableMixin {
   TextColumn get panVat => text().nullable()();
   TextColumn get address => text().nullable()();
 }
+

@@ -14,3 +14,4 @@ final dashboardMetricsProvider = FutureProvider<DashboardMetrics>((ref) {
   final repo = ref.watch(dashboardRepositoryProvider);
   return repo.getDashboardMetrics();
 });
+

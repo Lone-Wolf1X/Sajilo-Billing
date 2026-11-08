@@ -11,3 +11,4 @@ class BillSequence extends Table {
   @override
   Set<Column> get primaryKey => {sequenceType, fiscalYear};
 }
+

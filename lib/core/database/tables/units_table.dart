@@ -8,3 +8,4 @@ class Units extends Table with SyncTableMixin {
   TextColumn get nepaliSymbol => text().nullable()();
   BoolColumn get isFractional => boolean().withDefault(const Constant(false))();
 }
+

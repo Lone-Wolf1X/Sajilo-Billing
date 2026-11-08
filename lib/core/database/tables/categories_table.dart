@@ -7,3 +7,4 @@ class Categories extends Table with SyncTableMixin {
   TextColumn get nepaliName => text().nullable()();
   TextColumn get description => text().nullable()();
 }
+

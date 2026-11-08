@@ -466,3 +466,4 @@ class SalesRepository {
     return (_db.select(_db.customers)..where((tbl) => tbl.id.equals(id))).getSingle();
   }
 }
+

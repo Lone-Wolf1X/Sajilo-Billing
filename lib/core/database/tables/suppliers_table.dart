@@ -9,3 +9,4 @@ class Suppliers extends Table with SyncTableMixin {
   TextColumn get address => text().nullable()();
   TextColumn get contactPerson => text().nullable()();
 }
+

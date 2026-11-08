@@ -57,3 +57,4 @@ final suppliersStreamProvider = StreamProvider<List<Supplier>>((ref) {
   final repo = ref.watch(purchaseRepositoryProvider);
   return repo.watchSuppliers();
 });
+

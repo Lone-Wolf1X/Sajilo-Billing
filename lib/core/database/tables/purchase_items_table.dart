@@ -15,3 +15,4 @@ class PurchaseItems extends Table with SyncTableMixin {
   IntColumn get vatPaisa => integer().withDefault(const Constant(0))();
   IntColumn get lineTotalPaisa => integer()();
 }
+

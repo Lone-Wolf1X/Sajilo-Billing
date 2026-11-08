@@ -242,3 +242,4 @@ class _PurchaseScreenState extends ConsumerState<PurchaseScreen> {
     );
   }
 }
+

@@ -16,3 +16,4 @@ class Items extends Table with SyncTableMixin {
   RealColumn get lowStockThreshold => real().withDefault(const Constant(5.0))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 }
+

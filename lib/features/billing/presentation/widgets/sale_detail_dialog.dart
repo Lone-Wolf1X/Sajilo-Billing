@@ -281,3 +281,4 @@ class _SaleDetailDialogState extends ConsumerState<SaleDetailDialog> {
     );
   }
 }
+
