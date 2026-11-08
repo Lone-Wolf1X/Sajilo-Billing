@@ -6,6 +6,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/paisa_helper.dart';
 import 'inventory_provider.dart';
+import 'widgets/import_products_dialog.dart';
 import 'widgets/item_form_dialog.dart';
 import 'widgets/stock_adjustment_dialog.dart';
 
@@ -98,6 +99,38 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     }
   }
 
+  void _openImportDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const ImportProductsDialog(),
+    );
+  }
+
+  Future<void> _downloadTemplate({required bool isExcel}) async {
+    try {
+      final service = ref.read(inventoryImportExportServiceProvider);
+      final path = await service.downloadTemplate(isExcel: isExcel);
+      if (path != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Template saved: $path'),
+            backgroundColor: AppTheme.accentTeal,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to download template: $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -113,39 +146,114 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Header Controls
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.inventory,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textDark,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.inventory,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.inventorySubtitle,
+                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    ),
+                  ],
+                ),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    // Download Sample Template Dropdown
+                    PopupMenuButton<String>(
+                      tooltip: 'Download Sample Template (नमुना डाउनलोड)',
+                      onSelected: (val) {
+                        if (val == 'xlsx') _downloadTemplate(isExcel: true);
+                        if (val == 'csv') _downloadTemplate(isExcel: false);
+                      },
+                      itemBuilder: (ctx) => [
+                        const PopupMenuItem(
+                          value: 'xlsx',
+                          child: Row(
+                            children: [
+                              Icon(Icons.table_chart, size: 18, color: Color(0xFF1D6F42)),
+                              SizedBox(width: 8),
+                              Text('Excel Template (.xlsx)'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'csv',
+                          child: Row(
+                            children: [
+                              Icon(Icons.description, size: 18, color: AppTheme.primaryBlue),
+                              SizedBox(width: 8),
+                              Text('CSV Template (.csv)'),
+                            ],
+                          ),
+                        ),
+                      ],
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8.5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppTheme.borderSubtle),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.file_download_outlined, size: 17, color: AppTheme.textDark),
+                            SizedBox(width: 6),
+                            Text('Template (नमुना)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_drop_down, size: 18, color: AppTheme.textMuted),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.inventorySubtitle,
-                        style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    ),
+
+                    // Import CSV / Excel Button
+                    OutlinedButton.icon(
+                      onPressed: _openImportDialog,
+                      icon: const Icon(Icons.file_upload_outlined, size: 17),
+                      label: const Text('Import CSV / Excel'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       ),
-                    ],
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: _seedDefaultItems,
-                  icon: const Icon(Icons.auto_fix_high, size: 16),
-                  label: Text(l10n.seedSampleProducts),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: () => _openItemDialog(),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(l10n.addProduct),
-                  style: ElevatedButton.styleFrom(minimumSize: const Size(140, 42)),
+                    ),
+
+                    // Seed Sample Items Button
+                    OutlinedButton.icon(
+                      onPressed: _seedDefaultItems,
+                      icon: const Icon(Icons.auto_fix_high, size: 16),
+                      label: Text(l10n.seedSampleProducts),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      ),
+                    ),
+
+                    // Add Product Button
+                    ElevatedButton.icon(
+                      onPressed: () => _openItemDialog(),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addProduct),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
