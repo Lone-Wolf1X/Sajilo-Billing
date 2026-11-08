@@ -128,3 +128,4 @@ In the Sajilo Billing app under **Settings > Printer Settings (प्रिन�
 3. **Multi-Copy Receipt**:
    - Set to `1` for normal retail.
    - Set to `2` if store copy is required.
+

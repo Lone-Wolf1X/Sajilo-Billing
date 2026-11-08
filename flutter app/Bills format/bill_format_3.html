@@ -91,12 +91,14 @@
     .bill-card {
       background-color: var(--paper-pink);
       color: var(--ink-maroon);
-      padding: 24px 28px 20px 28px;
+      padding: 20px 24px 16px 24px;
       position: relative;
       border: 1px solid var(--paper-pink-darker);
       display: flex;
       flex-direction: column;
-      min-height: 820px;
+      min-height: 680px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     /* Subtle paper texture overlay */
@@ -371,12 +373,21 @@
       border-radius: 2px;
     }
 
-    /* Print Styles */
+    /* Print Styles: Strictly Single Page (A5 / A4) */
+    @page {
+      size: auto;
+      margin: 4mm 5mm;
+    }
+
     @media print {
-      body {
-        background: transparent;
-        padding: 0;
-        margin: 0;
+      html, body {
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: hidden !important;
       }
 
       .controls-bar {
@@ -384,16 +395,34 @@
       }
 
       .bill-wrapper {
-        box-shadow: none;
-        max-width: 100%;
-        border-radius: 0;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
       }
 
       .bill-card {
-        border: none;
-        min-height: 100vh;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        border: 1px solid var(--ink-maroon) !important;
+        min-height: auto !important;
+        max-height: 100% !important;
+        padding: 16px 20px 12px 20px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .bill-header, .info-grid, .bill-table-container, .bill-footer {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
   </style>
@@ -533,24 +562,8 @@
               <td class="col-rate" contenteditable="true"></td>
               <td class="col-amount" contenteditable="true"></td>
             </tr>
-            <!-- Row 8 -->
-            <tr class="table-body-row">
-              <td class="col-sn" contenteditable="true"></td>
-              <td class="col-desc" contenteditable="true"></td>
-              <td class="col-qty" contenteditable="true"></td>
-              <td class="col-rate" contenteditable="true"></td>
-              <td class="col-amount" contenteditable="true"></td>
-            </tr>
-            <!-- Row 9 -->
-            <tr class="table-body-row">
-              <td class="col-sn" contenteditable="true"></td>
-              <td class="col-desc" contenteditable="true"></td>
-              <td class="col-qty" contenteditable="true"></td>
-              <td class="col-rate" contenteditable="true"></td>
-              <td class="col-amount" contenteditable="true"></td>
-            </tr>
             <!-- Spacer to preserve ruled vertical pad lines -->
-            <tr class="table-spacer-row" style="height: 120px;">
+            <tr class="table-spacer-row" style="height: 40px;">
               <td class="col-sn"></td>
               <td class="col-desc"></td>
               <td class="col-qty"></td>
@@ -643,3 +656,4 @@
   </script>
 </body>
 </html>
+
