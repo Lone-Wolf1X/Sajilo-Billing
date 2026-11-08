@@ -72,3 +72,4 @@ Drift's WebAssembly worker utilizes `SharedArrayBuffer` for synchronous filesyst
 - `Cross-Origin-Embedder-Policy: require-corp`
 
 Ensure your web server or hosting provider provides these headers (already pre-configured in `web/nginx.conf`).
+

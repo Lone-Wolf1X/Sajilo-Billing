@@ -18,3 +18,4 @@ class BillPdfPrinterWeb implements BillPdfPrinter {
     );
   }
 }
+

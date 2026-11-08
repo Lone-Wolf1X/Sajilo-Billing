@@ -67,3 +67,4 @@ app.listen(PORT, () => {
   console.log(`Sajilo Billing Sync Server listening on port ${PORT}`);
   console.log(`Allowed CORS Origins: ${allowedOrigins.join(', ')}`);
 });
+

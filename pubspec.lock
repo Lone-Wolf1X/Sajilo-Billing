@@ -898,6 +898,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  syntech_nepali_calendar:
+    dependency: "direct main"
+    description:
+      name: syntech_nepali_calendar
+      sha256: f1122461be0034f494e2805aedc0425e3dcdd353c5c1d2514de02567cf66dff4
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   term_glyph:
     dependency: transitive
     description:

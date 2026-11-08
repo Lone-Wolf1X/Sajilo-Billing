@@ -13,3 +13,4 @@ class AppStorageLocationsWeb implements AppStorageLocations {
     return null;
   }
 }
+

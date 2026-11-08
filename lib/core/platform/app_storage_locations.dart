@@ -8,3 +8,4 @@ abstract class AppStorageLocations {
 
   static AppStorageLocations get instance => impl.getAppStorageLocationsInstance();
 }
+

@@ -30,3 +30,4 @@ class SecureTokenStoreIo implements SecureTokenStore {
     return _storage.deleteAll();
   }
 }
+

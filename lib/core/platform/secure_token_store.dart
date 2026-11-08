@@ -12,3 +12,4 @@ abstract class SecureTokenStore {
 
   static SecureTokenStore create() => impl.createSecureTokenStore();
 }
+

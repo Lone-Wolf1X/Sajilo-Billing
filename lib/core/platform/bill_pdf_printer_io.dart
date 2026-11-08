@@ -17,3 +17,4 @@ class BillPdfPrinterIo implements BillPdfPrinter {
     );
   }
 }
+

@@ -9,3 +9,4 @@ QueryExecutor openWebDatabase({
     throw UnsupportedError('WebDatabase is only supported on Web platform.');
   });
 }
+

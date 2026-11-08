@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/paisa_helper.dart';
+import '../../../shared/widgets/responsive_card.dart';
 import '../../backup/presentation/backup_provider.dart';
 import '../../inventory/presentation/widgets/item_form_dialog.dart';
 import '../../purchase/presentation/purchase_entry_screen.dart';
@@ -147,102 +148,148 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
               data: (metrics) {
+                final card1 = _buildMetricCard(
+                  title: "Today's Sales / आजको बिक्री",
+                  value: PaisaHelper.formatPaisa(metrics.todaySalesRevenuePaisa),
+                  subtitle: '${metrics.todaySalesCount} invoices generated',
+                  icon: Icons.payments_outlined,
+                  iconColor: AppTheme.primaryBlue,
+                  onTap: onNavigateToSale,
+                );
+
+                final card2 = _buildMetricCard(
+                  title: "Today's Purchases / आजको खरिद",
+                  value: PaisaHelper.formatPaisa(metrics.todayPurchaseAmountPaisa),
+                  subtitle: '${metrics.todayPurchaseCount} supplier intakes',
+                  icon: Icons.local_shipping_outlined,
+                  iconColor: AppTheme.accentTeal,
+                  onTap: onNavigateToPurchase,
+                );
+
+                final card3 = _buildMetricCard(
+                  title: 'Low-Stock Alerts / न्यून मौज्दात',
+                  value: '${metrics.lowStockCount} Items',
+                  subtitle: metrics.lowStockCount > 0 ? 'Requires restocking immediately' : 'Inventory levels healthy',
+                  icon: Icons.warning_amber_rounded,
+                  iconColor: metrics.lowStockCount > 0 ? Colors.redAccent : Colors.grey,
+                  badgeColor: metrics.lowStockCount > 0 ? Colors.redAccent : null,
+                  onTap: onNavigateToInventory,
+                );
+
+                final card4 = _buildMetricCard(
+                  title: 'Total Active Items / कुल सामान',
+                  value: '${metrics.totalItemsCount} Products',
+                  subtitle: 'Registered in store catalog',
+                  icon: Icons.inventory_2_outlined,
+                  iconColor: AppTheme.primaryBlue,
+                  onTap: onNavigateToInventory,
+                );
+
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        // Card 1: Today's Sales
-                        Expanded(
-                          child: _buildMetricCard(
-                            title: "Today's Sales / आजको बिक्री",
-                            value: PaisaHelper.formatPaisa(metrics.todaySalesRevenuePaisa),
-                            subtitle: '${metrics.todaySalesCount} invoices generated',
-                            icon: Icons.payments_outlined,
-                            iconColor: AppTheme.primaryBlue,
-                            onTap: onNavigateToSale,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Card 2: Today's Purchases
-                        Expanded(
-                          child: _buildMetricCard(
-                            title: "Today's Purchases / आजको खरिद",
-                            value: PaisaHelper.formatPaisa(metrics.todayPurchaseAmountPaisa),
-                            subtitle: '${metrics.todayPurchaseCount} supplier intakes',
-                            icon: Icons.local_shipping_outlined,
-                            iconColor: AppTheme.accentTeal,
-                            onTap: onNavigateToPurchase,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Card 3: Low-Stock Items
-                        Expanded(
-                          child: _buildMetricCard(
-                            title: 'Low-Stock Alerts / न्यून मौज्दात',
-                            value: '${metrics.lowStockCount} Items',
-                            subtitle: metrics.lowStockCount > 0 ? 'Requires restocking immediately' : 'Inventory levels healthy',
-                            icon: Icons.warning_amber_rounded,
-                            iconColor: metrics.lowStockCount > 0 ? Colors.redAccent : Colors.grey,
-                            badgeColor: metrics.lowStockCount > 0 ? Colors.redAccent : null,
-                            onTap: onNavigateToInventory,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Card 4: Total Inventory Items
-                        Expanded(
-                          child: _buildMetricCard(
-                            title: 'Total Active Items / कुल सामान',
-                            value: '${metrics.totalItemsCount} Products',
-                            subtitle: 'Registered in store catalog',
-                            icon: Icons.inventory_2_outlined,
-                            iconColor: AppTheme.primaryBlue,
-                            onTap: onNavigateToInventory,
-                          ),
-                        ),
-                      ],
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final width = constraints.maxWidth;
+                        if (width < 650) {
+                          return Column(
+                            children: [
+                              card1,
+                              const SizedBox(height: 12),
+                              card2,
+                              const SizedBox(height: 12),
+                              card3,
+                              const SizedBox(height: 12),
+                              card4,
+                            ],
+                          );
+                        } else if (width < 1050) {
+                          return Column(
+                            children: [
+                              Row(children: [Expanded(child: card1), const SizedBox(width: 16), Expanded(child: card2)]),
+                              const SizedBox(height: 16),
+                              Row(children: [Expanded(child: card3), const SizedBox(width: 16), Expanded(child: card4)]),
+                            ],
+                          );
+                        } else {
+                          return Row(
+                            children: [
+                              Expanded(child: card1),
+                              const SizedBox(width: 16),
+                              Expanded(child: card2),
+                              const SizedBox(width: 16),
+                              Expanded(child: card3),
+                              const SizedBox(width: 16),
+                              Expanded(child: card4),
+                            ],
+                          );
+                        }
+                      },
                     ),
                     const SizedBox(height: 20),
 
                     // Backup & Offline Status Card
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppTheme.accentTeal.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(10),
+                    ResponsiveCard(
+                      child: LayoutBuilder(
+                        builder: (context, cardConstraints) {
+                          final isCompact = cardConstraints.maxWidth < 650;
+                          final infoSection = Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.accentTeal.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.cloud_done_outlined, color: AppTheme.accentTeal, size: 28),
                               ),
-                              child: const Icon(Icons.cloud_done_outlined, color: AppTheme.accentTeal, size: 28),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Offline-First SQLite Storage Active',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    metrics.lastBackupTime != null
-                                        ? 'Last local database backup: ${dateFormat.format(metrics.lastBackupTime!.toLocal())}'
-                                        : 'No manual database backup exported yet. Click "Backup Now" to create a backup file.',
-                                    style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                                  ),
-                                ],
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Offline-First SQLite Storage Active',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      metrics.lastBackupTime != null
+                                          ? 'Last local database backup: ${dateFormat.format(metrics.lastBackupTime!.toLocal())}'
+                                          : 'No manual database backup exported yet. Click "Backup Now" to create a backup file.',
+                                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            OutlinedButton.icon(
-                              onPressed: () => _backupNow(context, ref),
-                              icon: const Icon(Icons.download, size: 16),
-                              label: const Text('Export SQLite Backup'),
-                            ),
-                          ],
-                        ),
+                            ],
+                          );
+
+                          final actionBtn = OutlinedButton.icon(
+                            onPressed: () => _backupNow(context, ref),
+                            icon: const Icon(Icons.download, size: 16),
+                            label: const Text('Export SQLite Backup'),
+                          );
+
+                          if (isCompact) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                infoSection,
+                                const SizedBox(height: 14),
+                                actionBtn,
+                              ],
+                            );
+                          }
+
+                          return Row(
+                            children: [
+                              Expanded(child: infoSection),
+                              const SizedBox(width: 16),
+                              actionBtn,
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -264,53 +311,51 @@ class DashboardScreen extends ConsumerWidget {
     Color? badgeColor,
     VoidCallback? onTap,
   }) {
-    return Card(
-      elevation: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return ResponsiveCard(
+      minHeight: 125,
+      onTap: onTap,
+      padding: const EdgeInsets.all(18.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: iconColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: iconColor, size: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: badgeColor ?? AppTheme.textDark,
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 13, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(fontSize: 11, color: badgeColor ?? AppTheme.textMuted),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 21,
+              fontWeight: FontWeight.bold,
+              color: badgeColor ?? AppTheme.textDark,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 11.5, color: AppTheme.textMuted),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:printing/printing.dart';
+import 'package:syntech_nepali_calendar/syntech_nepali_calendar.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
@@ -42,6 +43,10 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
   String _paymentMode = 'CASH';
   bool _isSaving = false;
   String? _stockErrorMessage;
+
+  // Bill Date Settings
+  bool _isAutoDate = true;
+  DateTime _selectedInvoiceDate = DateTime.now();
 
   @override
   void dispose() {
@@ -160,6 +165,7 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
         customerName: _customerNameController.text.trim(),
         customerPhone: _customerPhoneController.text.trim().isEmpty ? null : _customerPhoneController.text.trim(),
         customerPan: _customerPanController.text.trim().isEmpty ? null : _customerPanController.text.trim(),
+        invoiceDate: _isAutoDate ? null : _selectedInvoiceDate,
         lines: _cartLines,
         billDiscountPaisa: billDiscountPaisa,
         tenderedPaisa: tenderedPaisa,
@@ -215,8 +221,8 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
             Text('Invoice ${billData.invoiceNumber} Generated!'),
           ],
         ),
-        content: SizedBox(
-          width: 480,
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,455 +284,697 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
     final changePaisa = tenderedPaisa > grandTotalPaisa ? (tenderedPaisa - grandTotalPaisa) : 0;
 
     return Scaffold(
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Left Side: Cart & Item Entry (Flex 7)
-          Expanded(
-            flex: 7,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Title and Clear Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Billing Counter (POS) / बिक्री काउन्टर',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textDark),
-                          ),
-                          SizedBox(height: 2),
-                          Text('Fast retail checkout with automatic stock audit', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
-                        ],
-                      ),
-                      if (_cartLines.isNotEmpty)
-                        TextButton.icon(
-                          onPressed: _clearCart,
-                          icon: const Icon(Icons.delete_sweep, color: Colors.redAccent, size: 18),
-                          label: const Text('Clear Cart / खाली गर्नुहोस्', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 1000;
 
-                  // Item Search and Add Bar
-                  Card(
-                    color: AppTheme.backgroundLight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 4,
-                            child: itemsAsync.when(
-                              loading: () => const LinearProgressIndicator(),
-                              error: (_, __) => const SizedBox(),
-                              data: (items) {
-                                return DropdownButtonFormField<Item>(
-                                  value: _selectedItem,
-                                  isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Search / Select Item *',
+          final leftSection = Padding(
+            padding: EdgeInsets.all(isNarrow ? 12.0 : 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Title and Clear Button
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Billing Counter (POS) / बिक्री काउन्टर',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                        ),
+                        SizedBox(height: 2),
+                        Text('Fast retail checkout with automatic stock audit', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                      ],
+                    ),
+                    if (_cartLines.isNotEmpty)
+                      TextButton.icon(
+                        onPressed: _clearCart,
+                        icon: const Icon(Icons.delete_sweep, color: Colors.redAccent, size: 18),
+                        label: const Text('Clear Cart / खाली गर्नुहोस्', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Item Search and Add Bar
+                Card(
+                  color: AppTheme.backgroundLight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: isNarrow
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildItemDropdown(itemsAsync),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _qtyController,
+                                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                      decoration: InputDecoration(
+                                        labelText: 'Qty',
+                                        suffixText: _selectedItem?.unit ?? '',
+                                        isDense: true,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _rateController,
+                                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Rate (Rs.)',
+                                        prefixText: 'Rs. ',
+                                        isDense: true,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _discountController,
+                                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Disc (Rs.)',
+                                        isDense: true,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              ElevatedButton.icon(
+                                onPressed: _addItemToCart,
+                                icon: const Icon(Icons.add_shopping_cart, size: 16),
+                                label: const Text('Add Item to Bill'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryBlue,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: _buildItemDropdown(itemsAsync),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                width: 85,
+                                child: TextFormField(
+                                  controller: _qtyController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: InputDecoration(
+                                    labelText: 'Qty',
+                                    suffixText: _selectedItem?.unit ?? '',
                                     isDense: true,
                                   ),
-                                  items: items.map((item) {
-                                    final stockColor = item.stockQty <= item.lowStockThreshold ? Colors.redAccent : AppTheme.accentTeal;
-                                    return DropdownMenuItem(
-                                      value: item,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(child: Text(item.name, overflow: TextOverflow.ellipsis)),
-                                          Text(
-                                            'Stock: ${item.stockQty} ${item.unit}',
-                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: stockColor),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            PaisaHelper.formatPaisa(item.sellingPricePaisa),
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: _onItemSelected,
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 85,
-                            child: TextFormField(
-                              controller: _qtyController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: InputDecoration(
-                                labelText: 'Qty',
-                                suffixText: _selectedItem?.unit ?? '',
-                                isDense: true,
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 110,
-                            child: TextFormField(
-                              controller: _rateController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: const InputDecoration(
-                                labelText: 'Rate (Rs.)',
-                                prefixText: 'Rs. ',
-                                isDense: true,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 95,
-                            child: TextFormField(
-                              controller: _discountController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: const InputDecoration(
-                                labelText: 'Disc (Rs.)',
-                                isDense: true,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          ElevatedButton.icon(
-                            onPressed: _addItemToCart,
-                            icon: const Icon(Icons.add_shopping_cart, size: 16),
-                            label: const Text('Add'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryBlue,
-                              minimumSize: const Size(80, 44),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Inline Stock Error Notification
-                  if (_stockErrorMessage != null) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.redAccent),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              _stockErrorMessage!,
-                              style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-
-                  // Live Cart Table
-                  Expanded(
-                    child: Card(
-                      child: _cartLines.isEmpty
-                          ? const Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.shopping_basket_outlined, size: 54, color: AppTheme.textMuted),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    'Cart is empty. Select products above to start billing.',
-                                    style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                width: 110,
+                                child: TextFormField(
+                                  controller: _rateController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Rate (Rs.)',
+                                    prefixText: 'Rs. ',
+                                    isDense: true,
                                   ),
-                                ],
+                                ),
                               ),
-                            )
-                          : SingleChildScrollView(
-                              child: DataTable(
-                                columnSpacing: 18,
-                                headingRowColor: MaterialStateProperty.all(AppTheme.backgroundLight),
-                                columns: const [
-                                  DataColumn(label: Text('S.N.', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Item Name', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Qty', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                                  DataColumn(label: Text('Rate', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                                  DataColumn(label: Text('Disc', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                                  DataColumn(label: Text('Total', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                                  DataColumn(label: Text('Action', style: TextStyle(fontWeight: FontWeight.bold))),
-                                ],
-                                rows: List.generate(_cartLines.length, (index) {
-                                  final line = _cartLines[index];
-                                  return DataRow(
-                                    cells: [
-                                      DataCell(Text('${index + 1}')),
-                                      DataCell(Text(line.itemName, style: const TextStyle(fontWeight: FontWeight.w600))),
-                                      DataCell(Text('${line.quantity} ${line.unit}')),
-                                      DataCell(Text(PaisaHelper.formatPaisa(line.ratePaisa))),
-                                      DataCell(Text(PaisaHelper.formatPaisa(line.discountPaisa))),
-                                      DataCell(
-                                        Text(
-                                          PaisaHelper.formatPaisa(line.lineTotalPaisa),
-                                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        IconButton(
-                                          icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 18),
-                                          onPressed: () => _removeCartLine(index),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                width: 95,
+                                child: TextFormField(
+                                  controller: _discountController,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Disc (Rs.)',
+                                    isDense: true,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 10),
+                              ElevatedButton.icon(
+                                onPressed: _addItemToCart,
+                                icon: const Icon(Icons.add_shopping_cart, size: 16),
+                                label: const Text('Add'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryBlue,
+                                  minimumSize: const Size(80, 44),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+
+                // Inline Stock Error Notification
+                if (_stockErrorMessage != null) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.redAccent),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.redAccent, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _stockErrorMessage!,
+                            style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
+                const SizedBox(height: 12),
 
-          // Right Side: Customer, Calculations, & Checkout (Flex 4)
-          Container(
-            width: 380,
-            decoration: const BoxDecoration(
+                // Live Cart Table
+                if (isNarrow)
+                  SizedBox(height: 260, child: _buildCartTable())
+                else
+                  Expanded(child: _buildCartTable()),
+              ],
+            ),
+          );
+
+          final checkoutPanel = Container(
+            width: isNarrow ? double.infinity : 380,
+            decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(left: BorderSide(color: AppTheme.borderSubtle)),
+              border: isNarrow
+                  ? const Border(top: BorderSide(color: AppTheme.borderSubtle))
+                  : const Border(left: BorderSide(color: AppTheme.borderSubtle)),
             ),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
+              child: _buildCheckoutForm(subtotalPaisa, taxablePaisa, vatPaisa, grandTotalPaisa, changePaisa),
+            ),
+          );
+
+          if (isNarrow) {
+            return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Customer & Payment / ग्राहक तथा भुक्तानी',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 14),
+                  leftSection,
+                  checkoutPanel,
+                ],
+              ),
+            );
+          }
 
-                  // Customer Fields
-                  TextFormField(
-                    controller: _customerNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Name / ग्राहकको नाम',
-                      prefixIcon: Icon(Icons.person_outline, size: 20),
-                      isDense: true,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _customerPhoneController,
-                          keyboardType: TextInputType.phone,
-                          maxLength: 10,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone',
-                            counterText: '',
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _customerPanController,
-                          keyboardType: TextInputType.number,
-                          maxLength: 9,
-                          decoration: const InputDecoration(
-                            labelText: 'Buyer PAN',
-                            counterText: '',
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: 7, child: leftSection),
+              checkoutPanel,
+            ],
+          );
+        },
+      ),
+    );
+  }
 
-                  // VAT Toggle
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.backgroundLight,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.borderSubtle),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Issue 13% VAT Bill (कर बिजक)',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                        Switch(
-                          value: _isVatBill,
-                          activeColor: AppTheme.primaryBlue,
-                          onChanged: (val) => setState(() => _isVatBill = val),
-                        ),
-                      ],
-                    ),
+  Widget _buildItemDropdown(AsyncValue<List<Item>> itemsAsync) {
+    return itemsAsync.when(
+      loading: () => const LinearProgressIndicator(),
+      error: (_, __) => const SizedBox(),
+      data: (items) {
+        return DropdownButtonFormField<Item>(
+          value: _selectedItem,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'Search / Select Item *',
+            isDense: true,
+          ),
+          items: items.map((item) {
+            final stockColor = item.stockQty <= item.lowStockThreshold ? Colors.redAccent : AppTheme.accentTeal;
+            return DropdownMenuItem(
+              value: item,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: Text(item.name, overflow: TextOverflow.ellipsis)),
+                  Text(
+                    'Stock: ${item.stockQty} ${item.unit}',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: stockColor),
                   ),
-                  const SizedBox(height: 14),
-
-                  // Payment Mode Choice
-                  const Text('Payment Mode (भुक्तानीको माध्यम):', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ChoiceChip(
-                          label: const Text('Cash / नगद', style: TextStyle(fontSize: 12)),
-                          selected: _paymentMode == 'CASH',
-                          onSelected: (s) {
-                            if (s) setState(() => _paymentMode = 'CASH');
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ChoiceChip(
-                          label: const Text('Fonepay / QR', style: TextStyle(fontSize: 12)),
-                          selected: _paymentMode == 'FONEPAY',
-                          onSelected: (s) {
-                            if (s) setState(() => _paymentMode = 'FONEPAY');
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ChoiceChip(
-                          label: const Text('Credit / उधारो', style: TextStyle(fontSize: 12)),
-                          selected: _paymentMode == 'CREDIT',
-                          onSelected: (s) {
-                            if (s) setState(() => _paymentMode = 'CREDIT');
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(color: AppTheme.borderSubtle),
-                  const SizedBox(height: 10),
-
-                  // Calculations
-                  _buildCalcRow('Subtotal / उप-जम्मा:', PaisaHelper.formatPaisa(subtotalPaisa)),
-                  const SizedBox(height: 8),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Bill Discount (Rs.):', style: TextStyle(fontSize: 13)),
-                      SizedBox(
-                        width: 100,
-                        child: TextFormField(
-                          controller: _billDiscountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          textAlign: TextAlign.right,
-                          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.all(8)),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  _buildCalcRow('Taxable Amount:', PaisaHelper.formatPaisa(taxablePaisa)),
-                  const SizedBox(height: 8),
-                  _buildCalcRow('13% VAT:', PaisaHelper.formatPaisa(vatPaisa)),
-                  const Divider(color: AppTheme.borderSubtle, height: 20),
-
-                  _buildCalcRow(
-                    'Grand Total / कुल जम्मा:',
-                    PaisaHelper.formatPaisa(grandTotalPaisa),
-                    isBold: true,
-                    color: AppTheme.primaryBlue,
-                    fontSize: 18,
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Tendered and Change calculator
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Tendered Cash (रु.):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                      SizedBox(
-                        width: 120,
-                        child: TextFormField(
-                          controller: _tenderedController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          textAlign: TextAlign.right,
-                          decoration: const InputDecoration(
-                            isDense: true,
-                            prefixText: 'Rs. ',
-                            contentPadding: EdgeInsets.all(8),
-                          ),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.accentTeal.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Change Return (फिर्ता रकम):',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.accentTeal),
-                        ),
-                        Text(
-                          PaisaHelper.formatPaisa(changePaisa),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.accentTeal),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Complete Checkout Button
-                  ElevatedButton.icon(
-                    onPressed: _isSaving ? null : _completeCheckout,
-                    icon: _isSaving
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
-                        : const Icon(Icons.print),
-                    label: const Text('Complete & Generate Bill (Enter)'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryBlue,
-                      minimumSize: const Size.fromHeight(50),
-                    ),
+                  const SizedBox(width: 8),
+                  Text(
+                    PaisaHelper.formatPaisa(item.sellingPricePaisa),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
+            );
+          }).toList(),
+          onChanged: _onItemSelected,
+        );
+      },
+    );
+  }
+
+  Widget _buildCartTable() {
+    return Card(
+      child: _cartLines.isEmpty
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.shopping_basket_outlined, size: 54, color: AppTheme.textMuted),
+                    SizedBox(height: 10),
+                    Text(
+                      'Cart is empty. Select products above to start billing.',
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                child: DataTable(
+                  columnSpacing: 18,
+                  headingRowColor: MaterialStateProperty.all(AppTheme.backgroundLight),
+                  columns: const [
+                    DataColumn(label: Text('S.N.', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Item Name', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Qty', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                    DataColumn(label: Text('Rate', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                    DataColumn(label: Text('Disc', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                    DataColumn(label: Text('Total', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                    DataColumn(label: Text('Action', style: TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                  rows: List.generate(_cartLines.length, (index) {
+                    final line = _cartLines[index];
+                    return DataRow(
+                      cells: [
+                        DataCell(Text('${index + 1}')),
+                        DataCell(Text(line.itemName, style: const TextStyle(fontWeight: FontWeight.w600))),
+                        DataCell(Text('${line.quantity} ${line.unit}')),
+                        DataCell(Text(PaisaHelper.formatPaisa(line.ratePaisa))),
+                        DataCell(Text(PaisaHelper.formatPaisa(line.discountPaisa))),
+                        DataCell(
+                          Text(
+                            PaisaHelper.formatPaisa(line.lineTotalPaisa),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                          ),
+                        ),
+                        DataCell(
+                          IconButton(
+                            icon: const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 18),
+                            onPressed: () => _removeCartLine(index),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
             ),
+    );
+  }
+
+  Widget _buildCheckoutForm(
+    int subtotalPaisa,
+    int taxablePaisa,
+    int vatPaisa,
+    int grandTotalPaisa,
+    int changePaisa,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Customer & Payment / ग्राहक तथा भुक्तानी',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        const SizedBox(height: 12),
+
+        // Invoice Date Mode Toggle & Nepali Calendar Display
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundLight,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTheme.borderSubtle),
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.calendar_month_outlined, size: 16, color: AppTheme.primaryBlue),
+                      SizedBox(width: 6),
+                      Text(
+                        'Bill Date / बिल मिति',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: () => setState(() => _isAutoDate = true),
+                        borderRadius: BorderRadius.circular(4),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _isAutoDate ? AppTheme.primaryBlue : Colors.transparent,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: _isAutoDate ? AppTheme.primaryBlue : AppTheme.borderSubtle,
+                            ),
+                          ),
+                          child: Text(
+                            'Auto',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: _isAutoDate ? Colors.white : AppTheme.textDark,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () => setState(() => _isAutoDate = false),
+                        borderRadius: BorderRadius.circular(4),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: !_isAutoDate ? AppTheme.primaryBlue : Colors.transparent,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: !_isAutoDate ? AppTheme.primaryBlue : AppTheme.borderSubtle,
+                            ),
+                          ),
+                          child: Text(
+                            'Manual',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: !_isAutoDate ? Colors.white : AppTheme.textDark,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Builder(
+                builder: (context) {
+                  final effectiveDate = _isAutoDate ? DateTime.now() : _selectedInvoiceDate;
+                  final bsDateStr = NepaliDateFormat('yyyy-MM-dd', Language.nepali).format(effectiveDate.toNepaliDateTime());
+                  final adDateStr = '${effectiveDate.year}-${effectiveDate.month.toString().padLeft(2, '0')}-${effectiveDate.day.toString().padLeft(2, '0')}';
+                  return InkWell(
+                    onTap: _isAutoDate ? null : () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedInvoiceDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2035),
+                      );
+                      if (picked != null) {
+                        setState(() => _selectedInvoiceDate = picked);
+                      }
+                    },
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          '$adDateStr AD',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.accentTeal.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'वि.सं. $bsDateStr',
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppTheme.accentTeal),
+                          ),
+                        ),
+                        if (!_isAutoDate)
+                          const Icon(Icons.edit_calendar, size: 14, color: AppTheme.primaryBlue),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Customer Fields
+        TextFormField(
+          controller: _customerNameController,
+          decoration: const InputDecoration(
+            labelText: 'Customer Name / ग्राहकको नाम',
+            prefixIcon: Icon(Icons.person_outline, size: 20),
+            isDense: true,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _customerPhoneController,
+                keyboardType: TextInputType.phone,
+                maxLength: 10,
+                decoration: const InputDecoration(
+                  labelText: 'Phone',
+                  counterText: '',
+                  isDense: true,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: _customerPanController,
+                keyboardType: TextInputType.number,
+                maxLength: 9,
+                decoration: const InputDecoration(
+                  labelText: 'Buyer PAN',
+                  counterText: '',
+                  isDense: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // VAT Toggle
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppTheme.backgroundLight,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppTheme.borderSubtle),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Text(
+                  'Issue 13% VAT Bill (कर बिजक)',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Switch(
+                value: _isVatBill,
+                activeColor: AppTheme.primaryBlue,
+                onChanged: (val) => setState(() => _isVatBill = val),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Payment Mode Choice
+        const Text('Payment Mode (भुक्तानीको माध्यम):', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            _buildPaymentChip('CASH', 'Cash / नगद'),
+            _buildPaymentChip('FONEPAY', 'Fonepay / QR'),
+            _buildPaymentChip('CREDIT', 'Credit / उधारो'),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // Calculations
+        _buildCalcRow('Subtotal / उप-जम्मा:', PaisaHelper.formatPaisa(subtotalPaisa)),
+        const SizedBox(height: 8),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Expanded(
+              child: Text('Bill Discount (Rs.):', style: TextStyle(fontSize: 13)),
+            ),
+            SizedBox(
+              width: 100,
+              child: TextFormField(
+                controller: _billDiscountController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textAlign: TextAlign.right,
+                decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.all(8)),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        _buildCalcRow('Taxable Amount:', PaisaHelper.formatPaisa(taxablePaisa)),
+        const SizedBox(height: 8),
+        _buildCalcRow('13% VAT:', PaisaHelper.formatPaisa(vatPaisa)),
+        const Divider(color: AppTheme.borderSubtle, height: 20),
+
+        _buildCalcRow(
+          'Grand Total / कुल जम्मा:',
+          PaisaHelper.formatPaisa(grandTotalPaisa),
+          isBold: true,
+          color: AppTheme.primaryBlue,
+          fontSize: 18,
+        ),
+        const SizedBox(height: 14),
+
+        // Tendered and Change calculator
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Expanded(
+              child: Text('Tendered Cash (रु.):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
+            SizedBox(
+              width: 120,
+              child: TextFormField(
+                controller: _tenderedController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textAlign: TextAlign.right,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  prefixText: 'Rs. ',
+                  contentPadding: EdgeInsets.all(8),
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppTheme.accentTeal.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Text(
+                  'Change Return (फिर्ता रकम):',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.accentTeal),
+                ),
+              ),
+              Text(
+                PaisaHelper.formatPaisa(changePaisa),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.accentTeal),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // Complete Checkout Button
+        ElevatedButton.icon(
+          onPressed: _isSaving ? null : _completeCheckout,
+          icon: _isSaving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+              : const Icon(Icons.print),
+          label: const Text('Complete & Generate Bill (Enter)'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryBlue,
+            minimumSize: const Size.fromHeight(50),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentChip(String mode, String label) {
+    final isSelected = _paymentMode == mode;
+    return InkWell(
+      onTap: () => setState(() => _paymentMode = mode),
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.backgroundLight,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryBlue : AppTheme.borderSubtle,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : AppTheme.textDark,
+          ),
+        ),
       ),
     );
   }
@@ -735,10 +983,13 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: fontSize, fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(fontSize: fontSize, fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: TextStyle(
@@ -751,4 +1002,3 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
     );
   }
 }
-

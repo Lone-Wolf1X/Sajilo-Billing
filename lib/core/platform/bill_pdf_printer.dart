@@ -11,3 +11,4 @@ abstract class BillPdfPrinter {
 
   static BillPdfPrinter get instance => impl.getBillPdfPrinterInstance();
 }
+

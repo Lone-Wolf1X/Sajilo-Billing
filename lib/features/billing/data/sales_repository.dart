@@ -162,8 +162,57 @@ class SalesRepository {
       );
     }
 
+    final prefix = existing?.prefix ?? 'SB';
     final formattedNumber = nextNumber.toString().padLeft(4, '0');
-    return 'SB-$fiscalYear-$formattedNumber';
+    return '$prefix-$fiscalYear-$formattedNumber';
+  }
+
+  /// Gets the current invoice prefix (default 'SB').
+  Future<String> getBillPrefix({DateTime? date}) async {
+    final d = date ?? DateTime.now();
+    final fiscalYear = '${d.year + 57}';
+    const seqType = 'SALES_INVOICE';
+    final existing = await (_db.select(_db.billSequence)
+          ..where((tbl) =>
+              tbl.sequenceType.equals(seqType) & tbl.fiscalYear.equals(fiscalYear)))
+        .getSingleOrNull();
+    return existing?.prefix ?? 'SB';
+  }
+
+  /// Configures custom invoice prefix (e.g. 'SB', 'KT', 'INV').
+  Future<void> setBillPrefix(String newPrefix, {DateTime? date}) async {
+    final d = date ?? DateTime.now();
+    final fiscalYear = '${d.year + 57}';
+    const seqType = 'SALES_INVOICE';
+    final clean = newPrefix.trim().toUpperCase();
+    if (clean.isEmpty) return;
+
+    final existing = await (_db.select(_db.billSequence)
+          ..where((tbl) =>
+              tbl.sequenceType.equals(seqType) & tbl.fiscalYear.equals(fiscalYear)))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      await _db.into(_db.billSequence).insert(
+            BillSequenceCompanion.insert(
+              sequenceType: seqType,
+              fiscalYear: fiscalYear,
+              prefix: Value(clean),
+              currentNumber: const Value(0),
+              updatedAt: Value(DateTime.now().toUtc()),
+            ),
+          );
+    } else {
+      await (_db.update(_db.billSequence)
+            ..where((tbl) =>
+                tbl.sequenceType.equals(seqType) & tbl.fiscalYear.equals(fiscalYear)))
+          .write(
+        BillSequenceCompanion(
+          prefix: Value(clean),
+          updatedAt: Value(DateTime.now().toUtc()),
+        ),
+      );
+    }
   }
 
   /// Creates a sale and tax invoice in ONE single atomic transaction:

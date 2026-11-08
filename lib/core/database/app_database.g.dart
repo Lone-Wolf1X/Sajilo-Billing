@@ -65,6 +65,12 @@ class $BusinessProfilesTable extends BusinessProfiles
           GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 200),
       type: DriftSqlType.string,
       requiredDuringInsert: true);
+  static const VerificationMeta _businessNameNepaliMeta =
+      const VerificationMeta('businessNameNepali');
+  @override
+  late final GeneratedColumn<String> businessNameNepali =
+      GeneratedColumn<String>('business_name_nepali', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _panVatNumberMeta =
       const VerificationMeta('panVatNumber');
   @override
@@ -114,6 +120,7 @@ class $BusinessProfilesTable extends BusinessProfiles
         remoteId,
         isDeleted,
         businessName,
+        businessNameNepali,
         panVatNumber,
         contactNumber,
         shopAddress,
@@ -159,6 +166,12 @@ class $BusinessProfilesTable extends BusinessProfiles
               data['business_name']!, _businessNameMeta));
     } else if (isInserting) {
       context.missing(_businessNameMeta);
+    }
+    if (data.containsKey('business_name_nepali')) {
+      context.handle(
+          _businessNameNepaliMeta,
+          businessNameNepali.isAcceptableOrUnknown(
+              data['business_name_nepali']!, _businessNameNepaliMeta));
     }
     if (data.containsKey('pan_vat_number')) {
       context.handle(
@@ -214,6 +227,8 @@ class $BusinessProfilesTable extends BusinessProfiles
           .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
       businessName: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}business_name'])!,
+      businessNameNepali: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}business_name_nepali']),
       panVatNumber: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}pan_vat_number'])!,
       contactNumber: attachedDatabase.typeMapping
@@ -244,6 +259,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
   final String? remoteId;
   final bool isDeleted;
   final String businessName;
+  final String? businessNameNepali;
   final String panVatNumber;
   final String contactNumber;
   final String? shopAddress;
@@ -257,6 +273,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
       this.remoteId,
       required this.isDeleted,
       required this.businessName,
+      this.businessNameNepali,
       required this.panVatNumber,
       required this.contactNumber,
       this.shopAddress,
@@ -277,6 +294,9 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
     }
     map['is_deleted'] = Variable<bool>(isDeleted);
     map['business_name'] = Variable<String>(businessName);
+    if (!nullToAbsent || businessNameNepali != null) {
+      map['business_name_nepali'] = Variable<String>(businessNameNepali);
+    }
     map['pan_vat_number'] = Variable<String>(panVatNumber);
     map['contact_number'] = Variable<String>(contactNumber);
     if (!nullToAbsent || shopAddress != null) {
@@ -300,6 +320,9 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
           : Value(remoteId),
       isDeleted: Value(isDeleted),
       businessName: Value(businessName),
+      businessNameNepali: businessNameNepali == null && nullToAbsent
+          ? const Value.absent()
+          : Value(businessNameNepali),
       panVatNumber: Value(panVatNumber),
       contactNumber: Value(contactNumber),
       shopAddress: shopAddress == null && nullToAbsent
@@ -324,6 +347,8 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
       remoteId: serializer.fromJson<String?>(json['remoteId']),
       isDeleted: serializer.fromJson<bool>(json['isDeleted']),
       businessName: serializer.fromJson<String>(json['businessName']),
+      businessNameNepali:
+          serializer.fromJson<String?>(json['businessNameNepali']),
       panVatNumber: serializer.fromJson<String>(json['panVatNumber']),
       contactNumber: serializer.fromJson<String>(json['contactNumber']),
       shopAddress: serializer.fromJson<String?>(json['shopAddress']),
@@ -343,6 +368,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
       'remoteId': serializer.toJson<String?>(remoteId),
       'isDeleted': serializer.toJson<bool>(isDeleted),
       'businessName': serializer.toJson<String>(businessName),
+      'businessNameNepali': serializer.toJson<String?>(businessNameNepali),
       'panVatNumber': serializer.toJson<String>(panVatNumber),
       'contactNumber': serializer.toJson<String>(contactNumber),
       'shopAddress': serializer.toJson<String?>(shopAddress),
@@ -359,6 +385,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
           Value<String?> remoteId = const Value.absent(),
           bool? isDeleted,
           String? businessName,
+          Value<String?> businessNameNepali = const Value.absent(),
           String? panVatNumber,
           String? contactNumber,
           Value<String?> shopAddress = const Value.absent(),
@@ -372,6 +399,9 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
         remoteId: remoteId.present ? remoteId.value : this.remoteId,
         isDeleted: isDeleted ?? this.isDeleted,
         businessName: businessName ?? this.businessName,
+        businessNameNepali: businessNameNepali.present
+            ? businessNameNepali.value
+            : this.businessNameNepali,
         panVatNumber: panVatNumber ?? this.panVatNumber,
         contactNumber: contactNumber ?? this.contactNumber,
         shopAddress: shopAddress.present ? shopAddress.value : this.shopAddress,
@@ -390,6 +420,9 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
       businessName: data.businessName.present
           ? data.businessName.value
           : this.businessName,
+      businessNameNepali: data.businessNameNepali.present
+          ? data.businessNameNepali.value
+          : this.businessNameNepali,
       panVatNumber: data.panVatNumber.present
           ? data.panVatNumber.value
           : this.panVatNumber,
@@ -413,6 +446,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
           ..write('remoteId: $remoteId, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('businessName: $businessName, ')
+          ..write('businessNameNepali: $businessNameNepali, ')
           ..write('panVatNumber: $panVatNumber, ')
           ..write('contactNumber: $contactNumber, ')
           ..write('shopAddress: $shopAddress, ')
@@ -431,6 +465,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
       remoteId,
       isDeleted,
       businessName,
+      businessNameNepali,
       panVatNumber,
       contactNumber,
       shopAddress,
@@ -447,6 +482,7 @@ class BusinessProfile extends DataClass implements Insertable<BusinessProfile> {
           other.remoteId == this.remoteId &&
           other.isDeleted == this.isDeleted &&
           other.businessName == this.businessName &&
+          other.businessNameNepali == this.businessNameNepali &&
           other.panVatNumber == this.panVatNumber &&
           other.contactNumber == this.contactNumber &&
           other.shopAddress == this.shopAddress &&
@@ -462,6 +498,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
   final Value<String?> remoteId;
   final Value<bool> isDeleted;
   final Value<String> businessName;
+  final Value<String?> businessNameNepali;
   final Value<String> panVatNumber;
   final Value<String> contactNumber;
   final Value<String?> shopAddress;
@@ -476,6 +513,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
     this.remoteId = const Value.absent(),
     this.isDeleted = const Value.absent(),
     this.businessName = const Value.absent(),
+    this.businessNameNepali = const Value.absent(),
     this.panVatNumber = const Value.absent(),
     this.contactNumber = const Value.absent(),
     this.shopAddress = const Value.absent(),
@@ -491,6 +529,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
     this.remoteId = const Value.absent(),
     this.isDeleted = const Value.absent(),
     required String businessName,
+    this.businessNameNepali = const Value.absent(),
     required String panVatNumber,
     required String contactNumber,
     this.shopAddress = const Value.absent(),
@@ -509,6 +548,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
     Expression<String>? remoteId,
     Expression<bool>? isDeleted,
     Expression<String>? businessName,
+    Expression<String>? businessNameNepali,
     Expression<String>? panVatNumber,
     Expression<String>? contactNumber,
     Expression<String>? shopAddress,
@@ -524,6 +564,8 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
       if (remoteId != null) 'remote_id': remoteId,
       if (isDeleted != null) 'is_deleted': isDeleted,
       if (businessName != null) 'business_name': businessName,
+      if (businessNameNepali != null)
+        'business_name_nepali': businessNameNepali,
       if (panVatNumber != null) 'pan_vat_number': panVatNumber,
       if (contactNumber != null) 'contact_number': contactNumber,
       if (shopAddress != null) 'shop_address': shopAddress,
@@ -541,6 +583,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
       Value<String?>? remoteId,
       Value<bool>? isDeleted,
       Value<String>? businessName,
+      Value<String?>? businessNameNepali,
       Value<String>? panVatNumber,
       Value<String>? contactNumber,
       Value<String?>? shopAddress,
@@ -555,6 +598,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
       remoteId: remoteId ?? this.remoteId,
       isDeleted: isDeleted ?? this.isDeleted,
       businessName: businessName ?? this.businessName,
+      businessNameNepali: businessNameNepali ?? this.businessNameNepali,
       panVatNumber: panVatNumber ?? this.panVatNumber,
       contactNumber: contactNumber ?? this.contactNumber,
       shopAddress: shopAddress ?? this.shopAddress,
@@ -589,6 +633,9 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
     if (businessName.present) {
       map['business_name'] = Variable<String>(businessName.value);
     }
+    if (businessNameNepali.present) {
+      map['business_name_nepali'] = Variable<String>(businessNameNepali.value);
+    }
     if (panVatNumber.present) {
       map['pan_vat_number'] = Variable<String>(panVatNumber.value);
     }
@@ -620,6 +667,7 @@ class BusinessProfilesCompanion extends UpdateCompanion<BusinessProfile> {
           ..write('remoteId: $remoteId, ')
           ..write('isDeleted: $isDeleted, ')
           ..write('businessName: $businessName, ')
+          ..write('businessNameNepali: $businessNameNepali, ')
           ..write('panVatNumber: $panVatNumber, ')
           ..write('contactNumber: $contactNumber, ')
           ..write('shopAddress: $shopAddress, ')
@@ -11775,6 +11823,717 @@ class PartyPaymentsCompanion extends UpdateCompanion<PartyPayment> {
   }
 }
 
+class $LocalAuthTable extends LocalAuth
+    with TableInfo<$LocalAuthTable, LocalAuthData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalAuthTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _syncStatusMeta =
+      const VerificationMeta('syncStatus');
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus, String> syncStatus =
+      GeneratedColumn<String>('sync_status', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              defaultValue: Constant(SyncStatus.pending.name))
+          .withConverter<SyncStatus>($LocalAuthTable.$convertersyncStatus);
+  static const VerificationMeta _remoteIdMeta =
+      const VerificationMeta('remoteId');
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+      'remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _usernameMeta =
+      const VerificationMeta('username');
+  @override
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+      'username', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  static const VerificationMeta _passwordHashMeta =
+      const VerificationMeta('passwordHash');
+  @override
+  late final GeneratedColumn<String> passwordHash = GeneratedColumn<String>(
+      'password_hash', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _passwordSaltMeta =
+      const VerificationMeta('passwordSalt');
+  @override
+  late final GeneratedColumn<String> passwordSalt = GeneratedColumn<String>(
+      'password_salt', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _securityQuestionMeta =
+      const VerificationMeta('securityQuestion');
+  @override
+  late final GeneratedColumn<String> securityQuestion = GeneratedColumn<String>(
+      'security_question', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('What is your shop name?'));
+  static const VerificationMeta _securityAnswerHashMeta =
+      const VerificationMeta('securityAnswerHash');
+  @override
+  late final GeneratedColumn<String> securityAnswerHash =
+      GeneratedColumn<String>('security_answer_hash', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _failedAttemptsMeta =
+      const VerificationMeta('failedAttempts');
+  @override
+  late final GeneratedColumn<int> failedAttempts = GeneratedColumn<int>(
+      'failed_attempts', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _lockedUntilMeta =
+      const VerificationMeta('lockedUntil');
+  @override
+  late final GeneratedColumn<DateTime> lockedUntil = GeneratedColumn<DateTime>(
+      'locked_until', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _displayNameMeta =
+      const VerificationMeta('displayName');
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+      'display_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        createdAt,
+        updatedAt,
+        syncStatus,
+        remoteId,
+        isDeleted,
+        username,
+        passwordHash,
+        passwordSalt,
+        securityQuestion,
+        securityAnswerHash,
+        failedAttempts,
+        lockedUntil,
+        displayName
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_auth';
+  @override
+  VerificationContext validateIntegrity(Insertable<LocalAuthData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    context.handle(_syncStatusMeta, const VerificationResult.success());
+    if (data.containsKey('remote_id')) {
+      context.handle(_remoteIdMeta,
+          remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('username')) {
+      context.handle(_usernameMeta,
+          username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
+    } else if (isInserting) {
+      context.missing(_usernameMeta);
+    }
+    if (data.containsKey('password_hash')) {
+      context.handle(
+          _passwordHashMeta,
+          passwordHash.isAcceptableOrUnknown(
+              data['password_hash']!, _passwordHashMeta));
+    } else if (isInserting) {
+      context.missing(_passwordHashMeta);
+    }
+    if (data.containsKey('password_salt')) {
+      context.handle(
+          _passwordSaltMeta,
+          passwordSalt.isAcceptableOrUnknown(
+              data['password_salt']!, _passwordSaltMeta));
+    } else if (isInserting) {
+      context.missing(_passwordSaltMeta);
+    }
+    if (data.containsKey('security_question')) {
+      context.handle(
+          _securityQuestionMeta,
+          securityQuestion.isAcceptableOrUnknown(
+              data['security_question']!, _securityQuestionMeta));
+    }
+    if (data.containsKey('security_answer_hash')) {
+      context.handle(
+          _securityAnswerHashMeta,
+          securityAnswerHash.isAcceptableOrUnknown(
+              data['security_answer_hash']!, _securityAnswerHashMeta));
+    }
+    if (data.containsKey('failed_attempts')) {
+      context.handle(
+          _failedAttemptsMeta,
+          failedAttempts.isAcceptableOrUnknown(
+              data['failed_attempts']!, _failedAttemptsMeta));
+    }
+    if (data.containsKey('locked_until')) {
+      context.handle(
+          _lockedUntilMeta,
+          lockedUntil.isAcceptableOrUnknown(
+              data['locked_until']!, _lockedUntilMeta));
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+          _displayNameMeta,
+          displayName.isAcceptableOrUnknown(
+              data['display_name']!, _displayNameMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalAuthData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalAuthData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      syncStatus: $LocalAuthTable.$convertersyncStatus.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}sync_status'])!),
+      remoteId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      username: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
+      passwordHash: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}password_hash'])!,
+      passwordSalt: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}password_salt'])!,
+      securityQuestion: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}security_question'])!,
+      securityAnswerHash: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}security_answer_hash']),
+      failedAttempts: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}failed_attempts'])!,
+      lockedUntil: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}locked_until']),
+      displayName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}display_name']),
+    );
+  }
+
+  @override
+  $LocalAuthTable createAlias(String alias) {
+    return $LocalAuthTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+}
+
+class LocalAuthData extends DataClass implements Insertable<LocalAuthData> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final SyncStatus syncStatus;
+  final String? remoteId;
+  final bool isDeleted;
+  final String username;
+  final String passwordHash;
+  final String passwordSalt;
+  final String securityQuestion;
+  final String? securityAnswerHash;
+  final int failedAttempts;
+  final DateTime? lockedUntil;
+  final String? displayName;
+  const LocalAuthData(
+      {required this.id,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.syncStatus,
+      this.remoteId,
+      required this.isDeleted,
+      required this.username,
+      required this.passwordHash,
+      required this.passwordSalt,
+      required this.securityQuestion,
+      this.securityAnswerHash,
+      required this.failedAttempts,
+      this.lockedUntil,
+      this.displayName});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    {
+      map['sync_status'] = Variable<String>(
+          $LocalAuthTable.$convertersyncStatus.toSql(syncStatus));
+    }
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    map['username'] = Variable<String>(username);
+    map['password_hash'] = Variable<String>(passwordHash);
+    map['password_salt'] = Variable<String>(passwordSalt);
+    map['security_question'] = Variable<String>(securityQuestion);
+    if (!nullToAbsent || securityAnswerHash != null) {
+      map['security_answer_hash'] = Variable<String>(securityAnswerHash);
+    }
+    map['failed_attempts'] = Variable<int>(failedAttempts);
+    if (!nullToAbsent || lockedUntil != null) {
+      map['locked_until'] = Variable<DateTime>(lockedUntil);
+    }
+    if (!nullToAbsent || displayName != null) {
+      map['display_name'] = Variable<String>(displayName);
+    }
+    return map;
+  }
+
+  LocalAuthCompanion toCompanion(bool nullToAbsent) {
+    return LocalAuthCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      syncStatus: Value(syncStatus),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      isDeleted: Value(isDeleted),
+      username: Value(username),
+      passwordHash: Value(passwordHash),
+      passwordSalt: Value(passwordSalt),
+      securityQuestion: Value(securityQuestion),
+      securityAnswerHash: securityAnswerHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(securityAnswerHash),
+      failedAttempts: Value(failedAttempts),
+      lockedUntil: lockedUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lockedUntil),
+      displayName: displayName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(displayName),
+    );
+  }
+
+  factory LocalAuthData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalAuthData(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      syncStatus: $LocalAuthTable.$convertersyncStatus
+          .fromJson(serializer.fromJson<String>(json['syncStatus'])),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      username: serializer.fromJson<String>(json['username']),
+      passwordHash: serializer.fromJson<String>(json['passwordHash']),
+      passwordSalt: serializer.fromJson<String>(json['passwordSalt']),
+      securityQuestion: serializer.fromJson<String>(json['securityQuestion']),
+      securityAnswerHash:
+          serializer.fromJson<String?>(json['securityAnswerHash']),
+      failedAttempts: serializer.fromJson<int>(json['failedAttempts']),
+      lockedUntil: serializer.fromJson<DateTime?>(json['lockedUntil']),
+      displayName: serializer.fromJson<String?>(json['displayName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'syncStatus': serializer.toJson<String>(
+          $LocalAuthTable.$convertersyncStatus.toJson(syncStatus)),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'username': serializer.toJson<String>(username),
+      'passwordHash': serializer.toJson<String>(passwordHash),
+      'passwordSalt': serializer.toJson<String>(passwordSalt),
+      'securityQuestion': serializer.toJson<String>(securityQuestion),
+      'securityAnswerHash': serializer.toJson<String?>(securityAnswerHash),
+      'failedAttempts': serializer.toJson<int>(failedAttempts),
+      'lockedUntil': serializer.toJson<DateTime?>(lockedUntil),
+      'displayName': serializer.toJson<String?>(displayName),
+    };
+  }
+
+  LocalAuthData copyWith(
+          {String? id,
+          DateTime? createdAt,
+          DateTime? updatedAt,
+          SyncStatus? syncStatus,
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDeleted,
+          String? username,
+          String? passwordHash,
+          String? passwordSalt,
+          String? securityQuestion,
+          Value<String?> securityAnswerHash = const Value.absent(),
+          int? failedAttempts,
+          Value<DateTime?> lockedUntil = const Value.absent(),
+          Value<String?> displayName = const Value.absent()}) =>
+      LocalAuthData(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        syncStatus: syncStatus ?? this.syncStatus,
+        remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDeleted: isDeleted ?? this.isDeleted,
+        username: username ?? this.username,
+        passwordHash: passwordHash ?? this.passwordHash,
+        passwordSalt: passwordSalt ?? this.passwordSalt,
+        securityQuestion: securityQuestion ?? this.securityQuestion,
+        securityAnswerHash: securityAnswerHash.present
+            ? securityAnswerHash.value
+            : this.securityAnswerHash,
+        failedAttempts: failedAttempts ?? this.failedAttempts,
+        lockedUntil: lockedUntil.present ? lockedUntil.value : this.lockedUntil,
+        displayName: displayName.present ? displayName.value : this.displayName,
+      );
+  LocalAuthData copyWithCompanion(LocalAuthCompanion data) {
+    return LocalAuthData(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      syncStatus:
+          data.syncStatus.present ? data.syncStatus.value : this.syncStatus,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      username: data.username.present ? data.username.value : this.username,
+      passwordHash: data.passwordHash.present
+          ? data.passwordHash.value
+          : this.passwordHash,
+      passwordSalt: data.passwordSalt.present
+          ? data.passwordSalt.value
+          : this.passwordSalt,
+      securityQuestion: data.securityQuestion.present
+          ? data.securityQuestion.value
+          : this.securityQuestion,
+      securityAnswerHash: data.securityAnswerHash.present
+          ? data.securityAnswerHash.value
+          : this.securityAnswerHash,
+      failedAttempts: data.failedAttempts.present
+          ? data.failedAttempts.value
+          : this.failedAttempts,
+      lockedUntil:
+          data.lockedUntil.present ? data.lockedUntil.value : this.lockedUntil,
+      displayName:
+          data.displayName.present ? data.displayName.value : this.displayName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalAuthData(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('username: $username, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('passwordSalt: $passwordSalt, ')
+          ..write('securityQuestion: $securityQuestion, ')
+          ..write('securityAnswerHash: $securityAnswerHash, ')
+          ..write('failedAttempts: $failedAttempts, ')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('displayName: $displayName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      createdAt,
+      updatedAt,
+      syncStatus,
+      remoteId,
+      isDeleted,
+      username,
+      passwordHash,
+      passwordSalt,
+      securityQuestion,
+      securityAnswerHash,
+      failedAttempts,
+      lockedUntil,
+      displayName);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalAuthData &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.syncStatus == this.syncStatus &&
+          other.remoteId == this.remoteId &&
+          other.isDeleted == this.isDeleted &&
+          other.username == this.username &&
+          other.passwordHash == this.passwordHash &&
+          other.passwordSalt == this.passwordSalt &&
+          other.securityQuestion == this.securityQuestion &&
+          other.securityAnswerHash == this.securityAnswerHash &&
+          other.failedAttempts == this.failedAttempts &&
+          other.lockedUntil == this.lockedUntil &&
+          other.displayName == this.displayName);
+}
+
+class LocalAuthCompanion extends UpdateCompanion<LocalAuthData> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<SyncStatus> syncStatus;
+  final Value<String?> remoteId;
+  final Value<bool> isDeleted;
+  final Value<String> username;
+  final Value<String> passwordHash;
+  final Value<String> passwordSalt;
+  final Value<String> securityQuestion;
+  final Value<String?> securityAnswerHash;
+  final Value<int> failedAttempts;
+  final Value<DateTime?> lockedUntil;
+  final Value<String?> displayName;
+  final Value<int> rowid;
+  const LocalAuthCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.username = const Value.absent(),
+    this.passwordHash = const Value.absent(),
+    this.passwordSalt = const Value.absent(),
+    this.securityQuestion = const Value.absent(),
+    this.securityAnswerHash = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
+    this.lockedUntil = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalAuthCompanion.insert({
+    required String id,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    required String username,
+    required String passwordHash,
+    required String passwordSalt,
+    this.securityQuestion = const Value.absent(),
+    this.securityAnswerHash = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
+    this.lockedUntil = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        username = Value(username),
+        passwordHash = Value(passwordHash),
+        passwordSalt = Value(passwordSalt);
+  static Insertable<LocalAuthData> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? syncStatus,
+    Expression<String>? remoteId,
+    Expression<bool>? isDeleted,
+    Expression<String>? username,
+    Expression<String>? passwordHash,
+    Expression<String>? passwordSalt,
+    Expression<String>? securityQuestion,
+    Expression<String>? securityAnswerHash,
+    Expression<int>? failedAttempts,
+    Expression<DateTime>? lockedUntil,
+    Expression<String>? displayName,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (username != null) 'username': username,
+      if (passwordHash != null) 'password_hash': passwordHash,
+      if (passwordSalt != null) 'password_salt': passwordSalt,
+      if (securityQuestion != null) 'security_question': securityQuestion,
+      if (securityAnswerHash != null)
+        'security_answer_hash': securityAnswerHash,
+      if (failedAttempts != null) 'failed_attempts': failedAttempts,
+      if (lockedUntil != null) 'locked_until': lockedUntil,
+      if (displayName != null) 'display_name': displayName,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalAuthCompanion copyWith(
+      {Value<String>? id,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<SyncStatus>? syncStatus,
+      Value<String?>? remoteId,
+      Value<bool>? isDeleted,
+      Value<String>? username,
+      Value<String>? passwordHash,
+      Value<String>? passwordSalt,
+      Value<String>? securityQuestion,
+      Value<String?>? securityAnswerHash,
+      Value<int>? failedAttempts,
+      Value<DateTime?>? lockedUntil,
+      Value<String?>? displayName,
+      Value<int>? rowid}) {
+    return LocalAuthCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      remoteId: remoteId ?? this.remoteId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      username: username ?? this.username,
+      passwordHash: passwordHash ?? this.passwordHash,
+      passwordSalt: passwordSalt ?? this.passwordSalt,
+      securityQuestion: securityQuestion ?? this.securityQuestion,
+      securityAnswerHash: securityAnswerHash ?? this.securityAnswerHash,
+      failedAttempts: failedAttempts ?? this.failedAttempts,
+      lockedUntil: lockedUntil ?? this.lockedUntil,
+      displayName: displayName ?? this.displayName,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+          $LocalAuthTable.$convertersyncStatus.toSql(syncStatus.value));
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (passwordHash.present) {
+      map['password_hash'] = Variable<String>(passwordHash.value);
+    }
+    if (passwordSalt.present) {
+      map['password_salt'] = Variable<String>(passwordSalt.value);
+    }
+    if (securityQuestion.present) {
+      map['security_question'] = Variable<String>(securityQuestion.value);
+    }
+    if (securityAnswerHash.present) {
+      map['security_answer_hash'] = Variable<String>(securityAnswerHash.value);
+    }
+    if (failedAttempts.present) {
+      map['failed_attempts'] = Variable<int>(failedAttempts.value);
+    }
+    if (lockedUntil.present) {
+      map['locked_until'] = Variable<DateTime>(lockedUntil.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalAuthCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('username: $username, ')
+          ..write('passwordHash: $passwordHash, ')
+          ..write('passwordSalt: $passwordSalt, ')
+          ..write('securityQuestion: $securityQuestion, ')
+          ..write('securityAnswerHash: $securityAnswerHash, ')
+          ..write('failedAttempts: $failedAttempts, ')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('displayName: $displayName, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -11798,6 +12557,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BackupLogsTable backupLogs = $BackupLogsTable(this);
   late final $PartyLedgerTable partyLedger = $PartyLedgerTable(this);
   late final $PartyPaymentsTable partyPayments = $PartyPaymentsTable(this);
+  late final $LocalAuthTable localAuth = $LocalAuthTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -11820,7 +12580,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         billSequence,
         backupLogs,
         partyLedger,
-        partyPayments
+        partyPayments,
+        localAuth
       ];
 }
 
@@ -11833,6 +12594,7 @@ typedef $$BusinessProfilesTableCreateCompanionBuilder
   Value<String?> remoteId,
   Value<bool> isDeleted,
   required String businessName,
+  Value<String?> businessNameNepali,
   required String panVatNumber,
   required String contactNumber,
   Value<String?> shopAddress,
@@ -11849,6 +12611,7 @@ typedef $$BusinessProfilesTableUpdateCompanionBuilder
   Value<String?> remoteId,
   Value<bool> isDeleted,
   Value<String> businessName,
+  Value<String?> businessNameNepali,
   Value<String> panVatNumber,
   Value<String> contactNumber,
   Value<String?> shopAddress,
@@ -11882,6 +12645,7 @@ class $$BusinessProfilesTableTableManager extends RootTableManager<
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDeleted = const Value.absent(),
             Value<String> businessName = const Value.absent(),
+            Value<String?> businessNameNepali = const Value.absent(),
             Value<String> panVatNumber = const Value.absent(),
             Value<String> contactNumber = const Value.absent(),
             Value<String?> shopAddress = const Value.absent(),
@@ -11897,6 +12661,7 @@ class $$BusinessProfilesTableTableManager extends RootTableManager<
             remoteId: remoteId,
             isDeleted: isDeleted,
             businessName: businessName,
+            businessNameNepali: businessNameNepali,
             panVatNumber: panVatNumber,
             contactNumber: contactNumber,
             shopAddress: shopAddress,
@@ -11912,6 +12677,7 @@ class $$BusinessProfilesTableTableManager extends RootTableManager<
             Value<String?> remoteId = const Value.absent(),
             Value<bool> isDeleted = const Value.absent(),
             required String businessName,
+            Value<String?> businessNameNepali = const Value.absent(),
             required String panVatNumber,
             required String contactNumber,
             Value<String?> shopAddress = const Value.absent(),
@@ -11927,6 +12693,7 @@ class $$BusinessProfilesTableTableManager extends RootTableManager<
             remoteId: remoteId,
             isDeleted: isDeleted,
             businessName: businessName,
+            businessNameNepali: businessNameNepali,
             panVatNumber: panVatNumber,
             contactNumber: contactNumber,
             shopAddress: shopAddress,
@@ -11974,6 +12741,11 @@ class $$BusinessProfilesTableFilterComposer
 
   ColumnFilters<String> get businessName => $state.composableBuilder(
       column: $state.table.businessName,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get businessNameNepali => $state.composableBuilder(
+      column: $state.table.businessNameNepali,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -12038,6 +12810,11 @@ class $$BusinessProfilesTableOrderingComposer
 
   ColumnOrderings<String> get businessName => $state.composableBuilder(
       column: $state.table.businessName,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get businessNameNepali => $state.composableBuilder(
+      column: $state.table.businessNameNepali,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -16466,6 +17243,278 @@ class $$PartyPaymentsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$LocalAuthTableCreateCompanionBuilder = LocalAuthCompanion Function({
+  required String id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  required String username,
+  required String passwordHash,
+  required String passwordSalt,
+  Value<String> securityQuestion,
+  Value<String?> securityAnswerHash,
+  Value<int> failedAttempts,
+  Value<DateTime?> lockedUntil,
+  Value<String?> displayName,
+  Value<int> rowid,
+});
+typedef $$LocalAuthTableUpdateCompanionBuilder = LocalAuthCompanion Function({
+  Value<String> id,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<SyncStatus> syncStatus,
+  Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<String> username,
+  Value<String> passwordHash,
+  Value<String> passwordSalt,
+  Value<String> securityQuestion,
+  Value<String?> securityAnswerHash,
+  Value<int> failedAttempts,
+  Value<DateTime?> lockedUntil,
+  Value<String?> displayName,
+  Value<int> rowid,
+});
+
+class $$LocalAuthTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $LocalAuthTable,
+    LocalAuthData,
+    $$LocalAuthTableFilterComposer,
+    $$LocalAuthTableOrderingComposer,
+    $$LocalAuthTableCreateCompanionBuilder,
+    $$LocalAuthTableUpdateCompanionBuilder> {
+  $$LocalAuthTableTableManager(_$AppDatabase db, $LocalAuthTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$LocalAuthTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$LocalAuthTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<String> username = const Value.absent(),
+            Value<String> passwordHash = const Value.absent(),
+            Value<String> passwordSalt = const Value.absent(),
+            Value<String> securityQuestion = const Value.absent(),
+            Value<String?> securityAnswerHash = const Value.absent(),
+            Value<int> failedAttempts = const Value.absent(),
+            Value<DateTime?> lockedUntil = const Value.absent(),
+            Value<String?> displayName = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              LocalAuthCompanion(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            username: username,
+            passwordHash: passwordHash,
+            passwordSalt: passwordSalt,
+            securityQuestion: securityQuestion,
+            securityAnswerHash: securityAnswerHash,
+            failedAttempts: failedAttempts,
+            lockedUntil: lockedUntil,
+            displayName: displayName,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<SyncStatus> syncStatus = const Value.absent(),
+            Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            required String username,
+            required String passwordHash,
+            required String passwordSalt,
+            Value<String> securityQuestion = const Value.absent(),
+            Value<String?> securityAnswerHash = const Value.absent(),
+            Value<int> failedAttempts = const Value.absent(),
+            Value<DateTime?> lockedUntil = const Value.absent(),
+            Value<String?> displayName = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              LocalAuthCompanion.insert(
+            id: id,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            syncStatus: syncStatus,
+            remoteId: remoteId,
+            isDeleted: isDeleted,
+            username: username,
+            passwordHash: passwordHash,
+            passwordSalt: passwordSalt,
+            securityQuestion: securityQuestion,
+            securityAnswerHash: securityAnswerHash,
+            failedAttempts: failedAttempts,
+            lockedUntil: lockedUntil,
+            displayName: displayName,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$LocalAuthTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $LocalAuthTable> {
+  $$LocalAuthTableFilterComposer(super.$state);
+  ColumnFilters<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<SyncStatus, SyncStatus, String>
+      get syncStatus => $state.composableBuilder(
+          column: $state.table.syncStatus,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get username => $state.composableBuilder(
+      column: $state.table.username,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get passwordHash => $state.composableBuilder(
+      column: $state.table.passwordHash,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get passwordSalt => $state.composableBuilder(
+      column: $state.table.passwordSalt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get securityQuestion => $state.composableBuilder(
+      column: $state.table.securityQuestion,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get securityAnswerHash => $state.composableBuilder(
+      column: $state.table.securityAnswerHash,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get failedAttempts => $state.composableBuilder(
+      column: $state.table.failedAttempts,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get lockedUntil => $state.composableBuilder(
+      column: $state.table.lockedUntil,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get displayName => $state.composableBuilder(
+      column: $state.table.displayName,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$LocalAuthTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $LocalAuthTable> {
+  $$LocalAuthTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get updatedAt => $state.composableBuilder(
+      column: $state.table.updatedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get syncStatus => $state.composableBuilder(
+      column: $state.table.syncStatus,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get remoteId => $state.composableBuilder(
+      column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get username => $state.composableBuilder(
+      column: $state.table.username,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get passwordHash => $state.composableBuilder(
+      column: $state.table.passwordHash,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get passwordSalt => $state.composableBuilder(
+      column: $state.table.passwordSalt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get securityQuestion => $state.composableBuilder(
+      column: $state.table.securityQuestion,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get securityAnswerHash => $state.composableBuilder(
+      column: $state.table.securityAnswerHash,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get failedAttempts => $state.composableBuilder(
+      column: $state.table.failedAttempts,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get lockedUntil => $state.composableBuilder(
+      column: $state.table.lockedUntil,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get displayName => $state.composableBuilder(
+      column: $state.table.displayName,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -16505,4 +17554,6 @@ class $AppDatabaseManager {
       $$PartyLedgerTableTableManager(_db, _db.partyLedger);
   $$PartyPaymentsTableTableManager get partyPayments =>
       $$PartyPaymentsTableTableManager(_db, _db.partyPayments);
+  $$LocalAuthTableTableManager get localAuth =>
+      $$LocalAuthTableTableManager(_db, _db.localAuth);
 }

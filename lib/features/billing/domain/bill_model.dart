@@ -24,6 +24,7 @@ class BillItem {
 class BillData {
   // Business identity
   final String businessName;
+  final String? businessNameNepali;
   final String panVatNumber;
   final String contactNumber;
   final String? shopAddress;
@@ -52,6 +53,7 @@ class BillData {
 
   const BillData({
     required this.businessName,
+    this.businessNameNepali,
     required this.panVatNumber,
     required this.contactNumber,
     this.shopAddress,
@@ -101,6 +103,7 @@ class BillData {
 
     return BillData(
       businessName: profile.businessName,
+      businessNameNepali: profile.businessNameNepali,
       panVatNumber: profile.panVatNumber,
       contactNumber: profile.contactNumber,
       shopAddress: profile.shopAddress,
@@ -124,6 +127,7 @@ class BillData {
   /// Factory to generate dummy bill for testing Phase 1
   factory BillData.dummy({
     required String businessName,
+    String? businessNameNepali,
     required String panVatNumber,
     required String contactNumber,
     String? shopAddress,

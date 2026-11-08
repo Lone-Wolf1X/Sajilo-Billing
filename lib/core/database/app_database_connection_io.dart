@@ -21,3 +21,4 @@ QueryExecutor openAppConnection() {
     return NativeDatabase.createInBackground(file);
   });
 }
+

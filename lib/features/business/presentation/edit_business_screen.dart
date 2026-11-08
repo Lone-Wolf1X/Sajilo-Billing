@@ -19,6 +19,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _businessNameController;
+  late TextEditingController _businessNameNepaliController;
   late TextEditingController _panVatController;
   late TextEditingController _contactNumberController;
   late TextEditingController _shopAddressController;
@@ -31,6 +32,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   void initState() {
     super.initState();
     _businessNameController = TextEditingController();
+    _businessNameNepaliController = TextEditingController();
     _panVatController = TextEditingController();
     _contactNumberController = TextEditingController();
     _shopAddressController = TextEditingController();
@@ -39,6 +41,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   @override
   void dispose() {
     _businessNameController.dispose();
+    _businessNameNepaliController.dispose();
     _panVatController.dispose();
     _contactNumberController.dispose();
     _shopAddressController.dispose();
@@ -48,6 +51,7 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
   void _populateExisting(dynamic profile) {
     if (profile != null && !_initialized) {
       _businessNameController.text = profile.businessName;
+      _businessNameNepaliController.text = profile.businessNameNepali ?? '';
       _panVatController.text = profile.panVatNumber;
       _contactNumberController.text = profile.contactNumber;
       _shopAddressController.text = profile.shopAddress ?? '';
@@ -81,6 +85,9 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
       final repo = ref.read(businessRepositoryProvider);
       await repo.saveBusinessProfile(
         businessName: _businessNameController.text.trim(),
+        businessNameNepali: _businessNameNepaliController.text.trim().isEmpty
+            ? null
+            : _businessNameNepaliController.text.trim(),
         panVatNumber: _panVatController.text.trim(),
         contactNumber: _contactNumberController.text.trim(),
         shopAddress: _shopAddressController.text.trim().isEmpty
@@ -170,6 +177,20 @@ class _EditBusinessScreenState extends ConsumerState<EditBusinessScreen> {
                             validator: (val) => NepaliValidators.validateBusinessName(
                               val,
                               requiredMsg: l10n.businessNameRequired,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          Text(
+                            l10n.businessNameNepaliLabel,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 6),
+                          TextFormField(
+                            controller: _businessNameNepaliController,
+                            decoration: InputDecoration(
+                              hintText: l10n.businessNameNepaliHint,
+                              prefixIcon: const Icon(Icons.translate),
                             ),
                           ),
                           const SizedBox(height: 18),

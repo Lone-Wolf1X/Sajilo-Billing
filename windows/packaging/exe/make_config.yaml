@@ -1,0 +1,21 @@
+app_name: Sajilo Billing
+app_version: 1.0.0
+publisher_name: NextGen Innovations Pvt. Ltd.
+publisher_url: https://nextgeninnovations.com.np/
+app_id: 14176713-7E7A-4588-BD31-DC535639756B
+default_install_dir: "{autopf}\\SajiloBilling"
+executable_name: sajilo_billing.exe
+
+# InnoSetup packaging configuration
+inno_setup:
+  compression: lzma2/ultra64
+  solid_compression: yes
+  architectures_install_in_64_bit_mode: x64
+  wizard_style: modern
+  privileges_required: lowest
+  setup_icon_file: windows\runner\resources\app_icon.ico
+  license_file: LICENSE
+  create_desktop_icon: yes
+  create_start_menu_icon: yes
+  run_after_install: yes
+

@@ -20,6 +20,7 @@ import 'tables/bill_sequence_table.dart';
 import 'tables/backup_logs_table.dart';
 import 'tables/party_ledger_table.dart';
 import 'tables/party_payments_table.dart';
+import 'tables/local_auth_table.dart';
 
 part 'app_database.g.dart';
 
@@ -42,12 +43,13 @@ part 'app_database.g.dart';
   BackupLogs,
   PartyLedger,
   PartyPayments,
+  LocalAuth,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? db_conn.openAppConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +82,12 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.createTable(partyLedger);
             await m.createTable(partyPayments);
+          }
+          if (from < 5) {
+            await m.createTable(localAuth);
+            try {
+              await m.addColumn(businessProfiles, businessProfiles.businessNameNepali);
+            } catch (_) {}
           }
         },
         beforeOpen: (details) async {

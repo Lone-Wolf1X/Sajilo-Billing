@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:syntech_nepali_calendar/syntech_nepali_calendar.dart';
 
 import '../domain/bill_model.dart';
 
@@ -125,6 +126,16 @@ class PdfBillGenerator {
                 textAlign: pw.TextAlign.center,
               ),
             ),
+            if (data.businessNameNepali != null && data.businessNameNepali!.isNotEmpty) ...[
+              pw.SizedBox(height: 2),
+              pw.Center(
+                child: pw.Text(
+                  data.businessNameNepali!,
+                  style: pw.TextStyle(font: ttfBold, fontSize: 16, color: PdfColors.black),
+                  textAlign: pw.TextAlign.center,
+                ),
+              ),
+            ],
             if (data.shopAddress != null && data.shopAddress!.isNotEmpty) ...[
               pw.SizedBox(height: 2),
               pw.Center(
@@ -163,8 +174,8 @@ class PdfBillGenerator {
                         style: pw.TextStyle(font: ttfBold, fontSize: 11),
                       ),
                       pw.TextSpan(
-                        text: dateFormat.format(data.invoiceDate),
-                        style: pw.TextStyle(font: ttfRegular, fontSize: 11),
+                        text: '${dateFormat.format(data.invoiceDate)} (वि.सं. ${NepaliDateFormat('yyyy-MM-dd', Language.nepali).format(data.invoiceDate.toNepaliDateTime())})',
+                        style: pw.TextStyle(font: ttfRegular, fontSize: 10),
                       ),
                     ],
                   ),
@@ -349,6 +360,22 @@ class PdfBillGenerator {
                 ),
               ],
             ),
+            pw.SizedBox(height: 10),
+            pw.Divider(color: PdfColors.grey400, thickness: 0.5),
+            pw.SizedBox(height: 2),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  'Powered by Sajilo Billing | NextGen Innovations',
+                  style: pw.TextStyle(font: ttfRegular, fontSize: 8, color: PdfColors.grey700),
+                ),
+                pw.Text(
+                  'https://nextgeninnovations.com.np/ • नेपालमा निर्मित',
+                  style: pw.TextStyle(font: ttfRegular, fontSize: 8, color: PdfColors.grey700),
+                ),
+              ],
+            ),
           ],
         );
       },
@@ -394,6 +421,11 @@ class PdfBillGenerator {
                         data.businessName,
                         style: pw.TextStyle(font: ttfBold, fontSize: 18, color: PdfColors.blue900),
                       ),
+                      if (data.businessNameNepali != null && data.businessNameNepali!.isNotEmpty)
+                        pw.Text(
+                          data.businessNameNepali!,
+                          style: pw.TextStyle(font: ttfBold, fontSize: 14, color: PdfColors.blue800),
+                        ),
                       if (data.shopAddress != null && data.shopAddress!.isNotEmpty)
                         pw.Text(
                           data.shopAddress!,
@@ -443,7 +475,7 @@ class PdfBillGenerator {
                   crossAxisAlignment: pw.CrossAxisAlignment.end,
                   children: [
                     pw.Text('Bill No (बिल नं.): ${data.invoiceNumber}', style: pw.TextStyle(font: ttfBold, fontSize: 9.5)),
-                    pw.Text('Date (मिति): ${dateFormat.format(data.invoiceDate)}', style: pw.TextStyle(font: ttfRegular, fontSize: 9.5)),
+                    pw.Text('Date (मिति): ${dateFormat.format(data.invoiceDate)} (वि.सं. ${NepaliDateFormat('yyyy-MM-dd', Language.nepali).format(data.invoiceDate.toNepaliDateTime())})', style: pw.TextStyle(font: ttfRegular, fontSize: 9.5)),
                     pw.Text('Mode: ${data.paymentMode}', style: pw.TextStyle(font: ttfRegular, fontSize: 9.5)),
                   ],
                 ),
@@ -540,6 +572,22 @@ class PdfBillGenerator {
                   decoration: const pw.BoxDecoration(border: pw.Border(top: pw.BorderSide(color: PdfColors.grey700, width: 1))),
                   padding: const pw.EdgeInsets.only(top: 4),
                   child: pw.Text('Authorized Signatory', style: pw.TextStyle(font: ttfBold, fontSize: 9), textAlign: pw.TextAlign.center),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 10),
+            pw.Divider(color: PdfColors.grey400, thickness: 0.5),
+            pw.SizedBox(height: 2),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  'Powered by Sajilo Billing | NextGen Innovations',
+                  style: pw.TextStyle(font: ttfRegular, fontSize: 8, color: PdfColors.grey700),
+                ),
+                pw.Text(
+                  'https://nextgeninnovations.com.np/ • नेपालमा निर्मित',
+                  style: pw.TextStyle(font: ttfRegular, fontSize: 8, color: PdfColors.grey700),
                 ),
               ],
             ),

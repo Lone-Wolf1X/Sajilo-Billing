@@ -32,6 +32,7 @@ class BusinessRepository {
   /// Saves or updates the current business profile.
   Future<BusinessProfile> saveBusinessProfile({
     required String businessName,
+    String? businessNameNepali,
     required String panVatNumber,
     required String contactNumber,
     String? shopAddress,
@@ -43,6 +44,7 @@ class BusinessRepository {
     if (existing != null) {
       final updated = existing.copyWith(
         businessName: businessName,
+        businessNameNepali: Value(businessNameNepali),
         panVatNumber: panVatNumber,
         contactNumber: contactNumber,
         shopAddress: Value(shopAddress),
@@ -56,6 +58,7 @@ class BusinessRepository {
       final newProfile = BusinessProfilesCompanion.insert(
         id: _uuid.v4(),
         businessName: businessName,
+        businessNameNepali: Value(businessNameNepali),
         panVatNumber: panVatNumber,
         contactNumber: contactNumber,
         shopAddress: Value(shopAddress),

@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.18.1
   uuid: ^4.4.0
   cupertino_icons: ^1.0.6
+  syntech_nepali_calendar: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,7 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/branding/
 
   fonts:
     - family: NotoSansDevanagari

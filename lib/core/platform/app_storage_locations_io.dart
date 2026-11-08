@@ -16,3 +16,4 @@ class AppStorageLocationsIo implements AppStorageLocations {
     return downloads?.path;
   }
 }
+

@@ -99,3 +99,4 @@ Before going live:
   4. Verify initial sync pulls existing inventory from backend.
   5. Create a test sale and verify bill PDF preview dialog opens.
   6. Verify offline banner appears when network is disconnected and disappears when reconnected.
+
