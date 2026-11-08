@@ -58,37 +58,32 @@ class DashboardScreen extends ConsumerWidget {
     final metricsAsync = ref.watch(dashboardMetricsProvider);
     final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
-    return Scaffold(
-      body: SingleChildScrollView(
+    return Material(
+      color: AppTheme.backgroundLight,
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(28.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Responsive Welcome Title and Quick Actions Bar
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 16,
-              runSpacing: 16,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Dashboard / मुख्य पृष्ठ',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textDark,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Real-time retail overview, daily ledger, and store metrics',
-                      style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                    ),
-                  ],
+                const Text(
+                  'Dashboard / मुख्य पृष्ठ',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textDark,
+                  ),
                 ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Real-time retail overview, daily ledger, and store metrics',
+                  style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                ),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -214,7 +209,7 @@ class DashboardScreen extends ConsumerWidget {
                               card4,
                             ],
                           );
-                        } else if (width < 1050) {
+                        } else if (width < 1200) {
                           return Column(
                             children: [
                               Row(children: [Expanded(child: card1), const SizedBox(width: 16), Expanded(child: card2)]),

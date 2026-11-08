@@ -45,7 +45,7 @@ class ResponsiveCard extends StatelessWidget {
           minWidth: minWidth ?? 0.0,
           maxWidth: maxWidth ?? double.infinity,
         ),
-        child: IntrinsicHeight(child: cardContent),
+        child: cardContent,
       );
     }
 

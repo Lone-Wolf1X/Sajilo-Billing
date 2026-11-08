@@ -178,7 +178,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                   width: isExtended ? 190 : 48,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: 20,
+                      vertical: 10,
                       horizontal: isExtended ? 8 : 4,
                     ),
                     child: Row(
@@ -232,11 +232,11 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                 ),
                 trailing: isExtended
                     ? Padding(
-                        padding: const EdgeInsets.only(top: 24, bottom: 20, left: 16, right: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            minimumSize: const Size(180, 36),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: const Size(180, 32),
                           ),
                           onPressed: () {
                             ref.read(localeProvider.notifier).toggleLocale();
