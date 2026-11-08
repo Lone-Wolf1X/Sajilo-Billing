@@ -9,6 +9,7 @@ import '../../backup/presentation/backup_provider.dart';
 import '../../inventory/presentation/widgets/item_form_dialog.dart';
 import '../../purchase/presentation/purchase_entry_screen.dart';
 import '../../printing/presentation/printer_settings_screen.dart';
+import '../data/dashboard_repository.dart';
 import 'dashboard_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -60,251 +61,323 @@ class DashboardScreen extends ConsumerWidget {
 
     return Material(
       color: AppTheme.backgroundLight,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(28.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Responsive Welcome Title and Quick Actions Bar
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Dashboard / मुख्य पृष्ठ',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textDark,
+      // Outer Column: FIXED header on top, scrollable body below.
+      // These are siblings — they can NEVER overlap.
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ── STICKY HEADER ─────────────────────────────────────────────
+          // Always visible, never scrolls, never covered by metric cards.
+          _buildPageHeader(context, ref),
+
+          // ── SCROLLABLE BODY ───────────────────────────────────────────
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Top Metrics Grid
+                  metricsAsync.when(
+                    loading: () => const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                    error: (e, _) => Card(
+                      color: Colors.red.withOpacity(0.08),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text('Error loading dashboard: $e',
+                            style: const TextStyle(color: Colors.redAccent)),
+                      ),
+                    ),
+                    data: (metrics) => _buildMetricsAndBackup(
+                      context,
+                      ref,
+                      metrics,
+                      dateFormat,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Real-time retail overview, daily ledger, and store metrics',
-                  style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Sticky page header ─────────────────────────────────────────────────────
+  Widget _buildPageHeader(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 18, 24, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: AppTheme.borderSubtle, width: 1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Title row
+          const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title + subtitle
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: onNavigateToSale,
-                      icon: const Icon(Icons.point_of_sale, size: 18),
-                      label: const Text('New Sale / नयाँ बिल'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
-                        minimumSize: const Size(140, 44),
+                    Text(
+                      'Dashboard / मुख्य पृष्ठ',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textDark,
                       ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (_) => const PurchaseEntryScreen()))
-                            .then((_) => ref.invalidate(dashboardMetricsProvider));
-                      },
-                      icon: const Icon(Icons.add_shopping_cart, size: 18),
-                      label: const Text('New Purchase / नयाँ खरिद'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.accentTeal,
-                        minimumSize: const Size(150, 44),
-                      ),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _openAddItemDialog(context, ref),
-                      icon: const Icon(Icons.inventory_2_outlined, size: 18),
-                      label: const Text('Add Item'),
-                      style: OutlinedButton.styleFrom(minimumSize: const Size(120, 44)),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _backupNow(context, ref),
-                      icon: const Icon(Icons.download, size: 18),
-                      label: const Text('Backup Now'),
-                      style: OutlinedButton.styleFrom(minimumSize: const Size(130, 44)),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const PrinterSettingsScreen()),
-                        );
-                      },
-                      icon: const Icon(Icons.print_outlined, size: 18),
-                      label: const Text('Printer'),
-                      style: OutlinedButton.styleFrom(minimumSize: const Size(110, 44)),
+                    SizedBox(height: 2),
+                    Text(
+                      'Real-time retail overview, daily ledger, and store metrics',
+                      style: TextStyle(fontSize: 12.5, color: AppTheme.textMuted),
                     ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Top Metrics Grid
-            metricsAsync.when(
-              loading: () => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(40.0),
-                  child: CircularProgressIndicator(),
-                ),
               ),
-              error: (e, _) => Card(
-                color: Colors.red.withOpacity(0.08),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text('Error loading dashboard: $e', style: const TextStyle(color: Colors.redAccent)),
-                ),
-              ),
-              data: (metrics) {
-                final card1 = _buildMetricCard(
-                  title: "Today's Sales / आजको बिक्री",
-                  value: PaisaHelper.formatPaisa(metrics.todaySalesRevenuePaisa),
-                  subtitle: '${metrics.todaySalesCount} invoices generated',
-                  icon: Icons.payments_outlined,
-                  iconColor: AppTheme.primaryBlue,
-                  onTap: onNavigateToSale,
-                );
+            ],
+          ),
+          const SizedBox(height: 14),
+          // Action buttons — Wrap so they reflow on narrow widths
+          _buildActionButtons(context, ref),
+        ],
+      ),
+    );
+  }
 
-                final card2 = _buildMetricCard(
-                  title: "Today's Purchases / आजको खरिद",
-                  value: PaisaHelper.formatPaisa(metrics.todayPurchaseAmountPaisa),
-                  subtitle: '${metrics.todayPurchaseCount} supplier intakes',
-                  icon: Icons.local_shipping_outlined,
-                  iconColor: AppTheme.accentTeal,
-                  onTap: onNavigateToPurchase,
-                );
+  Widget _buildActionButtons(BuildContext context, WidgetRef ref) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 8,
+      children: [
+        ElevatedButton.icon(
+          onPressed: onNavigateToSale,
+          icon: const Icon(Icons.point_of_sale, size: 18),
+          label: const Text('New Sale / नयाँ बिल'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryBlue,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(140, 40),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const PurchaseEntryScreen()))
+                .then((_) => ref.invalidate(dashboardMetricsProvider));
+          },
+          icon: const Icon(Icons.add_shopping_cart, size: 18),
+          label: const Text('New Purchase / नयाँ खरिद'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.accentTeal,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(150, 40),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        OutlinedButton.icon(
+          onPressed: () => _openAddItemDialog(context, ref),
+          icon: const Icon(Icons.inventory_2_outlined, size: 18),
+          label: const Text('Add Item'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(120, 40),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        OutlinedButton.icon(
+          onPressed: () => _backupNow(context, ref),
+          icon: const Icon(Icons.download, size: 18),
+          label: const Text('Backup Now'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(130, 40),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+        OutlinedButton.icon(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const PrinterSettingsScreen()),
+            );
+          },
+          icon: const Icon(Icons.print_outlined, size: 18),
+          label: const Text('Printer'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(110, 40),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      ],
+    );
+  }
 
-                final card3 = _buildMetricCard(
-                  title: 'Low-Stock Alerts / न्यून मौज्दात',
-                  value: '${metrics.lowStockCount} Items',
-                  subtitle: metrics.lowStockCount > 0 ? 'Requires restocking immediately' : 'Inventory levels healthy',
-                  icon: Icons.warning_amber_rounded,
-                  iconColor: metrics.lowStockCount > 0 ? Colors.redAccent : Colors.grey,
-                  badgeColor: metrics.lowStockCount > 0 ? Colors.redAccent : null,
-                  onTap: onNavigateToInventory,
-                );
+  // ── Metrics grid + backup card ─────────────────────────────────────────────
+  Widget _buildMetricsAndBackup(
+    BuildContext context,
+    WidgetRef ref,
+    DashboardMetrics metrics,
+    DateFormat dateFormat,
+  ) {
+    final card1 = _buildMetricCard(
+      title: "Today's Sales / आजको बिक्री",
+      value: PaisaHelper.formatPaisa(metrics.todaySalesRevenuePaisa),
+      subtitle: '${metrics.todaySalesCount} invoices generated',
+      icon: Icons.payments_outlined,
+      iconColor: AppTheme.primaryBlue,
+      onTap: onNavigateToSale,
+    );
 
-                final card4 = _buildMetricCard(
-                  title: 'Total Active Items / कुल सामान',
-                  value: '${metrics.totalItemsCount} Products',
-                  subtitle: 'Registered in store catalog',
-                  icon: Icons.inventory_2_outlined,
-                  iconColor: AppTheme.primaryBlue,
-                  onTap: onNavigateToInventory,
-                );
+    final card2 = _buildMetricCard(
+      title: "Today's Purchases / आजको खरिद",
+      value: PaisaHelper.formatPaisa(metrics.todayPurchaseAmountPaisa),
+      subtitle: '${metrics.todayPurchaseCount} supplier intakes',
+      icon: Icons.local_shipping_outlined,
+      iconColor: AppTheme.accentTeal,
+      onTap: onNavigateToPurchase,
+    );
 
+    final card3 = _buildMetricCard(
+      title: 'Low-Stock Alerts / न्यून मौज्दात',
+      value: '${metrics.lowStockCount} Items',
+      subtitle: metrics.lowStockCount > 0 ? 'Requires restocking immediately' : 'Inventory levels healthy',
+      icon: Icons.warning_amber_rounded,
+      iconColor: metrics.lowStockCount > 0 ? Colors.redAccent : Colors.grey,
+      badgeColor: metrics.lowStockCount > 0 ? Colors.redAccent : null,
+      onTap: onNavigateToInventory,
+    );
+
+    final card4 = _buildMetricCard(
+      title: 'Total Active Items / कुल सामान',
+      value: '${metrics.totalItemsCount} Products',
+      subtitle: 'Registered in store catalog',
+      icon: Icons.inventory_2_outlined,
+      iconColor: AppTheme.primaryBlue,
+      onTap: onNavigateToInventory,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Responsive metric cards grid
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            if (width < 650) {
+              return Column(
+                children: [
+                  card1,
+                  const SizedBox(height: 12),
+                  card2,
+                  const SizedBox(height: 12),
+                  card3,
+                  const SizedBox(height: 12),
+                  card4,
+                ],
+              );
+            } else if (width < 1200) {
+              return Column(
+                children: [
+                  Row(children: [Expanded(child: card1), const SizedBox(width: 16), Expanded(child: card2)]),
+                  const SizedBox(height: 16),
+                  Row(children: [Expanded(child: card3), const SizedBox(width: 16), Expanded(child: card4)]),
+                ],
+              );
+            } else {
+              return Row(
+                children: [
+                  Expanded(child: card1),
+                  const SizedBox(width: 16),
+                  Expanded(child: card2),
+                  const SizedBox(width: 16),
+                  Expanded(child: card3),
+                  const SizedBox(width: 16),
+                  Expanded(child: card4),
+                ],
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 20),
+
+        // Backup & Offline Status Card
+        ResponsiveCard(
+          child: LayoutBuilder(
+            builder: (context, cardConstraints) {
+              final isCompact = cardConstraints.maxWidth < 650;
+              final infoSection = Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentTeal.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.cloud_done_outlined, color: AppTheme.accentTeal, size: 28),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Offline-First SQLite Storage Active',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          metrics.lastBackupTime != null
+                              ? 'Last local database backup: ${dateFormat.format(metrics.lastBackupTime!.toLocal())}'
+                              : 'No manual database backup exported yet. Click "Backup Now" to create a backup file.',
+                          style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+
+              final actionBtn = OutlinedButton.icon(
+                onPressed: () => _backupNow(context, ref),
+                icon: const Icon(Icons.download, size: 16),
+                label: const Text('Export SQLite Backup'),
+              );
+
+              if (isCompact) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final width = constraints.maxWidth;
-                        if (width < 650) {
-                          return Column(
-                            children: [
-                              card1,
-                              const SizedBox(height: 12),
-                              card2,
-                              const SizedBox(height: 12),
-                              card3,
-                              const SizedBox(height: 12),
-                              card4,
-                            ],
-                          );
-                        } else if (width < 1200) {
-                          return Column(
-                            children: [
-                              Row(children: [Expanded(child: card1), const SizedBox(width: 16), Expanded(child: card2)]),
-                              const SizedBox(height: 16),
-                              Row(children: [Expanded(child: card3), const SizedBox(width: 16), Expanded(child: card4)]),
-                            ],
-                          );
-                        } else {
-                          return Row(
-                            children: [
-                              Expanded(child: card1),
-                              const SizedBox(width: 16),
-                              Expanded(child: card2),
-                              const SizedBox(width: 16),
-                              Expanded(child: card3),
-                              const SizedBox(width: 16),
-                              Expanded(child: card4),
-                            ],
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Backup & Offline Status Card
-                    ResponsiveCard(
-                      child: LayoutBuilder(
-                        builder: (context, cardConstraints) {
-                          final isCompact = cardConstraints.maxWidth < 650;
-                          final infoSection = Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.accentTeal.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(Icons.cloud_done_outlined, color: AppTheme.accentTeal, size: 28),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Offline-First SQLite Storage Active',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      metrics.lastBackupTime != null
-                                          ? 'Last local database backup: ${dateFormat.format(metrics.lastBackupTime!.toLocal())}'
-                                          : 'No manual database backup exported yet. Click "Backup Now" to create a backup file.',
-                                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-
-                          final actionBtn = OutlinedButton.icon(
-                            onPressed: () => _backupNow(context, ref),
-                            icon: const Icon(Icons.download, size: 16),
-                            label: const Text('Export SQLite Backup'),
-                          );
-
-                          if (isCompact) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                infoSection,
-                                const SizedBox(height: 14),
-                                actionBtn,
-                              ],
-                            );
-                          }
-
-                          return Row(
-                            children: [
-                              Expanded(child: infoSection),
-                              const SizedBox(width: 16),
-                              actionBtn,
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+                    infoSection,
+                    const SizedBox(height: 14),
+                    actionBtn,
                   ],
                 );
-              },
-            ),
-          ],
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: infoSection),
+                  const SizedBox(width: 16),
+                  actionBtn,
+                ],
+              );
+            },
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -366,4 +439,3 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 }
-
