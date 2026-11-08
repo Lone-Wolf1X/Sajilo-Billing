@@ -73,3 +73,4 @@ public abstract class BaseEntity {
         updatedAt = Instant.now();
     }
 }
+

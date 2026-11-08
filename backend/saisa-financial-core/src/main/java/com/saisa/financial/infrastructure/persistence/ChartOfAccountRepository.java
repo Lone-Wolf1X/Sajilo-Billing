@@ -15,3 +15,4 @@ public interface ChartOfAccountRepository extends JpaRepository<ChartOfAccount, 
 
     boolean existsByTenantIdAndAccountCode(Long tenantId, String accountCode);
 }
+

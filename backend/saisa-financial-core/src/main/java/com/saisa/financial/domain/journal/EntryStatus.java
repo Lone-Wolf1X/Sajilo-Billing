@@ -14,3 +14,4 @@ public enum EntryStatus {
     POSTED,
     REVERSED
 }
+

@@ -176,3 +176,4 @@ public final class Money implements Comparable<Money> {
         return currency.name() + " " + amount.toPlainString();
     }
 }
+

@@ -38,3 +38,4 @@ public enum AccountType {
         return this == INCOME || this == EXPENSE;
     }
 }
+

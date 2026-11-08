@@ -47,3 +47,4 @@ public class AccountingPeriod extends BaseEntity {
         return status == PeriodStatus.OPEN;
     }
 }
+

@@ -30,3 +30,4 @@ public enum Currency {
         return defaultScale;
     }
 }
+

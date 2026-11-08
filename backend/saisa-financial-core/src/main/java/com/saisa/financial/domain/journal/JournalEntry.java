@@ -101,3 +101,4 @@ public class JournalEntry extends BaseEntity {
         return status == EntryStatus.POSTED;
     }
 }
+

@@ -16,3 +16,4 @@ public enum EntryType {
     REVERSAL,      // explicitly reverses an earlier entry
     ADJUSTMENT     // year-end / correction adjustments
 }
+

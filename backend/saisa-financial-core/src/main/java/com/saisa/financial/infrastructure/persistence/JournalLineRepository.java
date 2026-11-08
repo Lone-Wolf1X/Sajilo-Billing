@@ -12,3 +12,4 @@ public interface JournalLineRepository extends JpaRepository<JournalLine, Long> 
 
     List<JournalLine> findByTenantIdAndAccountId(Long tenantId, Long accountId);
 }
+

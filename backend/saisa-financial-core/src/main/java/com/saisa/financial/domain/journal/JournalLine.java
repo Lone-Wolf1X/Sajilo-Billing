@@ -100,3 +100,4 @@ public class JournalLine extends BaseEntity {
         if (currencyCode == null) currencyCode = "INR";
     }
 }
+

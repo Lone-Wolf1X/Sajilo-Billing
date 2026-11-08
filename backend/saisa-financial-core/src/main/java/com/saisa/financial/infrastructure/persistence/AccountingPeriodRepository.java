@@ -24,3 +24,4 @@ public interface AccountingPeriodRepository extends JpaRepository<AccountingPeri
 
     List<AccountingPeriod> findByTenantIdAndStatus(Long tenantId, PeriodStatus status);
 }
+

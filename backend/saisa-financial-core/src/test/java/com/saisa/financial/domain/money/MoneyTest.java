@@ -71,3 +71,4 @@ class MoneyTest {
         assertTrue(Money.zero(Currency.INR).isZero());
     }
 }
+
