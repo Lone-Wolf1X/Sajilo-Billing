@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'app_database_connection.dart' as db_conn;
 
 import 'sync_status.dart';
 import 'tables/business_profiles_table.dart';
@@ -47,7 +44,7 @@ part 'app_database.g.dart';
   PartyPayments,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? e]) : super(e ?? _openConnection());
+  AppDatabase([QueryExecutor? e]) : super(e ?? db_conn.openAppConnection());
 
   @override
   int get schemaVersion => 4;
@@ -87,25 +84,13 @@ class AppDatabase extends _$AppDatabase {
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
-          await customStatement('PRAGMA journal_mode = WAL');
+          try {
+            await customStatement('PRAGMA journal_mode = WAL');
+          } catch (_) {}
         },
       );
 
   /// Resolves the canonical file location for the SQLite database.
-  /// Uses path_provider exclusively without hardcoding OS directories.
-  static Future<File> getDatabaseFile() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'SajiloBilling', 'sajilo_billing.sqlite'));
-    if (!await file.parent.exists()) {
-      await file.parent.create(recursive: true);
-    }
-    return file;
-  }
-
-  static LazyDatabase _openConnection() {
-    return LazyDatabase(() async {
-      final file = await getDatabaseFile();
-      return NativeDatabase.createInBackground(file);
-    });
-  }
+  /// On desktop, returns File. On Web, throws UnsupportedError.
+  static Future<dynamic> getDatabaseFile() => db_conn.getDatabaseFile();
 }

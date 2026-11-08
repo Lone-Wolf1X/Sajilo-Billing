@@ -49,15 +49,29 @@ Because Sajilo Billing is a client-side application requesting access to store b
 
 ---
 
-## 4. Create OAuth 2.0 Client ID (Desktop App)
+## 4. Create OAuth 2.0 Client IDs (Desktop & Web)
 
+> **Important**: Two client IDs are required — one Desktop (loopback), one Web (JS origin). The app loads the correct one based on target platform.
+
+### A. Desktop Client ID (`GOOGLE_CLIENT_ID_DESKTOP`)
 1. Go to **APIs & Services > Credentials**.
 2. Click **+ Create Credentials** at the top and select **OAuth client ID**.
 3. In the **Application type** dropdown, select **Desktop app**.
    > **Note on Desktop Flow**: For desktop applications, Google authorizes loopback redirect URIs (`http://127.0.0.1:<random_port>`) automatically for the `Desktop app` client type without requiring you to register specific port numbers in advance.
 4. Set the **Name** to `Sajilo Billing Desktop Client`.
-5. Click **Create**.
-6. A dialog will show your **Client ID** and **Client Secret**. Copy both values.
+5. Click **Create** and copy your **Client ID** and **Client Secret**.
+
+### B. Web Client ID (`GOOGLE_CLIENT_ID_WEB`)
+1. In **APIs & Services > Credentials**, click **+ Create Credentials > OAuth client ID**.
+2. In the **Application type** dropdown, select **Web application**.
+3. Set the **Name** to `Sajilo Billing Web Client`.
+4. Under **Authorized JavaScript origins**, add:
+   - `http://localhost:8080` (for local development)
+   - `https://your-production-domain.com` (for production)
+5. Under **Authorized redirect URIs**, add:
+   - `http://localhost:8080/`
+   - `https://your-production-domain.com/`
+6. Click **Create** and copy your **Web Client ID**.
 
 ---
 

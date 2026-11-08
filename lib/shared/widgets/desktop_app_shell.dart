@@ -13,6 +13,7 @@ import '../../features/khata/presentation/khata_screen.dart';
 import '../../features/business/presentation/edit_business_screen.dart';
 import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/sync/presentation/sync_paused_banner.dart';
 
 class DesktopAppShell extends ConsumerStatefulWidget {
   const DesktopAppShell({super.key});
@@ -49,140 +50,216 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
       const SettingsScreen(),
     ];
 
-    return Scaffold(
-      body: Row(
-        children: [
-          // Desktop Navigation Rail
-          NavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _navigateToIndex,
-            extended: true,
-            minExtendedWidth: 220,
-            backgroundColor: Colors.white,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-              child: Row(
+    const destinations = [
+      NavigationRailDestination(
+        icon: Icon(Icons.dashboard_outlined),
+        selectedIcon: Icon(Icons.dashboard),
+        label: Text('Dashboard / मुख्य पृष्ठ'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.point_of_sale_outlined),
+        selectedIcon: Icon(Icons.point_of_sale),
+        label: Text('POS Billing (बिक्री)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.receipt_long_outlined),
+        selectedIcon: Icon(Icons.receipt_long),
+        label: Text('Sales Register (बिजक)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.local_shipping_outlined),
+        selectedIcon: Icon(Icons.local_shipping),
+        label: Text('Purchases (खरिद)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.inventory_2_outlined),
+        selectedIcon: Icon(Icons.inventory_2),
+        label: Text('Inventory (सामान)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.menu_book_outlined),
+        selectedIcon: Icon(Icons.menu_book),
+        label: Text('Khata (उधारो खाता)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.business_outlined),
+        selectedIcon: Icon(Icons.business),
+        label: Text('Business Info (व्यापार)'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.backup_table_outlined),
+        selectedIcon: Icon(Icons.backup_table),
+        label: Text('Backup / Restore'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.settings_outlined),
+        selectedIcon: Icon(Icons.settings),
+        label: Text('Settings (सेटिङ)'),
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final isCompact = width < 600;
+        final isExtended = width >= 900;
+
+        final contentArea = Column(
+          children: [
+            const SyncPausedBanner(),
+            Expanded(child: pages[_selectedIndex]),
+          ],
+        );
+
+        if (isCompact) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.appTitle),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.language),
+                  onPressed: () => ref.read(localeProvider.notifier).toggleLocale(),
+                  tooltip: locale.languageCode == 'en' ? 'नेपाली' : 'English',
+                ),
+              ],
+            ),
+            drawer: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.receipt_long, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  DrawerHeader(
+                    decoration: const BoxDecoration(color: AppTheme.primaryBlue),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        const Icon(Icons.receipt_long, color: Colors.white, size: 36),
+                        const SizedBox(height: 8),
                         Text(
                           l10n.appTitle,
                           style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: AppTheme.primaryBlue,
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 2),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppTheme.accentTeal.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            l10n.offlineReady,
-                            style: const TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.accentTeal,
-                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  ...List.generate(destinations.length, (idx) {
+                    return ListTile(
+                      leading: destinations[idx].icon,
+                      title: destinations[idx].label,
+                      selected: _selectedIndex == idx,
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToIndex(idx);
+                      },
+                    );
+                  }),
                 ],
               ),
             ),
-            trailing: Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      minimumSize: const Size.fromHeight(36),
+            body: contentArea,
+          );
+        }
+
+        return Scaffold(
+          body: Row(
+            children: [
+              // Navigation Rail (Extended on desktop >= 900, compact icons on tablet < 900)
+              NavigationRail(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: _navigateToIndex,
+                extended: isExtended,
+                minExtendedWidth: 220,
+                backgroundColor: Colors.white,
+                leading: SizedBox(
+                  width: isExtended ? 190 : 48,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: isExtended ? 8 : 4,
                     ),
-                    onPressed: () {
-                      ref.read(localeProvider.notifier).toggleLocale();
-                    },
-                    icon: const Icon(Icons.language, size: 16),
-                    label: Text(
-                      locale.languageCode == 'en' ? 'नेपाली' : 'English',
-                      style: const TextStyle(fontSize: 12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryBlue,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.receipt_long, color: Colors.white, size: 24),
+                        ),
+                        if (isExtended) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.appTitle,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: AppTheme.primaryBlue,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.accentTeal.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    l10n.offlineReady,
+                                    style: const TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.accentTeal,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
+                trailing: isExtended
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 24, bottom: 20, left: 16, right: 16),
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            minimumSize: const Size(180, 36),
+                          ),
+                          onPressed: () {
+                            ref.read(localeProvider.notifier).toggleLocale();
+                          },
+                          icon: const Icon(Icons.language, size: 16),
+                          label: Text(
+                            locale.languageCode == 'en' ? 'नेपाली' : 'English',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      )
+                    : null,
+                destinations: destinations,
               ),
-            ),
-            destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard),
-                label: Text('Dashboard / मुख्य पृष्ठ'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.point_of_sale_outlined),
-                selectedIcon: Icon(Icons.point_of_sale),
-                label: Text('POS Billing (बिक्री)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.receipt_long_outlined),
-                selectedIcon: Icon(Icons.receipt_long),
-                label: Text('Sales Register (बिजक)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.local_shipping_outlined),
-                selectedIcon: Icon(Icons.local_shipping),
-                label: Text('Purchases (खरिद)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.inventory_2_outlined),
-                selectedIcon: Icon(Icons.inventory_2),
-                label: Text('Inventory (सामान)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book),
-                label: Text('Khata (उधारो खाता)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.business_outlined),
-                selectedIcon: Icon(Icons.business),
-                label: Text('Business Info (व्यापार)'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.backup_table_outlined),
-                selectedIcon: Icon(Icons.backup_table),
-                label: Text('Backup / Restore'),
-              ),
-              NavigationRailDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: Text('Settings (सेटिङ)'),
+              const VerticalDivider(thickness: 1, width: 1, color: AppTheme.borderSubtle),
+              // Active Page View
+              Expanded(
+                child: contentArea,
               ),
             ],
           ),
-          const VerticalDivider(thickness: 1, width: 1, color: AppTheme.borderSubtle),
-          // Active Page View
-          Expanded(
-            child: pages[_selectedIndex],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

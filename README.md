@@ -174,3 +174,24 @@ flutter run -d windows
 ```bash
 flutter run -d linux
 ```
+
+---
+
+## Web Deployment (Step 5)
+
+> **Important**: Web is a secondary client — desktop remains the primary target for billing and Drive backup.
+
+Sajilo Billing supports Flutter Web deployment, allowing shopkeepers to inspect inventory, monitor sales, and view ledger records from any modern browser.
+
+### Key Web Features
+- **Storage**: Drift SQLite compiled to WebAssembly (`drift/wasm` + `web/sqlite3.wasm` + `web/drift_worker.js`) backed by browser IndexedDB / OPFS.
+- **Rendering**: CanvasKit web renderer (`--web-renderer canvaskit`) for bilingual font metrics and PDF fidelity.
+- **Google Auth**: Google Identity Services (GIS) with in-memory session tokens (never written to localStorage).
+- **Sync**: Integrated with `SyncEngine` for automatic 30s background sync, aggressive pull on tab focus/login, and non-blocking sync pause status banner.
+- **Responsive Layout**: Automatic collapse from wide desktop sidebar to compact navigation drawer on tablets and smaller screens.
+
+For setup and deployment guides:
+- [Web Setup Guide](docs/web_setup.md)
+- [Web Deployment & Docker Guide](docs/web_deploy.md)
+- [Google Cloud OAuth Guide](docs/google_setup.md)
+

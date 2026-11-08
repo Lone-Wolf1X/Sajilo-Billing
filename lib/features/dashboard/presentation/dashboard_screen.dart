@@ -62,31 +62,34 @@ class DashboardScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Welcome Title and Quick Actions Bar
-            Row(
+            // Responsive Welcome Title and Quick Actions Bar
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              runSpacing: 16,
               children: [
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Dashboard / मुख्य पृष्ठ',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textDark,
-                        ),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Dashboard / मुख्य पृष्ठ',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textDark,
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Real-time retail overview, daily ledger, and store metrics',
-                        style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Real-time retail overview, daily ledger, and store metrics',
+                      style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    ),
+                  ],
                 ),
                 Wrap(
                   spacing: 10,
+                  runSpacing: 10,
                   children: [
                     ElevatedButton.icon(
                       onPressed: onNavigateToSale,

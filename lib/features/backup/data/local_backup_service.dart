@@ -54,7 +54,7 @@ class LocalBackupService implements BackupService {
 
   @override
   Future<String> backupNow({String? targetDirectoryPath}) async {
-    final dbFile = await AppDatabase.getDatabaseFile();
+    final File dbFile = (await AppDatabase.getDatabaseFile()) as File;
     if (!await dbFile.exists()) {
       throw Exception('Database file does not exist yet at ${dbFile.path}');
     }
@@ -143,7 +143,7 @@ class LocalBackupService implements BackupService {
     }
 
     // Target database file
-    final currentDbFile = await AppDatabase.getDatabaseFile();
+    final File currentDbFile = (await AppDatabase.getDatabaseFile()) as File;
 
     // Close active database connections first
     await _db.close();

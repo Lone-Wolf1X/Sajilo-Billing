@@ -115,7 +115,7 @@ class GoogleDriveBackupService implements BackupService {
 
   /// Creates a compressed ZIP containing active SQLite database and settings.json metadata.
   Future<Uint8List> _createBackupZip() async {
-    final dbFile = await AppDatabase.getDatabaseFile();
+    final File dbFile = (await AppDatabase.getDatabaseFile()) as File;
     if (!await dbFile.exists()) {
       throw const CorruptBackupException('Database file does not exist locally.');
     }
@@ -468,7 +468,7 @@ class GoogleDriveBackupService implements BackupService {
 
       // 3. Pre-restore safety backup
       _emitProgress(BackupStep.restoring, 0.80, 'Creating pre-restore safety copy...');
-      final currentDbFile = await AppDatabase.getDatabaseFile();
+      final File currentDbFile = (await AppDatabase.getDatabaseFile()) as File;
       if (await currentDbFile.exists()) {
         final safetyTimestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
         final safetyFile = File(
