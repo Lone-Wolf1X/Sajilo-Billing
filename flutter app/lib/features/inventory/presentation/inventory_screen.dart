@@ -20,6 +20,20 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   final _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-seed default catalog from products.json if catalog is empty
+    Future.microtask(() async {
+      try {
+        final repo = ref.read(inventoryRepositoryProvider);
+        await repo.seedDevData();
+      } catch (e) {
+        debugPrint('Auto-seed check: $e');
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -91,8 +105,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     final filter = ref.watch(inventoryFilterProvider);
     final categoriesAsync = ref.watch(categoriesStreamProvider);
 
-    return Scaffold(
-      body: Padding(
+    return Material(
+      color: AppTheme.backgroundLight,
+      child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -180,6 +195,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                         error: (_, __) => const SizedBox(),
                         data: (cats) {
                           return DropdownButtonFormField<String?>(
+                            isExpanded: true,
                             value: filter.categoryId,
                             decoration: const InputDecoration(
                               labelText: 'Category Filter',
@@ -252,112 +268,118 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
                   return Card(
                     clipBehavior: Clip.antiAlias,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DataTable(
-                          columnSpacing: 24,
-                          headingRowColor: MaterialStateProperty.all(AppTheme.backgroundLight),
-                          columns: const [
-                            DataColumn(label: Text('Item Name / नाम', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: Text('SKU / Code', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: Text('Unit', style: TextStyle(fontWeight: FontWeight.bold))),
-                            DataColumn(label: Text('Cost Price', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                            DataColumn(label: Text('Selling Price', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                            DataColumn(label: Text('Current Stock', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
-                            DataColumn(label: Text('Actions / कार्य', style: TextStyle(fontWeight: FontWeight.bold))),
-                          ],
-                          rows: items.map((item) {
-                            final isLowStock = item.stockQty <= item.lowStockThreshold;
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                              child: DataTable(
+                                columnSpacing: 20,
+                                headingRowColor: MaterialStateProperty.all(AppTheme.backgroundLight),
+                                columns: const [
+                                  DataColumn(label: Text('Item Name / नाम', style: TextStyle(fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('SKU / Code', style: TextStyle(fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Unit', style: TextStyle(fontWeight: FontWeight.bold))),
+                                  DataColumn(label: Text('Cost Price', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                                  DataColumn(label: Text('Selling Price', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                                  DataColumn(label: Text('Current Stock', style: TextStyle(fontWeight: FontWeight.bold)), numeric: true),
+                                  DataColumn(label: Text('Actions / कार्य', style: TextStyle(fontWeight: FontWeight.bold))),
+                                ],
+                                rows: items.map((item) {
+                                  final isLowStock = item.stockQty <= item.lowStockThreshold;
 
-                            return DataRow(
-                              cells: [
-                                DataCell(
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                      if (item.nepaliName != null)
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                            if (item.nepaliName != null)
+                                              Text(
+                                                item.nepaliName!,
+                                                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      DataCell(Text(item.sku, style: const TextStyle(fontSize: 12))),
+                                      DataCell(Text(item.unit)),
+                                      DataCell(Text(PaisaHelper.formatPaisa(item.purchasePricePaisa))),
+                                      DataCell(
                                         Text(
-                                          item.nepaliName!,
-                                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                DataCell(Text(item.sku, style: const TextStyle(fontSize: 12))),
-                                DataCell(Text(item.unit)),
-                                DataCell(Text(PaisaHelper.formatPaisa(item.purchasePricePaisa))),
-                                DataCell(
-                                  Text(
-                                    PaisaHelper.formatPaisa(item.sellingPricePaisa),
-                                    style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
-                                  ),
-                                ),
-                                DataCell(
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '${item.stockQty} ${item.unit}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: isLowStock ? Colors.redAccent : AppTheme.textDark,
+                                          PaisaHelper.formatPaisa(item.sellingPricePaisa),
+                                          style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
                                         ),
                                       ),
-                                      if (isLowStock) ...[
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red.withOpacity(0.12),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: const Text(
-                                            'LOW',
-                                            style: TextStyle(
-                                              color: Colors.redAccent,
-                                              fontSize: 9,
-                                              fontWeight: FontWeight.bold,
+                                      DataCell(
+                                        Wrap(
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          spacing: 6,
+                                          children: [
+                                            Text(
+                                              '${item.stockQty.toStringAsFixed(item.stockQty.truncateToDouble() == item.stockQty ? 0 : 1)} ${item.unit}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: isLowStock ? Colors.redAccent : AppTheme.textDark,
+                                              ),
                                             ),
-                                          ),
+                                            if (isLowStock)
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red.withOpacity(0.12),
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: const Text(
+                                                  'LOW',
+                                                  style: TextStyle(
+                                                    color: Colors.redAccent,
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
+                                      DataCell(
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(Icons.tune, size: 18),
+                                              tooltip: 'Stock Adjustment (मौज्दात समायोजन)',
+                                              color: AppTheme.accentTeal,
+                                              onPressed: () => _openAdjustmentDialog(item),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.edit_outlined, size: 18),
+                                              tooltip: 'Edit Details',
+                                              color: AppTheme.primaryBlue,
+                                              onPressed: () => _openItemDialog(item),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.delete_outline, size: 18),
+                                              tooltip: 'Archive / Delete',
+                                              color: Colors.redAccent,
+                                              onPressed: () => _deleteItem(item),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
-                                  ),
-                                ),
-                                DataCell(
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.tune, size: 18),
-                                        tooltip: 'Stock Adjustment (मौज्दात समायोजन)',
-                                        color: AppTheme.accentTeal,
-                                        onPressed: () => _openAdjustmentDialog(item),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.edit_outlined, size: 18),
-                                        tooltip: 'Edit Details',
-                                        color: AppTheme.primaryBlue,
-                                        onPressed: () => _openItemDialog(item),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete_outline, size: 18),
-                                        tooltip: 'Archive / Delete',
-                                        color: Colors.redAccent,
-                                        onPressed: () => _deleteItem(item),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
