@@ -27,19 +27,21 @@ void main() {
       expect(await authRepo.hasLocalAccount(), isFalse);
 
       final seeded = await authRepo.seedDefaultTestAccount();
-      expect(seeded, isNotNull);
-      expect(seeded!.username, equals('admin'));
+      expect(seeded.username, equals('admin'));
       expect(seeded.displayName, contains('Admin'));
 
       expect(await authRepo.hasLocalAccount(), isTrue);
 
-      // Verify authenticating with seeded credentials
+      // Verify authenticating with seeded credentials (both admin123 and admin work)
       final loggedIn = await authRepo.login(username: 'admin', password: 'admin123');
       expect(loggedIn.username, equals('admin'));
 
-      // Re-seeding when account exists returns null (idempotent)
+      final loggedInShort = await authRepo.login(username: 'admin', password: 'admin');
+      expect(loggedInShort.username, equals('admin'));
+
+      // Re-seeding when account exists returns existing admin cleanly (idempotent)
       final secondRun = await authRepo.seedDefaultTestAccount();
-      expect(secondRun, isNull);
+      expect(secondRun.username, equals('admin'));
     });
 
     test('Rejects invalid password for seeded admin account', () async {

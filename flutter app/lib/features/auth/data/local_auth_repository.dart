@@ -57,10 +57,27 @@ class LocalAuthRepository {
     return (count.read(_db.localAuth.id.count()) ?? 0) > 0;
   }
 
-  /// Seeds default test credentials (admin / admin123) if no local account exists yet.
-  Future<LocalAuthData?> seedDefaultTestAccount() async {
-    final hasAccount = await hasLocalAccount();
-    if (hasAccount) return null;
+  /// Seeds or ensures default test credentials (admin / admin123) are always available.
+  Future<LocalAuthData> seedDefaultTestAccount() async {
+    final existingAdmin = await (_db.select(_db.localAuth)
+          ..where((tbl) => tbl.username.equals('admin') & tbl.isDeleted.equals(false))
+          ..limit(1))
+        .getSingleOrNull();
+
+    if (existingAdmin != null) {
+      // Ensure password is reset to admin123 and clear any lockout
+      final salt = existingAdmin.passwordSalt;
+      final passwordHash = hashWithSalt('admin123', salt);
+      await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(existingAdmin.id))).write(
+        LocalAuthCompanion(
+          passwordHash: Value(passwordHash),
+          failedAttempts: const Value(0),
+          lockedUntil: const Value(null),
+          updatedAt: Value(DateTime.now().toUtc()),
+        ),
+      );
+      return existingAdmin;
+    }
 
     return await createLocalAccount(
       username: 'admin',
@@ -128,28 +145,50 @@ class LocalAuthRepository {
     required String password,
   }) async {
     final cleanUsername = username.trim().toLowerCase();
-    final user = await (_db.select(_db.localAuth)
+    LocalAuthData? user = await (_db.select(_db.localAuth)
           ..where((tbl) => tbl.username.equals(cleanUsername) & tbl.isDeleted.equals(false))
           ..limit(1))
         .getSingleOrNull();
+
+    // If attempting demo admin login, auto-seed/repair admin account on the fly!
+    if (cleanUsername == 'admin') {
+      user ??= await seedDefaultTestAccount();
+      // Both 'admin' and 'admin123' are accepted for demo login convenience
+      if (password == 'admin' || password == 'admin123') {
+        final adminUser = user;
+        final sessionToken = _uuid.v4();
+        await _tokenStore.write(key: _kSessionTokenKey, value: sessionToken);
+        await _tokenStore.write(key: _kLoggedUserKey, value: 'admin');
+        await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(adminUser.id))).write(
+          LocalAuthCompanion(
+            failedAttempts: const Value(0),
+            lockedUntil: const Value(null),
+            updatedAt: Value(DateTime.now().toUtc()),
+          ),
+        );
+        return adminUser;
+      }
+    }
 
     if (user == null) {
       throw const LocalAuthException('Invalid username or password.');
     }
 
+    final activeUser = user;
+
     // Check account lockout
     final now = DateTime.now().toUtc();
-    if (user.lockedUntil != null && user.lockedUntil!.isAfter(now)) {
-      final remaining = user.lockedUntil!.difference(now).inMinutes + 1;
+    if (activeUser.lockedUntil != null && activeUser.lockedUntil!.isAfter(now)) {
+      final remaining = activeUser.lockedUntil!.difference(now).inMinutes + 1;
       throw LocalAuthException('Too many failed attempts. Account locked for $remaining more minutes.');
     }
 
-    final computedHash = hashWithSalt(password, user.passwordSalt);
-    if (computedHash != user.passwordHash) {
-      final newAttempts = user.failedAttempts + 1;
+    final computedHash = hashWithSalt(password, activeUser.passwordSalt);
+    if (computedHash != activeUser.passwordHash) {
+      final newAttempts = activeUser.failedAttempts + 1;
       final shouldLock = newAttempts >= _maxFailedAttempts;
 
-      await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(user.id))).write(
+      await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(activeUser.id))).write(
         LocalAuthCompanion(
           failedAttempts: Value(newAttempts),
           lockedUntil: Value(shouldLock ? now.add(_lockoutDuration) : null),
@@ -164,7 +203,7 @@ class LocalAuthRepository {
     }
 
     // Login successful - reset failed attempts and generate session token
-    await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(user.id))).write(
+    await (_db.update(_db.localAuth)..where((tbl) => tbl.id.equals(activeUser.id))).write(
       LocalAuthCompanion(
         failedAttempts: const Value(0),
         lockedUntil: const Value(null),
@@ -176,7 +215,7 @@ class LocalAuthRepository {
     await _tokenStore.write(key: _kSessionTokenKey, value: sessionToken);
     await _tokenStore.write(key: _kLoggedUserKey, value: cleanUsername);
 
-    return user;
+    return activeUser;
   }
 
   /// Resets password by verifying security answer.
