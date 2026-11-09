@@ -4,6 +4,8 @@ import com.saisa.common.tenant.TenantContext;
 import com.saisa.common.tenant.dto.CompanyProfileResponse;
 import com.saisa.common.tenant.dto.OpeningBalanceRequest;
 import com.saisa.common.tenant.dto.OpeningBalanceResponse;
+import com.saisa.common.tenant.dto.OpeningStockRequest;
+import com.saisa.common.tenant.dto.OpeningStockResponse;
 import com.saisa.common.tenant.dto.SetupStatusResponse;
 import com.saisa.common.tenant.dto.UpdateProfileRequest;
 import jakarta.validation.Valid;
@@ -19,11 +21,14 @@ public class SetupController {
 
     private final ProfileSetupService setupService;
     private final OpeningBalanceService openingBalanceService;
+    private final OpeningStockService openingStockService;
 
     public SetupController(ProfileSetupService setupService,
-                           OpeningBalanceService openingBalanceService) {
+                           OpeningBalanceService openingBalanceService,
+                           OpeningStockService openingStockService) {
         this.setupService = setupService;
         this.openingBalanceService = openingBalanceService;
+        this.openingStockService = openingStockService;
     }
 
     @GetMapping("/profile")
@@ -82,5 +87,21 @@ public class SetupController {
         Long userId = TenantContext.getCurrentUserId();
         openingBalanceService.resetViaReversal(tenantId, userId, reason);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/opening-stock")
+    public ResponseEntity<OpeningStockResponse> getOpeningStock() {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        return ResponseEntity.ok(openingStockService.getCurrent(tenantId));
+    }
+
+    @PostMapping("/opening-stock")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OpeningStockResponse> postOpeningStock(
+            @Valid @RequestBody OpeningStockRequest req) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        Long userId = TenantContext.getCurrentUserId();
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(openingStockService.post(tenantId, req, userId));
     }
 }

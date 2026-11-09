@@ -1,6 +1,8 @@
 package com.saisa.inventory.api;
 
 import com.saisa.common.tenant.TenantContext;
+import com.saisa.inventory.api.dto.BulkItemRequest;
+import com.saisa.inventory.api.dto.BulkItemResponse;
 import com.saisa.inventory.api.dto.CreateItemRequest;
 import com.saisa.inventory.api.dto.ItemResponse;
 import com.saisa.inventory.api.dto.UpdateItemRequest;
@@ -8,7 +10,9 @@ import com.saisa.inventory.domain.item.Item;
 import com.saisa.inventory.infrastructure.persistence.ItemRepository;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,6 +64,61 @@ public class ItemController {
 
         Item saved = itemRepo.save(item);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(saved));
+    }
+
+    @PostMapping("/bulk")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Transactional
+    public ResponseEntity<BulkItemResponse> createBulk(@Valid @RequestBody BulkItemRequest req) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        Long userId = TenantContext.getCurrentUserId();
+
+        // 1. Check for duplicate SKUs within request
+        Set<String> seenSkus = new HashSet<>();
+        for (CreateItemRequest itemReq : req.items()) {
+            String sku = itemReq.sku().trim();
+            if (!seenSkus.add(sku.toLowerCase())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duplicate SKU in request: " + sku);
+            }
+        }
+
+        // 2. Check for existing SKUs in database
+        for (CreateItemRequest itemReq : req.items()) {
+            if (itemRepo.existsByTenantIdAndSku(tenantId, itemReq.sku().trim())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Item SKU already exists: " + itemReq.sku());
+            }
+        }
+
+        // 3. Map and save all items
+        List<Item> toSave = req.items().stream().map(itemReq -> {
+            Item item = new Item();
+            item.setTenantId(tenantId);
+            item.setSku(itemReq.sku().trim());
+            item.setName(itemReq.name().trim());
+            item.setDescription(itemReq.description());
+            if (itemReq.unitOfMeasure() != null && !itemReq.unitOfMeasure().isBlank()) {
+                item.setUnitOfMeasure(itemReq.unitOfMeasure().trim());
+            }
+            item.setHsnCode(itemReq.hsnCode());
+            if (itemReq.tracksInventory() != null) {
+                item.setTracksInventory(itemReq.tracksInventory());
+            }
+            if (itemReq.salePrice() != null) {
+                item.setSalePrice(itemReq.salePrice());
+            }
+            if (itemReq.purchasePrice() != null) {
+                item.setPurchasePrice(itemReq.purchasePrice());
+            }
+            item.setReorderLevel(itemReq.reorderLevel());
+            item.setActive(true);
+            item.setCreatedBy(userId);
+            return item;
+        }).toList();
+
+        List<Item> saved = itemRepo.saveAll(toSave);
+        List<ItemResponse> responses = saved.stream().map(ItemResponse::from).toList();
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(new BulkItemResponse(saved.size(), responses));
     }
 
     @PutMapping("/{id}")

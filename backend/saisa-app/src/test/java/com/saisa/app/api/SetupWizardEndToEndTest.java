@@ -13,8 +13,14 @@ import com.saisa.app.auth.dto.RegisterTenantRequest;
 import com.saisa.common.tenant.BusinessNature;
 import com.saisa.common.tenant.IncorporationType;
 import com.saisa.common.tenant.dto.OpeningBalanceRequest;
+import com.saisa.common.tenant.dto.OpeningStockRequest;
 import com.saisa.common.tenant.dto.UpdateProfileRequest;
+import com.saisa.inventory.api.dto.BulkItemRequest;
+import com.saisa.inventory.api.dto.CreateItemRequest;
+import com.saisa.inventory.api.dto.CreateWarehouseRequest;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -270,5 +276,135 @@ class SetupWizardEndToEndTest {
             .andExpect(jsonPath("$.balanced").value(true))
             .andExpect(jsonPath("$.totalDebits").value(1760000.0))
             .andExpect(jsonPath("$.totalCredits").value(1760000.0));
+    }
+
+    @Test
+    void completePhase3InventorySetupFlow() throws Exception {
+        String tenantCode = "nepalinventory" + System.currentTimeMillis();
+
+        // 1. Register tenant
+        var reg = new RegisterTenantRequest(
+            tenantCode,
+            "Nepal Hardware & Tools",
+            "admin",
+            "admin@nepalhardware.com.np",
+            "Pass@12345",
+            "Hardware Admin"
+        );
+        String regRes = mvc.perform(post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(reg)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+        String token = json.readTree(regRes).get("accessToken").asText();
+
+        // 2. Open an Accounting Period
+        var periodReq = Map.of(
+            "periodName", "FY-2083/84-Q1",
+            "startDate", "2026-07-16",
+            "endDate", "2026-10-17"
+        );
+        mvc.perform(post("/api/v1/periods")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(periodReq)))
+            .andExpect(status().isCreated());
+
+        // 3. Test Bulk Item Creation: Duplicate SKU rejection
+        var dupItemsReq = new BulkItemRequest(List.of(
+            new CreateItemRequest("TOOL-001", "Hammer", "16oz Claw Hammer", "PCS", "8205", true, new BigDecimal("450.00"), new BigDecimal("300.00"), new BigDecimal("10")),
+            new CreateItemRequest("TOOL-001", "Duplicate Hammer", "Different name", "PCS", "8205", true, new BigDecimal("450.00"), new BigDecimal("300.00"), new BigDecimal("10"))
+        ));
+        mvc.perform(post("/api/v1/items/bulk")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(dupItemsReq)))
+            .andExpect(status().isBadRequest());
+
+        // 4. Test Bulk Item Creation: Success
+        var bulkItemsReq = new BulkItemRequest(List.of(
+            new CreateItemRequest("TOOL-001", "Claw Hammer", "16oz Steel Claw Hammer", "PCS", "8205", true, new BigDecimal("550.00"), new BigDecimal("350.00"), new BigDecimal("10")),
+            new CreateItemRequest("TOOL-002", "Hand Saw", "20-inch Hand Saw", "PCS", "8202", true, new BigDecimal("850.00"), new BigDecimal("600.00"), new BigDecimal("5")),
+            new CreateItemRequest("TOOL-003", "Measuring Tape", "5m Steel Tape", "PCS", "9017", true, new BigDecimal("250.00"), new BigDecimal("150.00"), new BigDecimal("20"))
+        ));
+        String bulkRes = mvc.perform(post("/api/v1/items/bulk")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(bulkItemsReq)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.createdCount").value(3))
+            .andExpect(jsonPath("$.items[0].sku").value("TOOL-001"))
+            .andExpect(jsonPath("$.items[1].sku").value("TOOL-002"))
+            .andExpect(jsonPath("$.items[2].sku").value("TOOL-003"))
+            .andReturn().getResponse().getContentAsString();
+
+        JsonNode itemsNode = json.readTree(bulkRes).get("items");
+        long item1Id = itemsNode.get(0).get("id").asLong();
+        long item2Id = itemsNode.get(1).get("id").asLong();
+
+        // 5. Create Warehouse
+        var whReq = new CreateWarehouseRequest("MAIN", "Main Godown / मुख्य गोदाम", "Lazimpat, Kathmandu", true);
+        String whRes = mvc.perform(post("/api/v1/warehouses")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(whReq)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.code").value("MAIN"))
+            .andReturn().getResponse().getContentAsString();
+
+        long warehouseId = json.readTree(whRes).get("id").asLong();
+
+        // 6. Post Opening Stock:
+        // Item 1: 100 pcs @ Rs 350 = 35,000
+        // Item 2: 50 pcs @ Rs 600 = 30,000
+        // Total stock value = 65,000
+        var stockReq = new OpeningStockRequest(
+            LocalDate.of(2026, 7, 17),
+            warehouseId,
+            List.of(
+                new OpeningStockRequest.OpeningStockLine(item1Id, new BigDecimal("100"), new BigDecimal("350.00")),
+                new OpeningStockRequest.OpeningStockLine(item2Id, new BigDecimal("50"), new BigDecimal("600.00"))
+            )
+        );
+
+        mvc.perform(post("/api/v1/setup/opening-stock")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(stockReq)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.posted").value(true))
+            .andExpect(jsonPath("$.itemCount").value(2))
+            .andExpect(jsonPath("$.totalQuantity").value(150.0))
+            .andExpect(jsonPath("$.totalValue").value(65000.0));
+
+        // 7. Verify Idempotency: Second call rejected
+        mvc.perform(post("/api/v1/setup/opening-stock")
+                .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(stockReq)))
+            .andExpect(status().is4xxClientError());
+
+        // 8. Query Opening Stock Status
+        mvc.perform(get("/api/v1/setup/opening-stock")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.posted").value(true))
+            .andExpect(jsonPath("$.totalValue").value(65000.0));
+
+        // 9. Verify Trial Balance: INVENTORY_ASSET is debited and CAPITAL is credited
+        mvc.perform(get("/api/v1/reports/trial-balance?asOf=2026-07-17")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.balanced").value(true))
+            .andExpect(jsonPath("$.rows[?(@.accountCode=='INVENTORY_ASSET')].debitBalance").value(65000.0))
+            .andExpect(jsonPath("$.rows[?(@.accountCode=='CAPITAL')].creditBalance").value(65000.0));
+
+        // 10. Complete Setup
+        mvc.perform(post("/api/v1/setup/complete")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.setupCompleted").value(true))
+            .andExpect(jsonPath("$.setupStep").value(4));
     }
 }
