@@ -34,7 +34,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         InvalidJournalEntryException.class,
         com.saisa.billing.domain.exception.InvalidPaymentException.class,
-        com.saisa.billing.domain.exception.InvalidCreditNoteException.class
+        com.saisa.billing.domain.exception.InvalidCreditNoteException.class,
+        com.saisa.billing.domain.exception.InvalidBankReconciliationException.class
     })
     public ResponseEntity<Map<String, Object>> handleInvalidJournalEntry(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)

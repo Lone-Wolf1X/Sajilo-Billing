@@ -30,8 +30,15 @@ public class BankAccountController {
         String accountNumber,
         String ifscCode,
         @NotNull Long glAccountId,
-        Boolean isDefault
-    ) {}
+        Boolean isDefault,
+        Boolean defaultAccount
+    ) {
+        public boolean isEffectiveDefault() {
+            if (isDefault != null) return isDefault;
+            if (defaultAccount != null) return defaultAccount;
+            return false;
+        }
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
@@ -51,9 +58,7 @@ public class BankAccountController {
         ba.setAccountNumber(req.accountNumber());
         ba.setIfscCode(req.ifscCode());
         ba.setGlAccountId(req.glAccountId());
-        if (req.isDefault() != null) {
-            ba.setDefaultAccount(req.isDefault());
-        }
+        ba.setDefaultAccount(req.isEffectiveDefault());
         ba.setActive(true);
         ba.setCreatedBy(userId);
 

@@ -84,7 +84,7 @@ class CrossTenantIsolationTest {
         mvc.perform(get("/api/v1/accounts")
                 .header("Authorization", "Bearer " + tokenB))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(12));  // B has 12 seeded system accounts
+            .andExpect(jsonPath("$.length()").value(15));  // B has 15 seeded system accounts
     }
 
     @Test

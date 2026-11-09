@@ -25,6 +25,9 @@ public final class SystemAccountCode {
     public static final String PURCHASE_EXPENSE = "PURCHASE";
     public static final String PURCHASE_RETURN = "PURCHASE_RETURN";
     public static final String COGS = "COGS";
+    public static final String BANK_CHARGES = "BANK_CHARGES";
+    public static final String INTEREST_INCOME = "INTEREST_INCOME";
+    public static final String SUSPENSE = "SUSPENSE";
 
     private SystemAccountCode() {}
 }
