@@ -1,0 +1,39 @@
+[Unit]
+Description=SAISA Accounting Application
+Documentation=https://github.com/yourorg/saisa-accounting
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=saisa
+Group=saisa
+WorkingDirectory=/opt/saisa-accounting
+EnvironmentFile=/opt/saisa-accounting/.env
+ExecStart=/usr/bin/java \
+    -Xms1024m -Xmx1024m \
+    -XX:+UseG1GC -XX:MaxGCPauseMillis=200 \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/var/log/saisa \
+    -Duser.timezone=UTC \
+    -Dfile.encoding=UTF-8 \
+    -jar /opt/saisa-accounting/dist/saisa-app.jar
+ExecStop=/bin/kill -TERM $MAINPID
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/saisa/stdout.log
+StandardError=append:/var/log/saisa/stderr.log
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/saisa /opt/saisa-accounting/logs /opt/saisa-accounting/run
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+
