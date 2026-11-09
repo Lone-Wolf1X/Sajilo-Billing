@@ -17,3 +17,4 @@ public interface SalesInvoiceRepository extends JpaRepository<SalesInvoice, Long
 
     Optional<SalesInvoice> findByTenantIdAndInvoiceNumber(Long tenantId, String invoiceNumber);
 }
+

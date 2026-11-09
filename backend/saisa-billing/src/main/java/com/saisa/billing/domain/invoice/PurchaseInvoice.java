@@ -41,6 +41,9 @@ public class PurchaseInvoice extends BaseEntity {
     @Column(name = "vendor_id", nullable = false)
     private Long vendorId;
 
+    @Column(name = "warehouse_id")
+    private Long warehouseId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 16)
     private InvoiceStatus status = InvoiceStatus.DRAFT;
@@ -91,3 +94,4 @@ public class PurchaseInvoice extends BaseEntity {
         return status == InvoiceStatus.DRAFT;
     }
 }
+

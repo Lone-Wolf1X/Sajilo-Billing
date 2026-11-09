@@ -135,8 +135,6 @@ public class InvoicePostingListener {
         }
 
         Long apId = requireAccount(tenantId, SystemAccountCode.ACCOUNTS_PAYABLE);
-        Long purchaseId = requireAccount(tenantId, SystemAccountCode.PURCHASE_EXPENSE);
-        Long gstInId = requireAccount(tenantId, SystemAccountCode.GST_INPUT_CREDIT);
         Long periodId = requirePeriod(tenantId, event.invoiceDate());
 
         Currency currency = Currency.valueOf(event.currency());
@@ -149,14 +147,38 @@ public class InvoicePostingListener {
             .reference("PURCHASE_INVOICE", event.invoiceId())
             .idempotencyKey("PURCHASE_INVOICE:" + event.invoiceId());
 
-        // Purchase Dr subtotal
-        if (event.subtotal().signum() > 0) {
-            builder.debit(purchaseId, Money.of(event.subtotal(), currency),
+        java.math.BigDecimal goodsSubtotal = java.math.BigDecimal.ZERO;
+        java.math.BigDecimal serviceSubtotal = java.math.BigDecimal.ZERO;
+
+        if (event.lines() != null && !event.lines().isEmpty()) {
+            for (var line : event.lines()) {
+                if (line.itemId() != null) {
+                    goodsSubtotal = goodsSubtotal.add(line.lineSubtotal());
+                } else {
+                    serviceSubtotal = serviceSubtotal.add(line.lineSubtotal());
+                }
+            }
+        } else {
+            serviceSubtotal = event.subtotal();
+        }
+
+        // Inventory Asset Dr for goods lines
+        if (goodsSubtotal.signum() > 0) {
+            Long invAssetId = requireAccount(tenantId, SystemAccountCode.INVENTORY_ASSET);
+            builder.debit(invAssetId, Money.of(goodsSubtotal, currency),
+                "Inventory asset purchase");
+        }
+
+        // Purchase Dr for non-item/service expense lines
+        if (serviceSubtotal.signum() > 0) {
+            Long purchaseId = requireAccount(tenantId, SystemAccountCode.PURCHASE_EXPENSE);
+            builder.debit(purchaseId, Money.of(serviceSubtotal, currency),
                 "Purchase expense");
         }
 
         // GST Input Dr tax
         if (event.taxAmount().signum() > 0) {
+            Long gstInId = requireAccount(tenantId, SystemAccountCode.GST_INPUT_CREDIT);
             builder.debit(gstInId, Money.of(event.taxAmount(), currency),
                 "GST input on invoice " + event.invoiceNumber());
         }

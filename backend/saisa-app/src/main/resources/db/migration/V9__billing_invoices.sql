@@ -172,3 +172,4 @@ CREATE INDEX idx_pi_tenant_date ON purchase_invoices(tenant_id, invoice_date);
 CREATE INDEX idx_pi_vendor ON purchase_invoices(tenant_id, vendor_id);
 CREATE INDEX idx_pi_status ON purchase_invoices(tenant_id, status);
 CREATE INDEX idx_pil_invoice ON purchase_invoice_lines(purchase_invoice_id);
+

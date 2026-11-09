@@ -55,6 +55,12 @@ public class BillingService {
         SalesInvoice saved = salesRepo.save(draft);
 
         // Publish event - listener will post journal entry in same transaction.
+        var salesLineSummaries = saved.getLines().stream()
+            .map(l -> new SalesInvoicePostedEvent.LineSummary(
+                l.getItemId(), l.getQuantity(), l.getUnitPrice(),
+                l.getLineSubtotal(), l.getLineTax(), l.getLineTotal()))
+            .toList();
+
         publisher.publishEvent(new SalesInvoicePostedEvent(
             saved.getTenantId(),
             saved.getId(),
@@ -64,7 +70,9 @@ public class BillingService {
             saved.getTaxAmount(),
             saved.getTotalAmount(),
             saved.getCurrency(),
-            userId));
+            userId,
+            saved.getWarehouseId(),
+            salesLineSummaries));
 
         return salesRepo.findById(saved.getId()).orElse(saved);
     }
@@ -81,6 +89,12 @@ public class BillingService {
 
         PurchaseInvoice saved = purchaseRepo.save(draft);
 
+        var purchaseLineSummaries = saved.getLines().stream()
+            .map(l -> new PurchaseInvoicePostedEvent.LineSummary(
+                l.getItemId(), l.getQuantity(), l.getUnitPrice(),
+                l.getLineSubtotal(), l.getLineTax(), l.getLineTotal()))
+            .toList();
+
         publisher.publishEvent(new PurchaseInvoicePostedEvent(
             saved.getTenantId(),
             saved.getId(),
@@ -90,7 +104,9 @@ public class BillingService {
             saved.getTaxAmount(),
             saved.getTotalAmount(),
             saved.getCurrency(),
-            userId));
+            userId,
+            saved.getWarehouseId(),
+            purchaseLineSummaries));
 
         return purchaseRepo.findById(saved.getId()).orElse(saved);
     }

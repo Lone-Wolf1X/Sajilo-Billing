@@ -5,3 +5,4 @@ public enum InvoiceStatus {
     POSTED,
     CANCELLED
 }
+

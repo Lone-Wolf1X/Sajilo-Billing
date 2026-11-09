@@ -84,10 +84,12 @@ public class AuthService {
     private void seedSystemAccounts(Long tenantId) {
         seedAccount(tenantId, "AR", "Accounts Receivable", AccountType.ASSET);
         seedAccount(tenantId, "AP", "Accounts Payable", AccountType.LIABILITY);
+        seedAccount(tenantId, "INVENTORY_ASSET", "Inventory Asset", AccountType.ASSET);
         seedAccount(tenantId, "GST_OUTPUT", "GST Output Payable", AccountType.LIABILITY);
         seedAccount(tenantId, "GST_INPUT", "GST Input Credit", AccountType.ASSET);
         seedAccount(tenantId, "SALES", "Sales Revenue", AccountType.INCOME);
         seedAccount(tenantId, "PURCHASE", "Purchase Expense", AccountType.EXPENSE);
+        seedAccount(tenantId, "COGS", "Cost of Goods Sold", AccountType.EXPENSE);
         seedAccount(tenantId, "CASH", "Cash", AccountType.ASSET);
         seedAccount(tenantId, "BANK", "Bank", AccountType.ASSET);
     }

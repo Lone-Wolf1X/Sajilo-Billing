@@ -43,3 +43,4 @@ public class Vendor extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 }
+

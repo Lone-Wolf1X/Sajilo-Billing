@@ -63,12 +63,14 @@ public class SalesInvoiceController {
         inv.setInvoiceDate(req.invoiceDate());
         inv.setDueDate(req.dueDate());
         inv.setCustomerId(req.customerId());
+        inv.setWarehouseId(req.warehouseId());
         inv.setNotes(req.notes());
         inv.setIdempotencyKey(req.idempotencyKey());
         inv.setCreatedBy(userId);
 
         for (var l : req.lines()) {
             SalesInvoiceLine line = new SalesInvoiceLine();
+            line.setItemId(l.itemId());
             line.setDescription(l.description());
             line.setQuantity(new BigDecimal(l.quantity()));
             line.setUnitPrice(new BigDecimal(l.unitPrice()));
@@ -96,7 +98,7 @@ public class SalesInvoiceController {
 
     private java.util.List<SalesInvoiceResponse.Line> mapLines(SalesInvoice i) {
         return i.getLines().stream().map(l -> new SalesInvoiceResponse.Line(
-            l.getLineNumber(), l.getDescription(), l.getQuantity(),
+            l.getLineNumber(), l.getItemId(), l.getDescription(), l.getQuantity(),
             l.getUnitPrice(), l.getTaxRate(), l.getLineSubtotal(),
             l.getLineTax(), l.getLineTotal())).toList();
     }

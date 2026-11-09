@@ -27,6 +27,9 @@ public class PurchaseInvoiceLine extends BaseEntity {
     @Column(name = "line_number", nullable = false)
     private Integer lineNumber;
 
+    @Column(name = "item_id")
+    private Long itemId;
+
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
@@ -48,3 +51,4 @@ public class PurchaseInvoiceLine extends BaseEntity {
     @Column(name = "line_total", nullable = false, precision = 20, scale = 4)
     private BigDecimal lineTotal;
 }
+

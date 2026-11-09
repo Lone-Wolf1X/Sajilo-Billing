@@ -17,3 +17,4 @@ public interface PurchaseInvoiceRepository extends JpaRepository<PurchaseInvoice
 
     Optional<PurchaseInvoice> findByTenantIdAndInvoiceNumber(Long tenantId, String invoiceNumber);
 }
+

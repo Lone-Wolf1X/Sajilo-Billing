@@ -12,12 +12,14 @@ public record CreateSalesInvoiceRequest(
     @NotNull LocalDate invoiceDate,
     LocalDate dueDate,
     @NotNull Long customerId,
+    Long warehouseId,
     String notes,
     String idempotencyKey,
     @NotEmpty @Valid List<LineRequest> lines
 ) {
 
     public record LineRequest(
+        Long itemId,
         String description,
         @NotNull String quantity,
         @NotNull String unitPrice,

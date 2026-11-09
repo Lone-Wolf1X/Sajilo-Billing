@@ -11,6 +11,7 @@ public record SalesInvoiceResponse(
     LocalDate invoiceDate,
     LocalDate dueDate,
     Long customerId,
+    Long warehouseId,
     String status,
     BigDecimal subtotal,
     BigDecimal taxAmount,
@@ -22,6 +23,7 @@ public record SalesInvoiceResponse(
 
     public record Line(
         Integer lineNumber,
+        Long itemId,
         String description,
         BigDecimal quantity,
         BigDecimal unitPrice,
@@ -38,6 +40,7 @@ public record SalesInvoiceResponse(
             i.getInvoiceDate(),
             i.getDueDate(),
             i.getCustomerId(),
+            i.getWarehouseId(),
             i.getStatus() != null ? i.getStatus().name() : null,
             i.getSubtotal(),
             i.getTaxAmount(),

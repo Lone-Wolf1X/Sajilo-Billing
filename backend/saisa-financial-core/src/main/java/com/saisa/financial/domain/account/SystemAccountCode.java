@@ -13,6 +13,7 @@ public final class SystemAccountCode {
     // Balance Sheet
     public static final String ACCOUNTS_RECEIVABLE = "AR";
     public static final String ACCOUNTS_PAYABLE = "AP";
+    public static final String INVENTORY_ASSET = "INVENTORY_ASSET";
     public static final String GST_OUTPUT_PAYABLE = "GST_OUTPUT";
     public static final String GST_INPUT_CREDIT = "GST_INPUT";
     public static final String CASH = "CASH";
@@ -25,3 +26,4 @@ public final class SystemAccountCode {
 
     private SystemAccountCode() {}
 }
+

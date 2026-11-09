@@ -12,3 +12,4 @@ public record CreateCustomerRequest(
     String billingAddress,
     String state
 ) {}
+

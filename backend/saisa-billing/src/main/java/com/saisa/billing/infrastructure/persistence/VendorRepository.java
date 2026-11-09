@@ -12,3 +12,4 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
     boolean existsByTenantIdAndVendorCode(Long tenantId, String vendorCode);
 }
+
