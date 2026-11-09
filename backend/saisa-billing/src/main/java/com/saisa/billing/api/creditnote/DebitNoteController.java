@@ -3,10 +3,14 @@ package com.saisa.billing.api.creditnote;
 import com.saisa.billing.application.creditnote.DebitNoteService;
 import com.saisa.billing.domain.creditnote.DebitNote;
 import com.saisa.billing.domain.creditnote.DebitNoteLine;
+import com.saisa.billing.domain.invoice.InvoiceStatus;
 import com.saisa.billing.infrastructure.persistence.DebitNoteRepository;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,6 +68,23 @@ public class DebitNoteController {
         DebitNote saved = service.createAndPost(dn, userId);
         DebitNote full = repo.findByIdWithLines(saved.getId()).orElse(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(DebitNoteResponse.from(full));
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<DebitNoteResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) Long vendorId,
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(defaultValue = "50") int limit) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        List<DebitNote> notes = repo.findWithFilters(
+            tenantId, from, to, vendorId, status,
+            PageRequest.of(0, Math.min(limit, 200)));
+        return notes.stream()
+            .map(DebitNoteResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")

@@ -267,3 +267,4 @@ export const AgingMatrixTable: React.FC<Props> = ({ groups, mode }) => {
     </div>
   );
 };
+

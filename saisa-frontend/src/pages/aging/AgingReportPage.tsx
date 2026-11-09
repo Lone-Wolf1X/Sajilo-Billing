@@ -185,3 +185,4 @@ export const AgingReportPage: React.FC<Props> = ({ mode }) => {
     </div>
   );
 };
+

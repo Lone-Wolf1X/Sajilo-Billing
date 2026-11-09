@@ -68,3 +68,4 @@ export const AgingSummaryCards: React.FC<Props> = ({ report, mode }) => {
     </div>
   );
 };
+

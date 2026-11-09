@@ -70,6 +70,7 @@ const MENU_ITEMS: NavMenu[] = [
         items: [
           { label: 'Purchase Invoices (Bills)', badge: '[F9]', to: '/purchase-invoices' },
           { label: 'Vendor Payments', badge: '[F5]', to: '/payments/vendor' },
+          { label: 'Debit Notes (Returns)', to: '/debit-notes' },
           { label: 'AP Aging Analysis', to: '/reports/ap-aging' },
           { label: 'Vendors Directory', to: '/vendors' },
         ],

@@ -151,3 +151,4 @@ export function fmtAgingAmount(n: number | string | null | undefined): string {
     maximumFractionDigits: 2,
   });
 }
+

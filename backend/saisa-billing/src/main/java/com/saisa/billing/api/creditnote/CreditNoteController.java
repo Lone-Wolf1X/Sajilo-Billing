@@ -3,11 +3,15 @@ package com.saisa.billing.api.creditnote;
 import com.saisa.billing.application.creditnote.CreditNoteService;
 import com.saisa.billing.domain.creditnote.CreditNote;
 import com.saisa.billing.domain.creditnote.CreditNoteLine;
+import com.saisa.billing.domain.invoice.InvoiceStatus;
 import com.saisa.billing.infrastructure.persistence.CreditNoteRepository;
 import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +70,23 @@ public class CreditNoteController {
         CreditNote saved = service.createAndPost(cn, userId);
         CreditNote full = repo.findByIdWithLines(saved.getId()).orElse(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(CreditNoteResponse.from(full));
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<CreditNoteResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) Long customerId,
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(defaultValue = "50") int limit) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        List<CreditNote> notes = repo.findWithFilters(
+            tenantId, from, to, customerId, status,
+            PageRequest.of(0, Math.min(limit, 200)));
+        return notes.stream()
+            .map(CreditNoteResponse::from)
+            .toList();
     }
 
     @GetMapping("/{id}")
