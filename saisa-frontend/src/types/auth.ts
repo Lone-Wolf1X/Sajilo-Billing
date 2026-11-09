@@ -34,3 +34,4 @@ export interface AuthResponse {
 export interface RefreshRequest {
   refreshToken: string;
 }
+

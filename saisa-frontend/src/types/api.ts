@@ -6,3 +6,4 @@ export interface ApiError {
   errors?: Record<string, string>;
   retryAfterSeconds?: number;
 }
+

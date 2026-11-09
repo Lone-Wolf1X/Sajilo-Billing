@@ -36,3 +36,4 @@ export const ModulePlaceholderPage: React.FC<ModulePlaceholderProps> = ({
     </div>
   );
 };
+

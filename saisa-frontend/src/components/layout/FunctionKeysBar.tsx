@@ -74,3 +74,4 @@ export const FunctionKeysBar: React.FC = () => {
     </div>
   );
 };
+
