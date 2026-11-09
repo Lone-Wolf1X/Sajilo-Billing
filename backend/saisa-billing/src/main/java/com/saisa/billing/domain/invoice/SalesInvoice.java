@@ -54,6 +54,9 @@ public class SalesInvoice extends BaseEntity {
     @Column(name = "total_amount", nullable = false, precision = 20, scale = 4)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
+    @Column(name = "amount_paid", nullable = false, precision = 20, scale = 4)
+    private BigDecimal amountPaid = BigDecimal.ZERO;
+
     @Column(name = "currency", nullable = false, length = 3)
     private String currency = "INR";
 

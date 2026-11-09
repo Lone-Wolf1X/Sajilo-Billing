@@ -17,6 +17,8 @@ public record PurchaseInvoiceResponse(
     BigDecimal subtotal,
     BigDecimal taxAmount,
     BigDecimal totalAmount,
+    BigDecimal amountPaid,
+    BigDecimal amountOutstanding,
     String currency,
     Long journalEntryId,
     List<Line> lines
@@ -35,6 +37,8 @@ public record PurchaseInvoiceResponse(
     ) {}
 
     public static PurchaseInvoiceResponse from(PurchaseInvoice i, List<Line> lines) {
+        BigDecimal paid = i.getAmountPaid() != null ? i.getAmountPaid() : BigDecimal.ZERO;
+        BigDecimal outstanding = i.getTotalAmount() != null ? i.getTotalAmount().subtract(paid) : BigDecimal.ZERO;
         return new PurchaseInvoiceResponse(
             i.getId(),
             i.getInvoiceNumber(),
@@ -47,6 +51,8 @@ public record PurchaseInvoiceResponse(
             i.getSubtotal(),
             i.getTaxAmount(),
             i.getTotalAmount(),
+            paid,
+            outstanding,
             i.getCurrency(),
             i.getJournalEntryId(),
             lines);
