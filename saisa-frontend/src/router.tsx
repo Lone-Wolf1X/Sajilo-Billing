@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ChartOfAccountsPage } from './pages/accounts/ChartOfAccountsPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -33,12 +34,7 @@ export const router = createBrowserRouter([
           // Financial Core
           {
             path: 'accounts',
-            element: (
-              <ModulePlaceholderPage
-                title="Chart of Accounts"
-                stepName="Step 16: Financial Core UI"
-              />
-            ),
+            element: <ChartOfAccountsPage />,
           },
           {
             path: 'journal-entries',

@@ -4,7 +4,8 @@ import { cn } from '@/lib/utils';
 
 export interface DialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   title: string;
   description?: string;
   children: React.ReactNode;
@@ -14,15 +15,21 @@ export interface DialogProps {
 export const Dialog: React.FC<DialogProps> = ({
   open,
   onOpenChange,
+  onClose,
   title,
   description,
   children,
   className,
 }) => {
+  const handleClose = React.useCallback(() => {
+    onOpenChange?.(false);
+    onClose?.();
+  }, [onOpenChange, onClose]);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onOpenChange(false);
+        handleClose();
       }
     };
     if (open) {
@@ -33,7 +40,7 @@ export const Dialog: React.FC<DialogProps> = ({
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, onOpenChange]);
+  }, [open, handleClose]);
 
   if (!open) return null;
 
@@ -42,7 +49,7 @@ export const Dialog: React.FC<DialogProps> = ({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-[#1e3a5f]/40 backdrop-blur-xs transition-opacity"
-        onClick={() => onOpenChange(false)}
+        onClick={handleClose}
       />
 
       {/* Dialog card */}
@@ -63,7 +70,8 @@ export const Dialog: React.FC<DialogProps> = ({
             )}
           </div>
           <button
-            onClick={() => onOpenChange(false)}
+            type="button"
+            onClick={handleClose}
             className="p-1 rounded text-paper-muted hover:text-paper-text hover:bg-paper-hover transition-colors cursor-pointer"
             title="Close dialog (Esc)"
           >

@@ -21,3 +21,4 @@ export interface LedgerStatement {
   toDate: string;
   entries: LedgerEntry[];
 }
+

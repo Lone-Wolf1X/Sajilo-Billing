@@ -8,3 +8,4 @@ export function useLedger(accountId?: number, from?: string, to?: string) {
     enabled: typeof accountId === 'number' && accountId > 0 && Boolean(from) && Boolean(to),
   });
 }
+

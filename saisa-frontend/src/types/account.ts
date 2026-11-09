@@ -21,3 +21,4 @@ export interface CreateAccountRequest {
   accountType: AccountType;
   parentAccountId?: number | null;
 }
+

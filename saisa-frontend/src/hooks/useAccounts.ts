@@ -39,6 +39,24 @@ export function useAccounts() {
   };
 }
 
+export function useCreateAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateAccountRequest) => accountsService.create(data),
+    onSuccess: (newAccount) => {
+      queryClient.invalidateQueries({ queryKey: ACCOUNTS_QUERY_KEY });
+      toast.success(
+        `Account "${newAccount.accountCode} — ${newAccount.accountName}" created successfully.`
+      );
+    },
+    onError: (err: any) => {
+      const msg =
+        err.response?.data?.message || err.message || 'Failed to create account.';
+      toast.error(msg);
+    },
+  });
+}
+
 export function useAccount(id?: number) {
   return useQuery({
     queryKey: [...ACCOUNTS_QUERY_KEY, id],

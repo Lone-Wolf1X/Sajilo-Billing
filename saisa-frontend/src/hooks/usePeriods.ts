@@ -44,3 +44,4 @@ export function usePeriod(id?: number) {
     enabled: typeof id === 'number' && id > 0,
   });
 }
+
