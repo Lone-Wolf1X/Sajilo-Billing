@@ -60,3 +60,4 @@ export function useVendor(id?: number) {
     enabled: typeof id === 'number' && id > 0,
   });
 }
+

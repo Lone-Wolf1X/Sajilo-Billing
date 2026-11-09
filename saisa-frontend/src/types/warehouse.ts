@@ -13,3 +13,4 @@ export interface CreateWarehouseRequest {
   address?: string;
   isDefault?: boolean;
 }
+

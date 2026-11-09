@@ -168,3 +168,4 @@ export function amountToWords(amount: number | string, currencyName = 'Rupees'):
 
   return (result + ' Only').trim();
 }
+

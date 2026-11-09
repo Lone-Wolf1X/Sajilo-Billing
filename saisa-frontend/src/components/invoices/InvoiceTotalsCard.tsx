@@ -71,3 +71,4 @@ export const InvoiceTotalsCard: React.FC<Props> = ({ lines }) => {
     </div>
   );
 };
+

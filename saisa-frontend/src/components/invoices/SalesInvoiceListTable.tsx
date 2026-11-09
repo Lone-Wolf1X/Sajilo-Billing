@@ -215,3 +215,4 @@ export const SalesInvoiceListTable: React.FC<Props> = ({
     </div>
   );
 };
+

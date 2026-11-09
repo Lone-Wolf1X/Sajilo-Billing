@@ -25,3 +25,4 @@ export function useItem(id?: number) {
     enabled: typeof id === 'number' && id > 0,
   });
 }
+

@@ -23,3 +23,4 @@ export const salesInvoicesService = {
     return res.data;
   },
 };
+

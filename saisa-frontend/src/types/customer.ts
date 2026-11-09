@@ -21,3 +21,4 @@ export interface CreateCustomerRequest {
   billingAddress?: string;
   state?: string;
 }
+

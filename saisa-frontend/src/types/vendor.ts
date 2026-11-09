@@ -21,3 +21,4 @@ export interface CreateVendorRequest {
   billingAddress?: string;
   state?: string;
 }
+

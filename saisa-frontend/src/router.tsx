@@ -12,6 +12,7 @@ import { SalesInvoiceFormPage } from './pages/invoices/SalesInvoiceFormPage';
 import { SalesInvoiceDetailPage } from './pages/invoices/SalesInvoiceDetailPage';
 import { PurchaseInvoicesPage } from './pages/invoices/PurchaseInvoicesPage';
 import { PurchaseInvoiceFormPage } from './pages/invoices/PurchaseInvoiceFormPage';
+import { PaymentFormPage } from './pages/payments/PaymentFormPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -103,12 +104,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'payments/receipt',
-            element: (
-              <ModulePlaceholderPage
-                title="Customer Payment Receipt [F6]"
-                stepName="Step 17: Billing & Invoicing UI"
-              />
-            ),
+            element: <PaymentFormPage mode="receipt" />,
+          },
+          {
+            path: 'payments/new-receipt',
+            element: <PaymentFormPage mode="receipt" />,
           },
           {
             path: 'credit-notes',
@@ -139,12 +139,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'payments/vendor',
-            element: (
-              <ModulePlaceholderPage
-                title="Vendor Payment Voucher [F5]"
-                stepName="Step 18: Inventory & Purchasing UI"
-              />
-            ),
+            element: <PaymentFormPage mode="payment" />,
+          },
+          {
+            path: 'payments/new-payment',
+            element: <PaymentFormPage mode="payment" />,
           },
           {
             path: 'vendors',

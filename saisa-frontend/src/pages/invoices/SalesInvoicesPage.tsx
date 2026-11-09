@@ -261,3 +261,4 @@ export const SalesInvoicesPage: React.FC = () => {
     </div>
   );
 };
+

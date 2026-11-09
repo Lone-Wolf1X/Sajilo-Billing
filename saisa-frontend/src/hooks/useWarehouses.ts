@@ -17,3 +17,4 @@ export function useWarehouses() {
     refetch: whQuery.refetch,
   };
 }
+

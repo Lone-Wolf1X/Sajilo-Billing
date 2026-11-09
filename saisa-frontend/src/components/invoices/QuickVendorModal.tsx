@@ -212,3 +212,4 @@ export const QuickVendorModal: React.FC<Props> = ({
     </Dialog>
   );
 };
+

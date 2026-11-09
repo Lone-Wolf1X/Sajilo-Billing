@@ -60,3 +60,4 @@ export function useCustomer(id?: number) {
     enabled: typeof id === 'number' && id > 0,
   });
 }
+

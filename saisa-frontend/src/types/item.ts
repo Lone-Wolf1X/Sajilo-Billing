@@ -23,3 +23,4 @@ export interface CreateItemRequest {
   purchasePrice?: number;
   reorderLevel?: number;
 }
+

@@ -23,3 +23,4 @@ export const purchaseInvoicesService = {
     return res.data;
   },
 };
+

@@ -58,3 +58,4 @@ export interface SalesInvoiceListParams {
   status?: string;
   limit?: number;
 }
+

@@ -2,15 +2,19 @@ package com.saisa.billing.api.payment;
 
 import com.saisa.billing.application.payment.PaymentPostingService;
 import com.saisa.billing.domain.exception.InvalidPaymentException;
+import com.saisa.billing.domain.payment.PartyType;
 import com.saisa.billing.domain.payment.Payment;
 import com.saisa.billing.domain.payment.PaymentAllocation;
+import com.saisa.billing.domain.payment.PaymentStatus;
 import com.saisa.billing.infrastructure.persistence.PaymentRepository;
 import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +33,24 @@ public class PaymentController {
                              PaymentRepository paymentRepo) {
         this.postingService = postingService;
         this.paymentRepo = paymentRepo;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) PartyType partyType,
+            @RequestParam(required = false) Long partyId,
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(defaultValue = "50") int limit) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        List<Payment> payments = paymentRepo.findWithFilters(
+            tenantId, from, to, partyType, partyId, status,
+            PageRequest.of(0, Math.min(limit, 200)));
+        return payments.stream()
+            .map(p -> PaymentResponse.from(p, List.of()))
+            .toList();
     }
 
     @PostMapping
