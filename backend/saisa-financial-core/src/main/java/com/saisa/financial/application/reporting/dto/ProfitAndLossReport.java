@@ -51,3 +51,4 @@ public record ProfitAndLossReport(
         return !netProfit.isNegative() && !netProfit.isZero();
     }
 }
+

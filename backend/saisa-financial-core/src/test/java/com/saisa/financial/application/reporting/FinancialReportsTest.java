@@ -133,3 +133,4 @@ class FinancialReportsTest {
         assertFalse(pl.isProfitable());
     }
 }
+

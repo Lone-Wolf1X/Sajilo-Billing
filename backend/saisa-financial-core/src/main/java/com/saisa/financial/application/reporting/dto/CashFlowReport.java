@@ -46,3 +46,4 @@ public record CashFlowReport(
         Money outflow
     ) {}
 }
+
