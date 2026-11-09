@@ -32,5 +32,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
 
     @Query("SELECT j FROM JournalEntry j LEFT JOIN FETCH j.lines WHERE j.entryNumber = :entryNumber AND j.tenantId = :tenantId")
     Optional<JournalEntry> findByEntryNumberWithLines(@Param("tenantId") Long tenantId, @Param("entryNumber") String entryNumber);
+
+    Optional<JournalEntry> findByTenantIdAndReferenceTypeAndReferenceId(Long tenantId, String referenceType, Long referenceId);
 }
 

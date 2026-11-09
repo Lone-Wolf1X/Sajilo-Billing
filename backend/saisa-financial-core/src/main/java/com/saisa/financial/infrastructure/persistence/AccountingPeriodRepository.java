@@ -19,7 +19,12 @@ public interface AccountingPeriodRepository extends JpaRepository<AccountingPeri
 
     boolean existsByTenantIdAndPeriodName(Long tenantId, String periodName);
 
-    @Query("SELECT p FROM AccountingPeriod p WHERE p.tenantId = :tenantId AND :date BETWEEN p.startDate AND p.endDate")
+    @Query("""
+        SELECT p FROM AccountingPeriod p
+        WHERE p.tenantId = :tenantId
+          AND :date BETWEEN p.startDate AND p.endDate
+          AND p.status = com.saisa.financial.domain.period.PeriodStatus.OPEN
+        """)
     Optional<AccountingPeriod> findActivePeriodForDate(@Param("tenantId") Long tenantId, @Param("date") LocalDate date);
 
     List<AccountingPeriod> findByTenantIdAndStatus(Long tenantId, PeriodStatus status);

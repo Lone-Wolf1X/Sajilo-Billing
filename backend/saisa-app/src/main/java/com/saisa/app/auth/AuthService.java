@@ -17,6 +17,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.saisa.financial.domain.account.AccountType;
+import com.saisa.financial.domain.account.ChartOfAccount;
+import com.saisa.financial.infrastructure.persistence.ChartOfAccountRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -25,6 +28,7 @@ public class AuthService {
     private final TenantRepository tenantRepo;
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
+    private final ChartOfAccountRepository accountRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
@@ -33,6 +37,7 @@ public class AuthService {
     public AuthService(TenantRepository tenantRepo,
                        UserRepository userRepo,
                        RoleRepository roleRepo,
+                       ChartOfAccountRepository accountRepo,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authManager,
                        JwtService jwtService,
@@ -40,6 +45,7 @@ public class AuthService {
         this.tenantRepo = tenantRepo;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
+        this.accountRepo = accountRepo;
         this.passwordEncoder = passwordEncoder;
         this.authManager = authManager;
         this.jwtService = jwtService;
@@ -57,6 +63,9 @@ public class AuthService {
         tenant.setCompanyName(req.companyName());
         tenant = tenantRepo.save(tenant);
 
+        // Seed system accounts - required for billing to work
+        seedSystemAccounts(tenant.getId());
+
         Role adminRole = roleRepo.findByRoleCode("ADMIN")
             .orElseThrow(() -> new IllegalStateException("ADMIN role missing"));
 
@@ -70,6 +79,27 @@ public class AuthService {
         admin = userRepo.save(admin);
 
         return issueTokens(admin);
+    }
+
+    private void seedSystemAccounts(Long tenantId) {
+        seedAccount(tenantId, "AR", "Accounts Receivable", AccountType.ASSET);
+        seedAccount(tenantId, "AP", "Accounts Payable", AccountType.LIABILITY);
+        seedAccount(tenantId, "GST_OUTPUT", "GST Output Payable", AccountType.LIABILITY);
+        seedAccount(tenantId, "GST_INPUT", "GST Input Credit", AccountType.ASSET);
+        seedAccount(tenantId, "SALES", "Sales Revenue", AccountType.INCOME);
+        seedAccount(tenantId, "PURCHASE", "Purchase Expense", AccountType.EXPENSE);
+        seedAccount(tenantId, "CASH", "Cash", AccountType.ASSET);
+        seedAccount(tenantId, "BANK", "Bank", AccountType.ASSET);
+    }
+
+    private void seedAccount(Long tenantId, String code, String name, AccountType type) {
+        ChartOfAccount acc = new ChartOfAccount();
+        acc.setTenantId(tenantId);
+        acc.setAccountCode(code);
+        acc.setAccountName(name);
+        acc.setAccountType(type);
+        acc.setSystemAccount(true);
+        accountRepo.save(acc);
     }
 
     @Transactional
