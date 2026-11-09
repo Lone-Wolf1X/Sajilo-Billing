@@ -2,6 +2,7 @@ package com.saisa.app.api.journal;
 
 import com.saisa.app.api.common.AuthenticatedUser;
 import com.saisa.app.api.common.TenantGuard;
+import com.saisa.app.metrics.BusinessMetrics;
 import com.saisa.common.audit.Auditable;
 import com.saisa.financial.application.posting.JournalPostingService;
 import com.saisa.financial.application.reversal.ReversalService;
@@ -38,17 +39,20 @@ public class JournalEntryController {
     private final ReversalService reversalService;
     private final AccountingPeriodRepository periodRepo;
     private final ChartOfAccountRepository accountRepo;
+    private final BusinessMetrics metrics;
 
     public JournalEntryController(JournalEntryRepository journalRepo,
                                   JournalPostingService postingService,
                                   ReversalService reversalService,
                                   AccountingPeriodRepository periodRepo,
-                                  ChartOfAccountRepository accountRepo) {
+                                  ChartOfAccountRepository accountRepo,
+                                  BusinessMetrics metrics) {
         this.journalRepo = journalRepo;
         this.postingService = postingService;
         this.reversalService = reversalService;
         this.periodRepo = periodRepo;
         this.accountRepo = accountRepo;
+        this.metrics = metrics;
     }
 
     @GetMapping("/{id}")
@@ -131,6 +135,9 @@ public class JournalEntryController {
         }
 
         JournalEntry posted = postingService.post(draft, AuthenticatedUser.userId());
+        if (metrics != null) {
+            metrics.journalEntryPosted();
+        }
         return JournalEntryResponse.from(posted, posted.getLines());
     }
 

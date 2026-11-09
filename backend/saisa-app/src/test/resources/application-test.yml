@@ -16,3 +16,22 @@ saisa:
   jwt:
     secret: dGhpcy1pcy1hLXRlc3Qtb25seS1zZWNyZXQta2V5LWZvci1zYWlzYS1hY2NvdW50aW5nLWtleS1sZW5ndGgtNjQ=
     access-token-validity-minutes: 15
+  ratelimit:
+    register-capacity: 1000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true

@@ -46,9 +46,10 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login",
                                  "/api/v1/auth/refresh").permitAll()
+                .requestMatchers("/actuator/prometheus", "/actuator/metrics").authenticated()
                 // Everything else authenticated
                 .anyRequest().authenticated()
             )
