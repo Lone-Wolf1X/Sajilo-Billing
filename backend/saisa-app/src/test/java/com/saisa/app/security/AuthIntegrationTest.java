@@ -79,3 +79,4 @@ class AuthIntegrationTest {
             .andExpect(status().isBadRequest());
     }
 }
+

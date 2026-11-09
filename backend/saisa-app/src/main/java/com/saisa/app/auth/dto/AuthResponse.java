@@ -14,3 +14,4 @@ public record AuthResponse(
         this(accessToken, refreshToken, "Bearer", expiresInSeconds, userId, tenantId, tenantCode);
     }
 }
+

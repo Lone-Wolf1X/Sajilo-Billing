@@ -64,3 +64,4 @@ public class User extends BaseEntity {
         return lockedUntil != null && lockedUntil.isAfter(Instant.now());
     }
 }
+

@@ -90,3 +90,4 @@ INSERT INTO roles (role_code, role_name, description) VALUES
   ('ADMIN',       'Administrator',    'Full access to all features'),
   ('ACCOUNTANT',  'Accountant',       'Can post entries and view reports'),
   ('VIEWER',      'Viewer',           'Read-only access to reports');
+

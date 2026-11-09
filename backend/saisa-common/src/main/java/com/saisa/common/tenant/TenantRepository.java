@@ -7,3 +7,4 @@ public interface TenantRepository extends JpaRepository<Tenant, Long> {
     Optional<Tenant> findByTenantCode(String tenantCode);
     boolean existsByTenantCode(String tenantCode);
 }
+

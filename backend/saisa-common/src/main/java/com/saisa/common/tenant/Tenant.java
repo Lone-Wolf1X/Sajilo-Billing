@@ -59,3 +59,4 @@ public class Tenant extends BaseEntity {
         return "ACTIVE".equals(status);
     }
 }
+
