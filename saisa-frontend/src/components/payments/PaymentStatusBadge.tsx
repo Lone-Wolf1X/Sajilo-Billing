@@ -33,3 +33,4 @@ export const PaymentStatusBadge: React.FC<Props> = ({ status }) => {
     </span>
   );
 };
+

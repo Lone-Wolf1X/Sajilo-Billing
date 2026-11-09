@@ -16,6 +16,8 @@ import { PaymentFormPage } from './pages/payments/PaymentFormPage';
 import { PaymentsPage } from './pages/payments/PaymentsPage';
 import { PaymentDetailPage } from './pages/payments/PaymentDetailPage';
 import { BankAccountsPage } from './pages/bankAccounts/BankAccountsPage';
+import { ArAgingPage } from './pages/aging/ArAgingPage';
+import { ApAgingPage } from './pages/aging/ApAgingPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -238,6 +240,22 @@ export const router = createBrowserRouter([
             ),
           },
           // Reports
+          {
+            path: 'reports/ar-aging',
+            element: <ArAgingPage />,
+          },
+          {
+            path: 'reports/ap-aging',
+            element: <ApAgingPage />,
+          },
+          {
+            path: 'customers/aging',
+            element: <ArAgingPage />,
+          },
+          {
+            path: 'vendors/aging',
+            element: <ApAgingPage />,
+          },
           {
             path: 'reports/trial-balance',
             element: (

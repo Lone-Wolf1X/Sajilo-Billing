@@ -26,3 +26,4 @@ export const PaymentTypeBadge: React.FC<Props> = ({ partyType }) => {
     </span>
   );
 };
+

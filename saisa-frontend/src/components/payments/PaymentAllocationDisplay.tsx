@@ -77,3 +77,4 @@ export const PaymentAllocationDisplay: React.FC<Props> = ({
     </div>
   );
 };
+

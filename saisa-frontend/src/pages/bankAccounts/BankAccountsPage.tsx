@@ -180,3 +180,4 @@ export const BankAccountsPage: React.FC = () => {
     </div>
   );
 };
+

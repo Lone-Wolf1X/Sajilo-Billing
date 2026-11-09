@@ -184,3 +184,4 @@ export const BankAccountForm: React.FC<Props> = ({ open, onClose }) => {
     </Dialog>
   );
 };
+

@@ -54,6 +54,14 @@
     font-weight: bold;
   }
 
+  td.bg-amber-50,
+  td.bg-amber-100,
+  td.bg-orange-100,
+  td.bg-rose-100 {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
   .ledger-print-container,
   .payment-print-container {
     page-break-inside: avoid;

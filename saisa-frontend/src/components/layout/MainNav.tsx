@@ -60,7 +60,8 @@ const MENU_ITEMS: NavMenu[] = [
           { label: 'Payments & Receipts Register', to: '/payments' },
           { label: 'Customer Payments', badge: '[F6]', to: '/payments/receipt' },
           { label: 'Credit Notes (Returns)', to: '/credit-notes' },
-          { label: 'Customers & Aging', to: '/customers' },
+          { label: 'AR Aging Analysis', to: '/reports/ar-aging' },
+          { label: 'Customers Directory', to: '/customers' },
         ],
       },
       {
@@ -69,7 +70,8 @@ const MENU_ITEMS: NavMenu[] = [
         items: [
           { label: 'Purchase Invoices (Bills)', badge: '[F9]', to: '/purchase-invoices' },
           { label: 'Vendor Payments', badge: '[F5]', to: '/payments/vendor' },
-          { label: 'Vendors & AP Statement', to: '/vendors' },
+          { label: 'AP Aging Analysis', to: '/reports/ap-aging' },
+          { label: 'Vendors Directory', to: '/vendors' },
         ],
       },
     ],
@@ -121,6 +123,8 @@ const MENU_ITEMS: NavMenu[] = [
           { label: 'Profit & Loss Statement (P&L)', to: '/reports/profit-loss' },
           { label: 'Balance Sheet', to: '/reports/balance-sheet' },
           { label: 'Cash Flow Statement', to: '/reports/cash-flow' },
+          { label: 'AR Debtors Aging', to: '/reports/ar-aging' },
+          { label: 'AP Creditors Aging', to: '/reports/ap-aging' },
         ],
       },
       {
