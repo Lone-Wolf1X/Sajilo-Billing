@@ -19,12 +19,14 @@ interface Props {
   control: any;
   register: any;
   setValue: any;
+  priceField?: 'salePrice' | 'purchasePrice';
 }
 
 export const InvoiceLinesTable: React.FC<Props> = ({
   control,
   register,
   setValue,
+  priceField = 'salePrice',
 }) => {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -39,8 +41,9 @@ export const InvoiceLinesTable: React.FC<Props> = ({
       if (!lines?.[index]?.description || lines[index].description.trim() === '') {
         setValue(`lines.${index}.description`, item.name, { shouldValidate: true });
       }
-      if (item.salePrice !== null && item.salePrice !== undefined) {
-        setValue(`lines.${index}.unitPrice`, String(item.salePrice), {
+      const price = priceField === 'purchasePrice' ? item.purchasePrice : item.salePrice;
+      if (price !== null && price !== undefined) {
+        setValue(`lines.${index}.unitPrice`, String(price), {
           shouldValidate: true,
         });
       }

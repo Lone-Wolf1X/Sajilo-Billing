@@ -9,6 +9,9 @@ import { JournalEntryDetailPage } from './pages/journal/JournalEntryDetailPage';
 import { GeneralLedgerPage } from './pages/ledger/GeneralLedgerPage';
 import { SalesInvoicesPage } from './pages/invoices/SalesInvoicesPage';
 import { SalesInvoiceFormPage } from './pages/invoices/SalesInvoiceFormPage';
+import { SalesInvoiceDetailPage } from './pages/invoices/SalesInvoiceDetailPage';
+import { PurchaseInvoicesPage } from './pages/invoices/PurchaseInvoicesPage';
+import { PurchaseInvoiceFormPage } from './pages/invoices/PurchaseInvoiceFormPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -95,6 +98,10 @@ export const router = createBrowserRouter([
             element: <SalesInvoiceFormPage />,
           },
           {
+            path: 'invoices/:id',
+            element: <SalesInvoiceDetailPage />,
+          },
+          {
             path: 'payments/receipt',
             element: (
               <ModulePlaceholderPage
@@ -124,21 +131,11 @@ export const router = createBrowserRouter([
           // Purchases & Inventory
           {
             path: 'purchase-invoices',
-            element: (
-              <ModulePlaceholderPage
-                title="Purchase Invoices (Bills) [F9]"
-                stepName="Step 18: Inventory & Purchasing UI"
-              />
-            ),
+            element: <PurchaseInvoicesPage />,
           },
           {
             path: 'purchase-invoices/new',
-            element: (
-              <ModulePlaceholderPage
-                title="New Purchase Invoice [F9]"
-                stepName="Step 18: Inventory & Purchasing UI"
-              />
-            ),
+            element: <PurchaseInvoiceFormPage />,
           },
           {
             path: 'payments/vendor',
