@@ -336,19 +336,19 @@ export const Phase3InventoryStep: React.FC<Props> = ({
   if (subStep === 'WAREHOUSE') {
     return (
       <div className="space-y-6">
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-          <div className="flex items-start gap-4 pb-5 border-b border-neutral-200 dark:border-neutral-800">
-            <div className="w-12 h-12 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-700 dark:text-blue-300 flex-shrink-0">
+        <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+          <div className="flex items-start gap-4 pb-5 border-b border-neutral-200">
+            <div className="w-12 h-12 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 flex-shrink-0">
               <Warehouse className="w-6 h-6" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold mb-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200 text-xs font-semibold mb-1">
                 <span>चरण ३.१: मुख्य गोदाम (Main Warehouse Setup)</span>
               </div>
-              <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-xl font-serif font-bold text-neutral-900">
                 सामान भण्डारण स्थान (Default Warehouse / Godown)
               </h2>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-xs text-neutral-600 mt-1">
                 बिक्री हुने सामान, खरिद दाखिला र स्टक गणनाका लागि तपाईंको मुख्य गोदाम दर्ता गर्नुहोस्।
               </p>
             </div>
@@ -356,7 +356,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
 
           {/* If Service Business Nature, show smart skip recommendation */}
           {businessNature === 'SERVICE' && (
-            <div className="mt-5 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 flex items-start gap-3 text-xs text-amber-900 dark:text-amber-200">
+            <div className="mt-5 p-4 rounded-lg bg-amber-50 border border-amber-300 flex items-start gap-3 text-xs text-amber-900">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-sm mb-1">
@@ -368,7 +368,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => setSubStep('FINISH')}
-                  className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-sm"
+                  className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-700 hover:bg-amber-800 text-white font-semibold text-xs shadow-sm"
                 >
                   <span>मौज्दात सेटअप छोड्नुहोस् (Skip to Finish Setup)</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -379,7 +379,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-semibold text-neutral-800 mb-1">
                 Warehouse / Godown Name (गोदामको नाम) <span className="text-rose-600">*</span>
               </label>
               <input
@@ -387,7 +387,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 value={whName}
                 onChange={(e) => setWhName(e.target.value)}
                 placeholder="Main Godown / मुख्य गोदाम"
-                className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-serif"
+                className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-serif shadow-sm"
               />
               <p className="text-[11px] text-neutral-500 mt-1">
                 उदाहरण: Main Godown, Birgunj Depot, Kathmandu Store
@@ -395,7 +395,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+              <label className="block text-xs font-semibold text-neutral-800 mb-1">
                 Warehouse Code (संक्षिप्त संकेत) <span className="text-rose-600">*</span>
               </label>
               <input
@@ -403,7 +403,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 value={whCode}
                 onChange={(e) => setWhCode(e.target.value.toUpperCase())}
                 placeholder="MAIN"
-                className="w-full px-3 py-2 text-sm font-mono uppercase font-bold border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="w-full px-3 py-2 text-sm font-mono uppercase font-bold border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
               />
               <p className="text-[11px] text-neutral-500 mt-1">
                 बीजक तथा ट्रान्सफर भौचरमा प्रयोग हुने ३-६ अक्षरको कोड
@@ -413,11 +413,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
           <button
             type="button"
             onClick={onBack}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>पछाडि फर्कनुहोस् (Back to Opening Balances)</span>
@@ -427,7 +427,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setSubStep('FINISH')}
-              className="px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               अहिलेलाई छोड्नुहोस् (Skip Inventory)
             </button>
@@ -451,20 +451,20 @@ export const Phase3InventoryStep: React.FC<Props> = ({
   if (subStep === 'ITEMS') {
     return (
       <div className="space-y-6">
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-200">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary-50 dark:bg-primary-950/50 border border-primary-200 dark:border-primary-800 flex items-center justify-center text-primary-700 dark:text-primary-300 flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-primary-50 border border-primary-200 flex items-center justify-center text-primary-700 flex-shrink-0">
                 <Boxes className="w-5 h-5" />
               </div>
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 text-xs font-semibold mb-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-800 border border-primary-200 text-xs font-semibold mb-1">
                   <span>चरण ३.२: उत्पादन तथा सामान (Add Items in Bulk)</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+                <h2 className="text-xl font-serif font-bold text-neutral-900">
                   सामान सूची दर्ता (Items Quick-add Table)
                 </h2>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-xs text-neutral-600 mt-1">
                   तपाईंले बिक्री तथा खरिद गर्ने सामानहरू थप्नुहोस्। पछि थप सामानहरू सामान व्यवस्थापन खण्डबाट पनि थप्न सकिनेछ।
                 </p>
               </div>
@@ -474,7 +474,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setPasteModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-neutral-100 hover:bg-neutral-200 text-neutral-800 border border-neutral-300 transition-colors shadow-sm"
               >
                 <ClipboardPaste className="w-3.5 h-3.5" />
                 <span>Excel / CSV बाट टाँस्नुहोस् (Paste)</span>
@@ -483,7 +483,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={addRow}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-primary-50 hover:bg-primary-100 dark:bg-primary-950/40 dark:hover:bg-primary-900/50 text-primary-700 dark:text-primary-300 border border-primary-300 dark:border-primary-800 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded bg-primary-50 hover:bg-primary-100 text-primary-700 border border-primary-300 transition-colors shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>नयाँ पंक्ति (Add Row)</span>
@@ -492,9 +492,9 @@ export const Phase3InventoryStep: React.FC<Props> = ({
           </div>
 
           {/* Bulk Grid */}
-          <div className="overflow-x-auto mt-4 border border-neutral-200 dark:border-neutral-800 rounded-lg">
+          <div className="overflow-x-auto mt-4 border border-neutral-200 rounded-lg">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 font-semibold border-b border-neutral-200 dark:border-neutral-800 uppercase tracking-wider text-[11px]">
+              <thead className="bg-neutral-50 text-neutral-700 font-semibold border-b border-neutral-200 uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-2.5 px-3 w-10">#</th>
                   <th className="py-2.5 px-3 min-w-[120px]">SKU / संकेत *</th>
@@ -506,9 +506,9 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                   <th className="py-2.5 px-3 w-10 text-center"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+              <tbody className="divide-y divide-neutral-200">
                 {rows.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30">
+                  <tr key={idx} className="hover:bg-neutral-50/50">
                     <td className="py-2 px-3 font-mono text-neutral-400">{idx + 1}</td>
                     <td className="py-1.5 px-2">
                       <input
@@ -516,7 +516,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                         value={row.sku}
                         onChange={(e) => updateRow(idx, 'sku', e.target.value.toUpperCase())}
                         placeholder="SKU-001"
-                        className="w-full px-2 py-1 font-mono uppercase font-semibold text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 font-mono uppercase font-semibold text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       />
                     </td>
                     <td className="py-1.5 px-2">
@@ -525,14 +525,14 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                         value={row.name}
                         onChange={(e) => updateRow(idx, 'name', e.target.value)}
                         placeholder="e.g. Dell Monitor 24-inch"
-                        className="w-full px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       />
                     </td>
                     <td className="py-1.5 px-2">
                       <select
                         value={row.unitOfMeasure}
                         onChange={(e) => updateRow(idx, 'unitOfMeasure', e.target.value)}
-                        className="w-full px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       >
                         {COMMON_UOMS.map((u) => (
                           <option key={u} value={u}>
@@ -547,7 +547,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                         value={row.hsnCode}
                         onChange={(e) => updateRow(idx, 'hsnCode', e.target.value)}
                         placeholder="8471"
-                        className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       />
                     </td>
                     <td className="py-1.5 px-2">
@@ -557,7 +557,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                         value={row.purchasePrice}
                         onChange={(e) => updateRow(idx, 'purchasePrice', e.target.value)}
                         placeholder="0.00"
-                        className="w-full px-2 py-1 font-mono text-xs text-right border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 font-mono text-xs text-right border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       />
                     </td>
                     <td className="py-1.5 px-2">
@@ -567,7 +567,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                         value={row.salePrice}
                         onChange={(e) => updateRow(idx, 'salePrice', e.target.value)}
                         placeholder="0.00"
-                        className="w-full px-2 py-1 font-mono text-xs text-right border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        className="w-full px-2 py-1 font-mono text-xs text-right border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                       />
                     </td>
                     <td className="py-2 px-2 text-center">
@@ -589,11 +589,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
           <button
             type="button"
             onClick={() => setSubStep('WAREHOUSE')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>गोदाममा फर्कनुहोस् (Back to Warehouse)</span>
@@ -603,7 +603,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setSubStep('STOCK')}
-              className="px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               छोड्नुहोस् (Skip to Stock Entry)
             </button>
@@ -634,7 +634,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
           description="Excel बाट कोलमहरू सिधै कपी गरेर यहाँ पेस्ट गर्नुहोस्।"
         >
           <div className="space-y-4">
-            <p className="text-xs text-neutral-600 dark:text-neutral-400">
+            <p className="text-xs text-neutral-600">
               कोलमको क्रम: <strong>SKU [ट्याब] Name [ट्याब] UOM [ट्याब] Purchase [ट्याब] Sale</strong>
             </p>
             <textarea
@@ -642,13 +642,13 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               onChange={(e) => setPasteText(e.target.value)}
               placeholder="ITEM-001	Wireless Mouse	PCS	450	750&#10;ITEM-002	Mechanical Keyboard	PCS	1500	2400"
               rows={8}
-              className="w-full p-2.5 text-xs font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full p-2.5 text-xs font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
             />
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => setPasteModalOpen(false)}
-                className="px-4 py-1.5 text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 rounded border border-neutral-300"
+                className="px-4 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 rounded border border-neutral-300 shadow-sm"
               >
                 रद्द गर्नुहोस् (Cancel)
               </button>
@@ -656,7 +656,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 type="button"
                 onClick={handlePasteData}
                 disabled={!pasteText.trim()}
-                className="px-4 py-1.5 text-xs font-semibold text-white bg-primary-700 hover:bg-primary-800 rounded disabled:opacity-50"
+                className="px-4 py-1.5 text-xs font-semibold text-white bg-primary-700 hover:bg-primary-800 rounded disabled:opacity-50 shadow-sm"
               >
                 टाँसिएको डाटा आयात गर्नुहोस् (Import Data)
               </button>
@@ -671,34 +671,34 @@ export const Phase3InventoryStep: React.FC<Props> = ({
   if (subStep === 'STOCK') {
     return (
       <div className="space-y-6">
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-200">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300 flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 flex-shrink-0">
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold mb-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold mb-1">
                   <span>चरण ३.३: सुरुवाती मौज्दात (Opening Stock Quantity & Cost)</span>
                 </div>
-                <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+                <h2 className="text-xl font-serif font-bold text-neutral-900">
                   प्रारम्भिक स्टक तथा लागत गणना (Initial Stock Valuation)
                 </h2>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-xs text-neutral-600 mt-1">
                   हरेक सामानको हाल गोदाममा रहेको परिमाण र खरिद लागत राख्नुहोस्। यसले <strong>OPENING</strong> भौचर मार्फत लेजरमा सम्पत्ति दर्ता गर्दछ।
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              <label className="text-xs font-semibold text-neutral-800">
                 स्टक मिति:
               </label>
               <input
                 type="date"
                 value={openingDate}
                 onChange={(e) => setOpeningDate(e.target.value)}
-                className="px-2.5 py-1 text-xs font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="px-2.5 py-1 text-xs font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
               />
             </div>
           </div>
@@ -715,9 +715,9 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto mt-4 border border-neutral-200 dark:border-neutral-800 rounded-lg">
+            <div className="overflow-x-auto mt-4 border border-neutral-200 rounded-lg">
               <table className="w-full text-left text-xs">
-                <thead className="bg-neutral-50 dark:bg-neutral-800/60 text-neutral-600 dark:text-neutral-400 font-semibold border-b border-neutral-200 dark:border-neutral-800 uppercase tracking-wider text-[11px]">
+                <thead className="bg-neutral-50 text-neutral-700 font-semibold border-b border-neutral-200 uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-2.5 px-3 w-10">#</th>
                     <th className="py-2.5 px-3 min-w-[120px]">SKU</th>
@@ -728,7 +728,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                     <th className="py-2.5 px-3 min-w-[140px] text-right">कुल रकम (Total Value)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                <tbody className="divide-y divide-neutral-200">
                   {items.map((item, idx) => {
                     const input = stockInputs[item.id] || { qty: '', cost: '' };
                     const q = parseNum(input.qty);
@@ -736,15 +736,15 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                     const lineTotal = q * c;
 
                     return (
-                      <tr key={item.id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30">
+                      <tr key={item.id} className="hover:bg-neutral-50/50">
                         <td className="py-2 px-3 font-mono text-neutral-400">{idx + 1}</td>
-                        <td className="py-2 px-3 font-mono font-bold text-neutral-800 dark:text-neutral-200">
+                        <td className="py-2 px-3 font-mono font-bold text-neutral-800">
                           {item.sku}
                         </td>
-                        <td className="py-2 px-3 font-semibold text-neutral-900 dark:text-neutral-100">
+                        <td className="py-2 px-3 font-semibold text-neutral-900">
                           {item.name}
                         </td>
-                        <td className="py-2 px-3 text-neutral-500 font-mono">{item.unitOfMeasure}</td>
+                        <td className="py-2 px-3 text-neutral-600 font-mono">{item.unitOfMeasure}</td>
                         <td className="py-1.5 px-2">
                           <input
                             type="number"
@@ -752,7 +752,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                             value={input.qty}
                             onChange={(e) => updateStockInput(item.id, 'qty', e.target.value)}
                             placeholder="0"
-                            className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 text-right"
+                            className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 text-right shadow-sm"
                           />
                         </td>
                         <td className="py-1.5 px-2">
@@ -762,10 +762,10 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                             value={input.cost}
                             onChange={(e) => updateStockInput(item.id, 'cost', e.target.value)}
                             placeholder="0.00"
-                            className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 text-right"
+                            className="w-full px-2 py-1 font-mono text-xs border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 text-right shadow-sm"
                           />
                         </td>
-                        <td className="py-2 px-3 font-mono font-bold text-right text-emerald-700 dark:text-emerald-400">
+                        <td className="py-2 px-3 font-mono font-bold text-right text-emerald-700">
                           {formatMoney(lineTotal.toFixed(2))}
                         </td>
                       </tr>
@@ -777,23 +777,23 @@ export const Phase3InventoryStep: React.FC<Props> = ({
           )}
 
           {/* Double Entry Posting Note */}
-          <div className="mt-5 p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="mt-5 p-4 rounded-lg bg-emerald-50 border border-emerald-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
-              <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+              <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
                 <span>लेखा भौचर प्रविष्टि (Automatic Double-Entry Voucher):</span>
               </div>
-              <div className="text-xs text-neutral-600 dark:text-neutral-400 font-mono">
+              <div className="text-xs text-neutral-700 font-mono font-medium">
                 Dr. INVENTORY_ASSET ({formatMoney(totalStockVal.toFixed(2))}) / Cr. CAPITAL ({formatMoney(totalStockVal.toFixed(2))})
               </div>
             </div>
 
             <div className="text-right">
-              <div className="text-[11px] text-neutral-500 uppercase font-semibold">कुल मौज्दात मूल्य</div>
-              <div className="font-mono text-lg font-bold text-emerald-700 dark:text-emerald-300">
+              <div className="text-[11px] text-neutral-600 uppercase font-semibold">कुल मौज्दात मूल्य</div>
+              <div className="font-mono text-lg font-bold text-emerald-700">
                 {formatMoney(totalStockVal.toFixed(2))}
               </div>
-              <div className="text-[10px] text-neutral-500 font-mono">
+              <div className="text-[10px] text-neutral-600 font-mono">
                 कुल संख्या: {totalStockQty} • वस्तुहरू: {stockLinesToPost.length}
               </div>
             </div>
@@ -801,11 +801,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
           <button
             type="button"
             onClick={() => setSubStep('ITEMS')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>सामान सूचीमा फर्कनुहोस् (Back to Items)</span>
@@ -815,7 +815,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => setSubStep('FINISH')}
-              className="px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               छोड्नुहोस् (Skip Stock Entry)
             </button>
@@ -844,20 +844,20 @@ export const Phase3InventoryStep: React.FC<Props> = ({
   // ==================== SUB-STEP 4: FINISH SCREEN ====================
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-800 rounded-lg p-6 sm:p-8 shadow-sm">
-        <div className="flex items-start gap-4 pb-6 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
+      <div className="bg-white border border-emerald-300 rounded-lg p-6 sm:p-8 shadow-sm">
+        <div className="flex items-start gap-4 pb-6 border-b border-neutral-200">
+          <div className="w-14 h-14 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 flex-shrink-0">
             <CheckCircle2 className="w-8 h-8" />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold mb-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-semibold mb-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
               <span>सेटअप पूर्ण रूपमा सम्पन्न (Setup Complete!)</span>
             </div>
-            <h2 className="text-2xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+            <h2 className="text-2xl font-serif font-bold text-neutral-900">
               बधाई छ! तपाईंको व्यापार SAISA मा सञ्चालनका लागि तयार छ।
             </h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-sm text-neutral-600 mt-1">
               कम्पनी प्रोफाइल, सुरुआती वित्तीय मौज्दात र गोदाम व्यवस्थापन सुरक्षित भइसकेको छ।
             </p>
           </div>
@@ -865,11 +865,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
 
         {/* Setup Summary Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-          <div className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800">
-            <div className="text-xs text-neutral-500 font-semibold mb-1">
+          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
+            <div className="text-xs text-neutral-600 font-semibold mb-1">
               १. व्यापार प्रोफाइल (Profile)
             </div>
-            <div className="font-bold text-sm text-neutral-900 dark:text-neutral-100 truncate">
+            <div className="font-bold text-sm text-neutral-900 truncate">
               {profile?.companyName || 'Registered'}
             </div>
             <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
@@ -877,11 +877,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800">
-            <div className="text-xs text-neutral-500 font-semibold mb-1">
+          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
+            <div className="text-xs text-neutral-600 font-semibold mb-1">
               २. प्रारम्भिक मौज्दात (Balance)
             </div>
-            <div className="font-bold text-sm text-emerald-700 dark:text-emerald-400">
+            <div className="font-bold text-sm text-emerald-700">
               {openingBalance?.posted ? 'दर्ता भयो (Posted)' : 'छोडिएको (Skipped)'}
             </div>
             <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
@@ -889,11 +889,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800">
-            <div className="text-xs text-neutral-500 font-semibold mb-1">
+          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
+            <div className="text-xs text-neutral-600 font-semibold mb-1">
               ३. गोदाम (Warehouse)
             </div>
-            <div className="font-bold text-sm text-neutral-900 dark:text-neutral-100">
+            <div className="font-bold text-sm text-neutral-900">
               {warehouses.length > 0 ? warehouses[0].name : whName}
             </div>
             <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
@@ -901,11 +901,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800">
-            <div className="text-xs text-neutral-500 font-semibold mb-1">
+          <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200">
+            <div className="text-xs text-neutral-600 font-semibold mb-1">
               ४. मौज्दात सामान (Inventory)
             </div>
-            <div className="font-bold text-sm text-blue-700 dark:text-blue-400">
+            <div className="font-bold text-sm text-blue-700">
               {items.length} सामानहरू दर्ता
             </div>
             <div className="text-[11px] text-neutral-500 font-mono mt-0.5">
@@ -915,11 +915,11 @@ export const Phase3InventoryStep: React.FC<Props> = ({
         </div>
 
         {/* Final CTA Bar */}
-        <div className="pt-6 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-6 border-t border-neutral-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <button
             type="button"
             onClick={() => setSubStep('STOCK')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>मौज्दात विवरण सच्याउनुहोस् (Review Stock)</span>

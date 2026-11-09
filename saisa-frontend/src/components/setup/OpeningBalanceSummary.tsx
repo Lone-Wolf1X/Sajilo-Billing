@@ -44,21 +44,21 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
   return (
     <div className="space-y-6">
       {/* Success Card */}
-      <div className="bg-white dark:bg-neutral-900 border border-emerald-300 dark:border-emerald-800 rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
+      <div className="bg-white border border-emerald-300 rounded-lg p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 flex-shrink-0">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold mb-1">
-                <ShieldCheck className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-semibold mb-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>सफलतापूर्वक लेजरमा प्रविष्टि गरिएको (Posted to Ledger)</span>
               </div>
-              <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-xl font-serif font-bold text-neutral-900">
                 प्रारम्भिक मौज्दात दर्ता भइसकेको छ (Opening Balances Active)
               </h2>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+              <p className="text-xs text-neutral-600 mt-1">
                 कम्पनीको सुरुआती वित्तीय स्थिति लेजर तथा वासलातमा सुरक्षित गरिएको छ।
               </p>
             </div>
@@ -68,7 +68,7 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
             <div className="text-xs text-neutral-500 uppercase tracking-wider font-semibold">
               भौचर नम्बर (Voucher No.)
             </div>
-            <div className="font-mono text-base font-bold text-primary-700 dark:text-primary-300 flex items-center gap-1 justify-end">
+            <div className="font-mono text-base font-bold text-primary-700 flex items-center gap-1 justify-end">
               <FileText className="w-4 h-4" />
               <span>{balance.journalEntryNumber || 'OPENING'}</span>
             </div>
@@ -76,47 +76,47 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-5 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded border border-neutral-200 dark:border-neutral-800">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 py-5 border-b border-neutral-200">
+          <div className="p-3.5 bg-neutral-50 rounded border border-neutral-200">
             <div className="flex items-center gap-1.5 text-xs text-neutral-500 mb-1">
               <Calendar className="w-3.5 h-3.5" />
               <span>प्रारम्भिक मिति (Date)</span>
             </div>
-            <div className="font-mono text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+            <div className="font-mono text-sm font-semibold text-neutral-900">
               {balance.openingDate || '—'}
             </div>
           </div>
 
-          <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded border border-neutral-200 dark:border-neutral-800">
+          <div className="p-3.5 bg-neutral-50 rounded border border-neutral-200">
             <div className="text-xs text-neutral-500 mb-1">
               कुल सम्पत्ति (Total Assets - Dr)
             </div>
-            <div className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400">
+            <div className="font-mono text-sm font-bold text-emerald-700">
               {formatMoney(balance.totalAssets || balance.totalDebits)}
             </div>
           </div>
 
-          <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded border border-neutral-200 dark:border-neutral-800">
+          <div className="p-3.5 bg-neutral-50 rounded border border-neutral-200">
             <div className="text-xs text-neutral-500 mb-1">
               कुल दायित्व (Total Liabilities - Cr)
             </div>
-            <div className="font-mono text-sm font-bold text-rose-700 dark:text-rose-400">
+            <div className="font-mono text-sm font-bold text-rose-700">
               {formatMoney(balance.totalLiabilities)}
             </div>
           </div>
 
-          <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded border border-neutral-200 dark:border-neutral-800">
+          <div className="p-3.5 bg-neutral-50 rounded border border-neutral-200">
             <div className="text-xs text-neutral-500 mb-1">
               कुल पुँजी (Owner's Equity - Cr)
             </div>
-            <div className="font-mono text-sm font-bold text-blue-700 dark:text-blue-400">
+            <div className="font-mono text-sm font-bold text-blue-700">
               {formatMoney(balance.totalEquity)}
             </div>
           </div>
         </div>
 
         {/* Audit / Balance Equation Note */}
-        <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-neutral-600 dark:text-neutral-400">
+        <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-neutral-600">
           <div className="flex items-center gap-2">
             <Scale className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             <span>
@@ -130,11 +130,11 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
       </div>
 
       {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
         <button
           type="button"
           onClick={() => setShowResetDialog(true)}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-rose-700 dark:text-rose-300 hover:text-rose-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded border border-rose-300 dark:border-rose-800 transition-colors"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-rose-700 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-300 transition-colors shadow-sm"
         >
           <RotateCcw className="w-4 h-4" />
           <span>पुनः सच्याउनुहोस् / रिसेट गर्नुहोस् (Edit / Reset Balances)</span>
@@ -158,7 +158,7 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
         description="अडिट नियम अनुसार पूर्व प्रविष्टि उल्ट्याएर नयाँ विवरण भर्न दिइनेछ।"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 p-3 rounded bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 text-xs">
+          <div className="flex items-start gap-3 p-3 rounded bg-amber-50 border border-amber-300 text-amber-900 text-xs">
             <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold mb-1">
@@ -171,7 +171,7 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="block text-xs font-semibold text-neutral-800 mb-1">
               उल्ट्याउनुको कारण (Reason for reset / reversal) <span className="text-rose-600">*</span>
             </label>
             <textarea
@@ -179,22 +179,22 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
               onChange={(e) => setResetReason(e.target.value)}
               placeholder="उदाहरण: बैंक हिसाब मिलान गर्दा सुरुवाती रकम फरक परेकोले (e.g. Correcting bank opening balance mismatch)"
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
             />
             <div className="text-[11px] text-neutral-500 mt-1 flex justify-between">
               <span>कम्तीमा ५ अक्षर अनिवार्य (Min. 5 characters required)</span>
-              <span className={resetReason.trim().length >= 5 ? 'text-emerald-600' : 'text-neutral-400'}>
+              <span className={resetReason.trim().length >= 5 ? 'text-emerald-600 font-semibold' : 'text-neutral-400'}>
                 {resetReason.trim().length}/5
               </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200">
             <button
               type="button"
               onClick={() => setShowResetDialog(false)}
               disabled={resetMutation.isPending}
-              className="px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700"
+              className="px-4 py-2 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 shadow-sm"
             >
               रद्द गर्नुहोस् (Cancel)
             </button>
@@ -202,7 +202,7 @@ export const OpeningBalanceSummary: React.FC<Props> = ({
               type="button"
               onClick={handleConfirmReset}
               disabled={resetReason.trim().length < 5 || resetMutation.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded disabled:opacity-50 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 active:bg-rose-800 rounded disabled:opacity-50 transition-colors shadow-sm"
             >
               {resetMutation.isPending ? (
                 <span>उल्ट्याउँदैछ... (Resetting...)</span>

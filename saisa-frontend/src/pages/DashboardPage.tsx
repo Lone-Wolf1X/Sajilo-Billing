@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   BookOpen,
@@ -11,8 +11,17 @@ import { useArAging, useApAging } from '../hooks/useAging';
 import { useBankAccounts } from '../hooks/useBankAccounts';
 import { useCreditNotes } from '../hooks/useCreditNotes';
 import { useDebitNotes } from '../hooks/useDebitNotes';
+import { useSetupStatus } from '../hooks/useSetup';
 
 export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: setupStatus, isLoading: isSetupLoading } = useSetupStatus();
+
+  useEffect(() => {
+    if (!isSetupLoading && setupStatus && !setupStatus.setupCompleted) {
+      navigate('/setup', { replace: true });
+    }
+  }, [setupStatus, isSetupLoading, navigate]);
   const { data: arAging } = useArAging();
   const { data: apAging } = useApAging();
   const { bankAccounts = [] } = useBankAccounts();

@@ -29,6 +29,24 @@ import { SetupWizardPage } from './pages/setup/SetupWizardPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
+import { useSetupStatus } from './hooks/useSetup';
+
+const RootRedirect: React.FC = () => {
+  const { data: status, isLoading } = useSetupStatus();
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-center font-serif text-sm text-neutral-500">
+          प्रणाली लोड हुँदैछ... (Loading SAISA...)
+        </div>
+      </div>
+    );
+  }
+  if (status && !status.setupCompleted) {
+    return <Navigate to="/setup" replace />;
+  }
+  return <Navigate to="/dashboard" replace />;
+};
 
 export const router = createBrowserRouter([
   {
@@ -48,7 +66,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="/dashboard" replace />,
+            element: <RootRedirect />,
           },
           {
             path: 'dashboard',

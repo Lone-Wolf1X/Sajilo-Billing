@@ -136,14 +136,14 @@ export const CascadingAddressSelector: React.FC<Props> = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Province */}
       <div>
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           Province / प्रदेश <span className="text-red-500">*</span>
         </label>
         <select
           value={value.province || ''}
           onChange={handleProvinceChange}
           disabled={disabled}
-          className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
         >
           <option value="">-- Select Province / प्रदेश छान्नुहोस् --</option>
           {locations.provinces.map((p) => (
@@ -156,14 +156,14 @@ export const CascadingAddressSelector: React.FC<Props> = ({
 
       {/* District */}
       <div>
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           District / जिल्ला <span className="text-red-500">*</span>
         </label>
         <select
           value={value.district || ''}
           onChange={handleDistrictChange}
           disabled={disabled || !value.province}
-          className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
+          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50 shadow-sm"
         >
           <option value="">
             {value.province
@@ -180,14 +180,14 @@ export const CascadingAddressSelector: React.FC<Props> = ({
 
       {/* Municipality / Local Level */}
       <div>
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           Local Level / स्थानीय तह <span className="text-red-500">*</span>
         </label>
         <select
           value={value.municipalityVdc || ''}
           onChange={handleMunicipalityChange}
           disabled={disabled || !value.district}
-          className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
+          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50 shadow-sm"
         >
           <option value="">
             {value.district
@@ -204,14 +204,14 @@ export const CascadingAddressSelector: React.FC<Props> = ({
 
       {/* Ward No */}
       <div>
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           Ward No. / वडा नं. <span className="text-red-500">*</span>
         </label>
         <select
           value={value.wardNo ?? ''}
           onChange={handleWardChange}
           disabled={disabled || !value.municipalityVdc}
-          className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
+          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50 shadow-sm"
         >
           <option value="">-- वडा नं. --</option>
           {availableWards.map((w) => (
@@ -224,7 +224,7 @@ export const CascadingAddressSelector: React.FC<Props> = ({
 
       {/* Tole / Street */}
       <div className="md:col-span-2 lg:col-span-4">
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           Tole / Street / Road / टोल वा सडक
         </label>
         <input
@@ -233,7 +233,7 @@ export const CascadingAddressSelector: React.FC<Props> = ({
           onChange={handleToleChange}
           disabled={disabled}
           placeholder="e.g. Lazimpat, Uttardhoka / लाजिम्पाट, उत्तरढोका"
-          className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
         />
       </div>
     </div>

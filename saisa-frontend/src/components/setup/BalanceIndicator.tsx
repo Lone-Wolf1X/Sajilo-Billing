@@ -24,7 +24,7 @@ export const BalanceIndicator: React.FC<Props> = ({ totalDebits, totalCredits })
 
   if (isBalanced) {
     return (
-      <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs sm:text-sm shadow-sm">
+      <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs sm:text-sm shadow-sm">
         <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
         <span className="font-bold">सन्तुलित (Balanced ✓)</span>
         <span className="text-xs opacity-90">
@@ -35,7 +35,7 @@ export const BalanceIndicator: React.FC<Props> = ({ totalDebits, totalCredits })
   }
 
   return (
-    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs sm:text-sm shadow-sm">
+    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md bg-rose-50 border border-rose-300 text-rose-900 text-xs sm:text-sm shadow-sm">
       <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
       <span className="font-bold">असन्तुलित (Unbalanced ⚠️)</span>
       <span className="text-xs font-mono">

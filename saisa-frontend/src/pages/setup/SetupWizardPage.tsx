@@ -169,160 +169,161 @@ export const SetupWizardPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Classical Header */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm mb-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-300 text-xs font-semibold mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>प्रारम्भिक सेटअप विजार्ड • Onboarding Guided Setup</span>
+    <div className="min-h-screen bg-[#f1f5f9] -m-4 md:-m-6 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Classical Header */}
+        <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm mb-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-neutral-200 pb-5">
+            <div>
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                <span>प्रारम्भिक सेटअप विजार्ड • Onboarding Guided Setup</span>
+              </div>
+              <h1 className="text-2xl font-serif font-bold text-neutral-900">
+                {currentStep === 1 && 'व्यापार प्रोफाइल तथा संस्थागत विवरण (Phase 1: Business Profile)'}
+                {currentStep === 2 && 'प्रारम्भिक मौज्दात तथा खाता सन्तुलन (Phase 2: Opening Balances)'}
+                {currentStep === 3 && 'मौज्दात तथा गोदाम व्यवस्थापन (Phase 3: Inventory Quickstart)'}
+              </h1>
+              <p className="text-sm text-neutral-600 mt-1">
+                नेपाल सरकारको नियमानुसार कर विजक (Tax Invoice), भ्याट विवरण, प्रारम्भिक खाता तथा आधिकारिक लेजरका लागि आवश्यक सेटअप।
+              </p>
             </div>
-            <h1 className="text-2xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
-              {currentStep === 1 && 'व्यापार प्रोफाइल तथा संस्थागत विवरण (Phase 1: Business Profile)'}
-              {currentStep === 2 && 'प्रारम्भिक मौज्दात तथा खाता सन्तुलन (Phase 2: Opening Balances)'}
-              {currentStep === 3 && 'मौज्दात तथा गोदाम व्यवस्थापन (Phase 3: Inventory Quickstart)'}
-            </h1>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-              नेपाल सरकारको नियमानुसार कर विजक (Tax Invoice), भ्याट विवरण, प्रारम्भिक खाता तथा आधिकारिक लेजरका लागि आवश्यक सेटअप।
-            </p>
+
+            <div className="flex items-center gap-3">
+              {profile?.setupCompleted ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  सेटअप पूरा भएको (Completed)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-800 border border-blue-300 text-xs font-semibold">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  सेटअप बाँकी (In Progress)
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {profile?.setupCompleted ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">
-                <CheckCircle2 className="w-4 h-4" />
-                सेटअप पूरा भएको (Completed)
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold">
-                <Clock className="w-4 h-4" />
-                सेटअप बाँकी (In Progress)
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* 3-Step Guided Stepper */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-5">
-          {/* Step 1 Pill */}
-          <button
-            type="button"
-            onClick={() => goToStep(1)}
-            className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
-              currentStep === 1
-                ? 'border-primary-500/60 bg-primary-50/60 dark:bg-primary-950/30'
-                : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20 hover:border-neutral-300'
-            }`}
-          >
-            <div
-              className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
-                profile?.companyName
-                  ? 'bg-emerald-600 text-white'
-                  : currentStep === 1
-                  ? 'bg-primary-700 text-white'
-                  : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+          {/* 3-Step Guided Stepper */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-5">
+            {/* Step 1 Pill */}
+            <button
+              type="button"
+              onClick={() => goToStep(1)}
+              className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
+                currentStep === 1
+                  ? 'border-primary-600 bg-primary-50 shadow-sm'
+                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
-              {profile?.companyName ? <Check className="w-4 h-4" /> : '1'}
-            </div>
-            <div>
-              <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-1">
-                Phase 1: Business Profile
-                {profile?.companyName && (
-                  <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded font-normal">
-                    सम्पन्न
-                  </span>
-                )}
+              <div
+                className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
+                  profile?.companyName
+                    ? 'bg-emerald-600 text-white'
+                    : currentStep === 1
+                    ? 'bg-primary-700 text-white'
+                    : 'bg-neutral-200 text-neutral-700'
+                }`}
+              >
+                {profile?.companyName ? <Check className="w-4 h-4" /> : '1'}
               </div>
-              <div className="text-[11px] text-neutral-500">
-                कम्पनी, प्यान/भ्याट, आधिकारिक ठेगाना
+              <div>
+                <div className="text-xs font-bold text-neutral-900 flex items-center gap-1">
+                  Phase 1: Business Profile
+                  {profile?.companyName && (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-normal">
+                      सम्पन्न
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  कम्पनी, प्यान/भ्याट, आधिकारिक ठेगाना
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
 
-          {/* Step 2 Pill */}
-          <button
-            type="button"
-            onClick={() => goToStep(2)}
-            className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
-              currentStep === 2
-                ? 'border-primary-500/60 bg-primary-50/60 dark:bg-primary-950/30'
-                : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20 hover:border-neutral-300'
-            }`}
-          >
-            <div
-              className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
-                openingBalance?.posted
-                  ? 'bg-emerald-600 text-white'
-                  : currentStep === 2
-                  ? 'bg-primary-700 text-white'
-                  : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+            {/* Step 2 Pill */}
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
+                currentStep === 2
+                  ? 'border-primary-600 bg-primary-50 shadow-sm'
+                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
-              {openingBalance?.posted ? <Check className="w-4 h-4" /> : '2'}
-            </div>
-            <div>
-              <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-1">
-                Phase 2: Opening Balances
-                {openingBalance?.posted && (
-                  <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.2 rounded font-normal">
-                    दर्ता भयो
-                  </span>
-                )}
+              <div
+                className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
+                  openingBalance?.posted
+                    ? 'bg-emerald-600 text-white'
+                    : currentStep === 2
+                    ? 'bg-primary-700 text-white'
+                    : 'bg-neutral-200 text-neutral-700'
+                }`}
+              >
+                {openingBalance?.posted ? <Check className="w-4 h-4" /> : '2'}
               </div>
-              <div className="text-[11px] text-neutral-500">
-                प्रारम्भिक मौज्दात र लेजर सन्तुलन
+              <div>
+                <div className="text-xs font-bold text-neutral-900 flex items-center gap-1">
+                  Phase 2: Opening Balances
+                  {openingBalance?.posted && (
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-normal">
+                      दर्ता भयो
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  प्रारम्भिक मौज्दात र लेजर सन्तुलन
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
 
-          {/* Step 3 Pill */}
-          <button
-            type="button"
-            onClick={() => goToStep(3)}
-            className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
-              currentStep === 3
-                ? 'border-primary-500/60 bg-primary-50/60 dark:bg-primary-950/30'
-                : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20 hover:border-neutral-300'
-            }`}
-          >
-            <div
-              className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
+            {/* Step 3 Pill */}
+            <button
+              type="button"
+              onClick={() => goToStep(3)}
+              className={`flex items-center gap-3 p-3 rounded border text-left transition-colors cursor-pointer ${
                 currentStep === 3
-                  ? 'bg-primary-700 text-white'
-                  : 'bg-neutral-300 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300'
+                  ? 'border-primary-600 bg-primary-50 shadow-sm'
+                  : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
-              3
-            </div>
-            <div>
-              <div className="text-xs font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-1">
-                Phase 3: Inventory Quickstart
+              <div
+                className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 ${
+                  currentStep === 3
+                    ? 'bg-primary-700 text-white'
+                    : 'bg-neutral-200 text-neutral-700'
+                }`}
+              >
+                3
               </div>
-              <div className="text-[11px] text-neutral-500">
-                गोदाम (Warehouse) र सुरुआती सामान
+              <div>
+                <div className="text-xs font-bold text-neutral-900 flex items-center gap-1">
+                  Phase 3: Inventory Quickstart
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  गोदाम (Warehouse) र सुरुआती सामान
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* PHASE 1: Business Profile Form */}
       {currentStep === 1 && (
         <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
           {/* SECTION 1: Unit / Company Master Information */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200">
               <Building2 className="w-5 h-5 text-primary-600" />
-              <h2 className="text-base font-bold font-serif text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-base font-bold font-serif text-neutral-900">
                 १. कम्पनी / संस्थाको विवरण (Unit / Business Information)
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Company Name (English) <span className="text-rose-600">*</span>
                 </label>
                 <input
@@ -331,12 +332,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="e.g. Acme Nepal Technologies Pvt. Ltd."
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-serif"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-serif shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   कम्पनीको नाम (नेपालीमा) / Business Name in Devanagari
                 </label>
                 <input
@@ -344,12 +345,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={companyNameNepali}
                   onChange={(e) => setCompanyNameNepali(e.target.value)}
                   placeholder="जस्तै: एक्मी नेपाल टेक्नोलोजिज प्रा. लि."
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Legal / Trade Name (व्यापारिक नाम)
                 </label>
                 <input
@@ -357,19 +358,19 @@ export const SetupWizardPage: React.FC = () => {
                   value={legalName}
                   onChange={(e) => setLegalName(e.target.value)}
                   placeholder="Official registered legal entity name"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-800 mb-1">
                     Incorporation Type (दर्ता प्रकार)
                   </label>
                   <select
                     value={incorporationType}
                     onChange={(e) => setIncorporationType(e.target.value as IncorporationType)}
-                    className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                   >
                     <option value="PROPRIETORSHIP">एकलौटी फर्म (Proprietorship)</option>
                     <option value="PARTNERSHIP">साझेदारी फर्म (Partnership)</option>
@@ -383,13 +384,13 @@ export const SetupWizardPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-800 mb-1">
                     Nature of Business (कारोबारको प्रकृति)
                   </label>
                   <select
                     value={businessNature}
                     onChange={(e) => setBusinessNature(e.target.value as BusinessNature)}
-                    className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                   >
                     <option value="TRADING">व्यापार (Trading)</option>
                     <option value="MANUFACTURING">उत्पादन (Manufacturing)</option>
@@ -405,23 +406,23 @@ export const SetupWizardPage: React.FC = () => {
           </div>
 
           {/* SECTION 2: Tax, Registration & Statutory */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200">
               <FileText className="w-5 h-5 text-primary-600" />
-              <h2 className="text-base font-bold font-serif text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-base font-bold font-serif text-neutral-900">
                 २. कर, प्यान/भ्याट तथा दर्ता विवरण (Tax & Registration Details)
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Registration Authority (दर्ता गर्ने निकाय)
                 </label>
                 <select
                   value={registrationAuthority}
                   onChange={(e) => setRegistrationAuthority(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 >
                   <option value="">-- दर्ता गर्ने निकाय छान्नुहोस् (Select Authority) --</option>
                   {Object.entries(authorities).map(([key, val]) => (
@@ -434,7 +435,7 @@ export const SetupWizardPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-800 mb-1">
                     Registration No. (दर्ता नं.)
                   </label>
                   <input
@@ -442,25 +443,25 @@ export const SetupWizardPage: React.FC = () => {
                     value={registrationNo}
                     onChange={(e) => setRegistrationNo(e.target.value)}
                     placeholder="e.g. 123456/080/081"
-                    className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-800 mb-1">
                     Registration Date (दर्ता मिति)
                   </label>
                   <input
                     type="date"
                     value={registrationDate}
                     onChange={(e) => setRegistrationDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono"
+                    className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   PAN / VAT No. (स्थायी लेखा नं. / भ्याट नं.)
                 </label>
                 <input
@@ -469,7 +470,7 @@ export const SetupWizardPage: React.FC = () => {
                   value={panVatNo}
                   onChange={(e) => setPanVatNo(e.target.value.replace(/\D/g, ''))}
                   placeholder="9-digit PAN (e.g. 601234567)"
-                  className="w-full px-3 py-2 text-sm font-mono font-bold tracking-wider border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm font-mono font-bold tracking-wider border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
                 <p className="text-[11px] text-neutral-500 mt-1">
                   नेपालको कर कानुन अनुसार ९ अंकको प्यान नम्बर बिल र विजकमा अनिवार्य हुन्छ।
@@ -477,24 +478,24 @@ export const SetupWizardPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   PAN / VAT Registration Date (प्यान दर्ता मिति)
                 </label>
                 <input
                   type="date"
                   value={panVatDate}
                   onChange={(e) => setPanVatDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* SECTION 3: Registered Official Address */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200">
               <MapPin className="w-5 h-5 text-primary-600" />
-              <h2 className="text-base font-bold font-serif text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-base font-bold font-serif text-neutral-900">
                 ३. कम्पनीको दर्ता भएको आधिकारिक ठेगाना (Registered Address)
               </h2>
             </div>
@@ -504,9 +505,9 @@ export const SetupWizardPage: React.FC = () => {
               onChange={(val) => setAddressValue(val)}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-neutral-200">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Official Phone (कार्यालय फोन नं.)
                 </label>
                 <input
@@ -514,12 +515,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="01-XXXXXXX or 98XXXXXXXX"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Official Email (कार्यालय इमेल)
                 </label>
                 <input
@@ -527,24 +528,24 @@ export const SetupWizardPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="billing@company.com.np"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* SECTION 4: Authorized Signatory */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200">
               <UserCheck className="w-5 h-5 text-primary-600" />
-              <h2 className="text-base font-bold font-serif text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-base font-bold font-serif text-neutral-900">
                 ४. आधिकारिक हस्ताक्षरकर्ता / सम्पर्क व्यक्ति (Authorized Signatory)
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Full Name (पूरा नाम)
                 </label>
                 <input
@@ -552,12 +553,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={authorizedPersonName}
                   onChange={(e) => setAuthorizedPersonName(e.target.value)}
                   placeholder="e.g. Ramesh Kumar Shrestha"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Designation (पद / जिम्मेवारी)
                 </label>
                 <input
@@ -565,12 +566,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={authorizedPersonDesignation}
                   onChange={(e) => setAuthorizedPersonDesignation(e.target.value)}
                   placeholder="Managing Director / Proprietor / CEO"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Mobile Number / मोबाइल नं.
                 </label>
                 <input
@@ -578,12 +579,12 @@ export const SetupWizardPage: React.FC = () => {
                   value={authorizedPersonPhone}
                   onChange={(e) => setAuthorizedPersonPhone(e.target.value)}
                   placeholder="+977-98XXXXXXXX"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <label className="block text-xs font-semibold text-neutral-800 mb-1">
                   Personal / Direct Email (इमेल)
                 </label>
                 <input
@@ -591,18 +592,18 @@ export const SetupWizardPage: React.FC = () => {
                   value={authorizedPersonEmail}
                   onChange={(e) => setAuthorizedPersonEmail(e.target.value)}
                   placeholder="signatory@company.com.np"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                 />
               </div>
             </div>
           </div>
 
           {/* Action Buttons Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
-              className="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
             >
               अहिलेलाई छोड्नुहोस् (Skip to Dashboard)
             </button>
@@ -640,6 +641,7 @@ export const SetupWizardPage: React.FC = () => {
           }}
         />
       )}
+      </div>
     </div>
   );
 };

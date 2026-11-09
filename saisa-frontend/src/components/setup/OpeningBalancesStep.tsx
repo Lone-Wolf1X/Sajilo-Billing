@@ -149,7 +149,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
     const num = parse(value);
     return (
       <div>
-        <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+        <label className="block text-xs font-semibold text-neutral-800 mb-1">
           {label}
         </label>
         <div className="relative">
@@ -159,10 +159,10 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
           />
           {num > 0 && (
-            <div className="text-[11px] font-mono text-neutral-500 mt-0.5 text-right">
+            <div className="text-[11px] font-mono text-neutral-600 mt-0.5 text-right font-medium">
               {formatMoney(num.toFixed(2))}
             </div>
           )}
@@ -175,23 +175,23 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Introduction Card */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+      <div className="bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold mb-1">
-              <Scale className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-xs font-semibold mb-1">
+              <Scale className="w-3.5 h-3.5 text-blue-600" />
               <span>दोहोरो लेखा प्रणाली (Double Entry Balance)</span>
             </div>
-            <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
+            <h2 className="text-xl font-serif font-bold text-neutral-900">
               प्रारम्भिक मौज्दात प्रविष्टि (Phase 2: Opening Balances)
             </h2>
-            <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
+            <p className="text-xs text-neutral-600 mt-1">
               आर्थिक वर्षको सुरुमा तपाईंको व्यापारको नगद, बैंक, सम्पत्ति र दायित्वको विवरण भर्नुहोस्। यसले खाता सुरु गर्न <strong>OPENING</strong> भौचर सिर्जना गर्दछ।
             </p>
           </div>
 
           <div className="flex flex-col items-start sm:items-end gap-1.5">
-            <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <label className="text-xs font-semibold text-neutral-800">
               प्रारम्भिक मिति (Opening Date) <span className="text-rose-600">*</span>
             </label>
             <input
@@ -199,7 +199,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
               value={openingDate}
               onChange={(e) => setOpeningDate(e.target.value)}
               required
-              className="px-3 py-1.5 text-sm font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="px-3 py-1.5 text-sm font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
             />
           </div>
         </div>
@@ -208,14 +208,14 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
       {/* Grid: Assets (Left) vs Liabilities & Equity (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Assets Section (Debits) */}
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+        <div className="bg-white border border-neutral-300 rounded-lg p-5 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+              <div className="w-8 h-8 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
                 <Coins className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-serif font-bold text-base text-neutral-900 dark:text-neutral-100">
+                <h3 className="font-serif font-bold text-base text-neutral-900">
                   सम्पत्ति विवरण (Assets - Debit)
                 </h3>
                 <p className="text-[11px] text-neutral-500">
@@ -225,7 +225,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
             </div>
             <div className="text-right">
               <div className="text-[10px] text-neutral-500 font-semibold uppercase">कुल सम्पत्ति</div>
-              <div className="font-mono text-sm font-bold text-emerald-700 dark:text-emerald-400">
+              <div className="font-mono text-sm font-bold text-emerald-700">
                 {formatMoney(totalAssets.toFixed(2))}
               </div>
             </div>
@@ -279,14 +279,14 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
         {/* Liabilities & Equity Section (Credits) */}
         <div className="space-y-6">
           {/* Liabilities Section */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+          <div className="bg-white border border-neutral-300 rounded-lg p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-md bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-700 dark:text-rose-300">
+                <div className="w-8 h-8 rounded-md bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700">
                   <CreditCard className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-base text-neutral-900 dark:text-neutral-100">
+                  <h3 className="font-serif font-bold text-base text-neutral-900">
                     दायित्व विवरण (Liabilities - Credit)
                   </h3>
                   <p className="text-[11px] text-neutral-500">
@@ -296,7 +296,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-neutral-500 font-semibold uppercase">कुल दायित्व</div>
-                <div className="font-mono text-sm font-bold text-rose-700 dark:text-rose-400">
+                <div className="font-mono text-sm font-bold text-rose-700">
                   {formatMoney(totalLiabilities.toFixed(2))}
                 </div>
               </div>
@@ -327,14 +327,14 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
           </div>
 
           {/* Equity / Capital Section */}
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+          <div className="bg-white border border-neutral-300 rounded-lg p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-700 dark:text-blue-300">
+                <div className="w-8 h-8 rounded-md bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
                   <Building className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-base text-neutral-900 dark:text-neutral-100">
+                  <h3 className="font-serif font-bold text-base text-neutral-900">
                     पुँजी तथा संचित कोष (Equity - Credit)
                   </h3>
                   <p className="text-[11px] text-neutral-500">
@@ -344,7 +344,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-neutral-500 font-semibold uppercase">कुल पुँजी</div>
-                <div className="font-mono text-sm font-bold text-blue-700 dark:text-blue-400">
+                <div className="font-mono text-sm font-bold text-blue-700">
                   {formatMoney(totalEquity.toFixed(2))}
                 </div>
               </div>
@@ -359,9 +359,9 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
               )}
 
               {/* Auto Capital Calculation Box */}
-              <div className="p-3.5 bg-neutral-50 dark:bg-neutral-800/40 rounded border border-neutral-200 dark:border-neutral-700 space-y-2">
+              <div className="p-3.5 bg-neutral-50 rounded border border-neutral-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 cursor-pointer">
+                  <label className="text-xs font-semibold text-neutral-800 flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={autoCapital}
@@ -370,24 +370,24 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
                     />
                     <span>स्वतः पुँजी गणना गर्नुहोस् (Auto-balance Owner's Capital)</span>
                   </label>
-                  <span className="text-[11px] text-primary-700 dark:text-primary-300 font-semibold inline-flex items-center gap-1">
+                  <span className="text-[11px] text-primary-700 font-semibold inline-flex items-center gap-1">
                     <Calculator className="w-3.5 h-3.5" />
                     Capital = Assets - Liabilities
                   </span>
                 </div>
 
                 {autoCapital ? (
-                  <div className="flex items-center justify-between p-2.5 bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-700 font-mono text-sm">
-                    <span className="text-neutral-600 dark:text-neutral-400 text-xs">
+                  <div className="flex items-center justify-between p-2.5 bg-white rounded border border-neutral-200 font-mono text-sm shadow-sm">
+                    <span className="text-neutral-600 text-xs">
                       मालिकको चुक्ता पुँजी (Owner's Capital):
                     </span>
-                    <span className="font-bold text-primary-700 dark:text-primary-300">
+                    <span className="font-bold text-primary-700">
                       {formatMoney(computedCapital.toFixed(2))}
                     </span>
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-800 mb-1">
                       मालिकको पुँजी म्यानुअल प्रविष्टि (Manual Capital Amount)
                     </label>
                     <input
@@ -396,7 +396,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
                       value={manualCapital}
                       onChange={(e) => setManualCapital(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                      className="w-full px-3 py-2 text-sm font-mono border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
                     />
                   </div>
                 )}
@@ -412,7 +412,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
       </div>
 
       {/* Live Balance Summary Bar */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white border border-neutral-300 rounded-lg p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <BalanceIndicator totalDebits={totalAssets} totalCredits={totalCredits} />
 
         <div className="text-xs text-neutral-500 flex items-center gap-2">
@@ -424,13 +424,13 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
       </div>
 
       {/* Action Buttons Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-5 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>पछाडि फर्कनुहोस् (Back to Profile)</span>
@@ -441,7 +441,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
             <button
               type="button"
               onClick={onContinue}
-              className="px-4 py-2 text-sm font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               अहिलेलाई छोड्नुहोस् (Skip for now)
             </button>
@@ -451,7 +451,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {postMutation.isPending ? (
             <span>प्रविष्टि गर्दैछ... (Posting...)</span>

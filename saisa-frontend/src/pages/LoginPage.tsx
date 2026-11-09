@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Check, ShieldCheck, BookOpen, Layers, BarChart3 } from 'lucide-react';
+import { setupService } from '../services/setupService';
 
 const loginSchema = z.object({
   tenantCode: z
@@ -41,14 +42,23 @@ export const LoginPage: React.FC = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       tenantCode: 'ACME',
-      username: '',
-      password: '',
+      username: 'admin',
+      password: 'Password@123',
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
-      onSuccess: () => {
+      onSuccess: async () => {
+        try {
+          const status = await setupService.getStatus();
+          if (status && !status.setupCompleted) {
+            navigate('/setup', { replace: true });
+            return;
+          }
+        } catch (err) {
+          console.warn('Could not verify setup status on login:', err);
+        }
         navigate(from, { replace: true });
       },
     });
@@ -201,6 +211,19 @@ export const LoginPage: React.FC = () => {
             >
               Sign In to Accounting System
             </Button>
+
+            {/* Quick Demo Hint */}
+            <div className="mt-4 p-3 rounded bg-blue-50/70 border border-blue-200 text-xs text-blue-900 space-y-1">
+              <div className="font-semibold flex items-center justify-between">
+                <span>Quick Test Credentials:</span>
+                <span className="text-[10px] text-blue-700 font-mono bg-blue-100 px-1.5 py-0.5 rounded">Pre-filled</span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <span>Company: <strong>ACME</strong></span>
+                <span>User: <strong>admin</strong></span>
+                <span>Pass: <strong>Password@123</strong></span>
+              </div>
+            </div>
           </form>
 
           <div className="mt-6 pt-5 border-t border-paper-border text-center text-sm text-paper-muted">

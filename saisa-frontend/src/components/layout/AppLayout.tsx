@@ -22,14 +22,14 @@ export const AppLayout: React.FC = () => {
 
       <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 md:p-6">
         {showSetupBanner && (
-          <div className="mb-5 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/80 rounded-md p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-fadeIn">
-            <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-200 text-xs sm:text-sm">
+          <div className="mb-5 bg-amber-50 border border-amber-300 rounded-md p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-fadeIn">
+            <div className="flex items-center gap-2.5 text-black text-xs sm:text-sm">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <div>
-                <span className="font-bold font-serif">
+                <span className="font-bold font-serif text-black">
                   कम्पनी प्रोफाइल सेटअप अधुरो छ (Business Profile Incomplete):
                 </span>{' '}
-                <span className="text-neutral-700 dark:text-neutral-300">
+                <span className="text-black font-semibold">
                   कर विजक (Tax Invoices), भ्याट विवरण र आधिकारिक लेजरका लागि नेपाल सरकारको मापदण्ड अनुसार विवरण पूरा गर्नुहोस्।
                 </span>
               </div>
