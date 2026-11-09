@@ -1,0 +1,354 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   SAISA Design Tokens — Classical Accounting Look
+   ============================================================ */
+
+:root {
+  /* Colors — Classical palette */
+  --color-primary:        #1e3a5f;
+  --color-primary-hover:  #162c47;
+  --color-primary-light:  #e8eef6;
+  --color-primary-border: #b8c8db;
+
+  --color-secondary:        #7a2e2e;
+  --color-secondary-hover:  #5e2323;
+  --color-secondary-light:  #f5e8e8;
+
+  --color-success:        #2d6a4f;
+  --color-success-light:  #e3f0ea;
+
+  --color-warning:        #b8860b;
+  --color-warning-light:  #fdf6e3;
+
+  --color-danger:        #a83232;
+  --color-danger-light:  #f9e8e8;
+
+  --color-bg:              #faf8f3;   /* cream page background */
+  --color-bg-alt:          #f5f2ea;   /* slightly darker panels */
+  --color-surface:         #ffffff;   /* card backgrounds */
+  --color-surface-hover:   #fafaf7;
+
+  --color-border:          #e0dcd0;
+  --color-border-strong:   #c9c2b3;
+
+  --color-text:            #2b2b28;
+  --color-text-muted:      #6b6b62;
+  --color-text-subtle:     #999999;
+
+  --color-row-zebra:       #f9f7f1;
+  --color-row-hover:       #f0ece0;
+
+  /* Typography */
+  --font-heading: 'Georgia', 'Merriweather', 'Times New Roman', serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter',
+                  'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Monaco', 'Consolas',
+                  'Courier New', monospace;
+
+  /* Radii */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 2px rgba(43, 43, 40, 0.06);
+  --shadow-md:  0 2px 4px rgba(43, 43, 40, 0.08),
+                0 1px 2px rgba(43, 43, 40, 0.04);
+  --shadow-lg:  0 4px 12px rgba(43, 43, 40, 0.10),
+                0 2px 4px rgba(43, 43, 40, 0.06);
+
+  --container-max: 1280px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+}
+
+.num, .amount, .balance, td.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.double-underline {
+  border-bottom: 3px double var(--color-text) !important;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+  min-height: 36px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(to bottom, #2a4d75 0%, var(--color-primary) 100%);
+  color: #ffffff;
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #1e3a5f 0%, var(--color-primary-hover) 100%);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary-border);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: #ffffff;
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #922828;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  min-height: 28px;
+}
+
+.btn-lg {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+  min-height: 42px;
+}
+
+/* ---------- INPUTS ---------- */
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 36px;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+/* ---------- CARDS ---------- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* ---------- TABLES — Classical ledger look ---------- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.data-table thead {
+  background: var(--color-bg-alt);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.data-table th {
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  border-right: 1px solid var(--color-border);
+}
+
+.data-table th:last-child {
+  border-right: none;
+}
+
+.data-table td {
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.data-table td:last-child {
+  border-right: none;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: var(--color-row-zebra);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--color-row-hover);
+}
+
+/* ---------- BADGES ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  line-height: 1.3;
+}
+
+.badge-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-color: #b7ddcb;
+}
+
+.badge-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: #fae4a8;
+}
+
+.badge-danger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: #f3bebe;
+}
+
+.badge-default {
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+/* Classic ledger highlight */
+.ledger-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: #ece7db;
+  border: 1px solid #d5cfc2;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.dot-green { background: var(--color-success); }
+.dot-amber { background: var(--color-warning); }
+.dot-red { background: var(--color-danger); }
+
+/* Quick keys bar */
+.key-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.key-tag kbd {
+  background: #ece7db;
+  color: var(--color-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid #c9c2b3;
+  font-weight: bold;
+}
+
+.key-tag:hover {
+  background: #f0ece0;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}

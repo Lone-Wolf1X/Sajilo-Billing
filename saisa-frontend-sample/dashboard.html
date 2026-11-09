@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAISA — Financial Accounting Dashboard</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    /* Full width desktop navbar layout — no sidebar */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+
+    .dashboard-container {
+      max-width: var(--container-max);
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    /* Executive ribbon */
+    .executive-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    @media (max-width: 900px) {
+      .executive-ribbon {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Classic ledger highlight */
+    .ledger-badge {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background: #ece7db;
+      border: 1px solid #d5cfc2;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot-green { background: var(--color-success); }
+    .dot-amber { background: var(--color-warning); }
+    .dot-red { background: var(--color-danger); }
+
+    .table-footer-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg-alt);
+      border-top: 1px solid var(--color-border-strong);
+      font-size: var(--text-sm);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================== -->
+<!-- 1. TOP UTILITY BAR (Company & Session Metadata) -->
+<!-- ============================================================== -->
+<div class="top-utility-bar">
+  <div class="top-utility-left">
+    <span style="font-weight: 600; color: #ffffff;">🏢 Acme Traders Pvt. Ltd.</span>
+    <span>|</span>
+    <span>Code: <code class="ledger-badge" style="color:#ffffff; background:#1e3a5f; border-color:#2e5687;">ACME-01</code></span>
+    <span>|</span>
+    <span>Financial Year: <strong>2026-2027</strong></span>
+    <span>|</span>
+    <span>Period: <strong>November 2026</strong> <span class="status-dot dot-green" style="margin-left:4px;"></span>OPEN</span>
+  </div>
+
+  <div class="top-utility-right">
+    <span>Currency: <strong>NPR / INR (₹)</strong></span>
+    <span>|</span>
+    <span>Last Backup: <span class="text-success" style="font-weight:600;">Today 11:29 AM ✓</span></span>
+    <span>|</span>
+    <span>User: <strong>Abhisek Paswan (ADMIN)</strong></span>
+    <a href="login.html" style="margin-left: 8px; text-decoration: underline;">Logout</a>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- 2. MAIN NAVIGATION BAR (Classic Top Menus with Dropdowns) -->
+<!-- ============================================================== -->
+<header class="main-navbar">
+  <div style="display: flex; align-items: center; height: 100%;">
+    <a href="dashboard.html" class="nav-brand">
+      <span class="nav-brand-mark">S</span>
+      <span>SAISA</span>
+    </a>
+
+    <ul class="nav-menu">
+      <!-- Dashboard -->
+      <li class="nav-dropdown">
+        <a href="dashboard.html" class="nav-link active">
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <!-- Financial Core -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>Financial Core ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">General Accounting</li>
+          <li><a href="#" class="dropdown-item">Chart of Accounts <span>COA</span></a></li>
+          <li><a href="journal-entry.html" class="dropdown-item">Journal Entries (Vouchers) <span>[F7]</span></a></li>
+          <li><a href="#" class="dropdown-item">General Ledger Statement</a></li>
+          <li class="dropdown-divider"></li>
+          <li class="dropdown-header">Period & Closing</li>
+          <li><a href="#" class="dropdown-item">Accounting Periods</a></li>
+          <li><a href="#" class="dropdown-item">Month-End Period Close</a></li>
+        </ul>
+      </li>
+
+      <!-- Billing Module -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>Billing & Invoices ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">Sales (Receivables)</li>
+          <li><a href="#" class="dropdown-item">Customers Directory</a></li>
+          <li><a href="#" class="dropdown-item">Sales Invoices <span>[F8]</span></a></li>
+          <li><a href="#" class="dropdown-item">Customer Receipts (Payments) <span>[F6]</span></a></li>
+          <li><a href="#" class="dropdown-item">Credit Notes (Sales Returns)</a></li>
+          <li class="dropdown-divider"></li>
+          <li class="dropdown-header">Purchases (Payables)</li>
+          <li><a href="#" class="dropdown-item">Vendors Directory</a></li>
+          <li><a href="#" class="dropdown-item">Purchase Invoices <span>[F9]</span></a></li>
+          <li><a href="#" class="dropdown-item">Vendor Payments <span>[F5]</span></a></li>
+          <li><a href="#" class="dropdown-item">Debit Notes (Purchase Returns)</a></li>
+          <li class="dropdown-divider"></li>
+          <li><a href="#" class="dropdown-item">AR / AP Aging Schedules</a></li>
+        </ul>
+      </li>
+
+      <!-- Inventory Module -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>Inventory ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">Master Data</li>
+          <li><a href="#" class="dropdown-item">Items & Products Catalog</a></li>
+          <li><a href="#" class="dropdown-item">Warehouses & Locations</a></li>
+          <li class="dropdown-divider"></li>
+          <li class="dropdown-header">Stock Operations</li>
+          <li><a href="#" class="dropdown-item">Stock Inward / GRN</a></li>
+          <li><a href="#" class="dropdown-item">Stock Outward / Dispatch</a></li>
+          <li><a href="#" class="dropdown-item">Stock Balances & Valuation (WAC)</a></li>
+          <li class="dropdown-divider"></li>
+          <li><a href="#" class="dropdown-item">Low Stock & Reorder Alerts <span class="badge badge-warning">2 Low</span></a></li>
+        </ul>
+      </li>
+
+      <!-- Banking & Cash -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>Banking & Cash ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="#" class="dropdown-item">Bank Accounts Master</a></li>
+          <li><a href="#" class="dropdown-item">Bank Reconciliation (BRS)</a></li>
+          <li><a href="#" class="dropdown-item">Bank Adjustments & Charges</a></li>
+          <li><a href="#" class="dropdown-item">Contra Entry <span>[F4]</span></a></li>
+        </ul>
+      </li>
+
+      <!-- Reports -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>Financial Reports ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-header">Core Ledgers</li>
+          <li><a href="#" class="dropdown-item">Trial Balance</a></li>
+          <li><a href="#" class="dropdown-item">Profit & Loss Statement</a></li>
+          <li><a href="#" class="dropdown-item">Balance Sheet</a></li>
+          <li><a href="#" class="dropdown-item">Cash Flow Statement</a></li>
+          <li class="dropdown-divider"></li>
+          <li class="dropdown-header">Operational Registers</li>
+          <li><a href="#" class="dropdown-item">Sales Register / VAT Report</a></li>
+          <li><a href="#" class="dropdown-item">Purchase Register</a></li>
+          <li><a href="#" class="dropdown-item">Stock Movement Register</a></li>
+        </ul>
+      </li>
+
+      <!-- System & Audit -->
+      <li class="nav-dropdown">
+        <a href="#" class="nav-link">
+          <span>System & Audit ▾</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="#" class="dropdown-item">Immutable Audit Trail</a></li>
+          <li><a href="#" class="dropdown-item">User Accounts & Roles</a></li>
+          <li><a href="#" class="dropdown-item">Company Configuration</a></li>
+          <li><a href="#" class="dropdown-item">System Health & Metrics</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: var(--space-3);">
+    <div style="position: relative;">
+      <input type="text" placeholder="Search account, invoice, SKU... (Ctrl+K)"
+             style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #ffffff; padding: 4px 10px; border-radius: var(--radius-sm); font-size: var(--text-xs); width: 220px;">
+    </div>
+    <a href="journal-entry.html" class="btn btn-sm" style="background: var(--color-secondary); color:#ffffff; border-color: #5e2323;">
+      + New Voucher
+    </a>
+  </div>
+</header>
+
+<!-- ============================================================== -->
+<!-- 3. CLASSICAL ACCOUNTING FUNCTION KEYS (Tally / Desktop style) -->
+<!-- ============================================================== -->
+<div class="quick-keys-bar">
+  <span style="font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; margin-right: 4px;">Quick Actions:</span>
+  <a href="#" class="key-tag"><kbd>F2</kbd> Period</a>
+  <a href="#" class="key-tag"><kbd>F4</kbd> Contra</a>
+  <a href="#" class="key-tag"><kbd>F5</kbd> Payment</a>
+  <a href="#" class="key-tag"><kbd>F6</kbd> Receipt</a>
+  <a href="journal-entry.html" class="key-tag"><kbd>F7</kbd> Journal Entry</a>
+  <a href="#" class="key-tag"><kbd>F8</kbd> Sales Invoice</a>
+  <a href="#" class="key-tag"><kbd>F9</kbd> Purchase Invoice</a>
+  <a href="#" class="key-tag"><kbd>F10</kbd> Stock Movement</a>
+  <a href="#" class="key-tag"><kbd>Alt+R</kbd> Trial Balance</a>
+  <a href="#" class="key-tag"><kbd>Alt+B</kbd> Balance Sheet</a>
+</div>
+
+<!-- ============================================================== -->
+<!-- 4. MAIN DASHBOARD CONTENT -->
+<!-- ============================================================== -->
+<main class="dashboard-container">
+
+  <!-- Page Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: var(--space-5); border-bottom: 2px solid var(--color-border); padding-bottom: var(--space-3);">
+    <div>
+      <h1 style="font-size: var(--text-2xl); color: var(--color-primary); margin-bottom: 2px;">
+        Accounting & Financial Overview
+      </h1>
+      <p style="font-size: var(--text-sm); color: var(--color-text-muted);">
+        Consolidated ledger status, billing receivables, and inventory position as of <strong>09 November 2026</strong>.
+      </p>
+    </div>
+    <div style="display: flex; gap: var(--space-2);">
+      <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print Summary</button>
+      <button class="btn btn-secondary btn-sm">📊 Export Excel</button>
+      <a href="journal-entry.html" class="btn btn-primary btn-sm">+ Post Journal</a>
+    </div>
+  </div>
+
+  <!-- Executive Financial Ribbon -->
+  <div class="executive-ribbon">
+    <div class="kpi-card" style="border-top-color: var(--color-primary);">
+      <div class="kpi-label">Liquid Assets (Cash & Bank)</div>
+      <div class="kpi-value">₹4,52,100.00</div>
+      <div class="kpi-change text-muted" style="font-size: var(--text-xs);">
+        HDFC: ₹3,12,000 | Cash in Hand: ₹1,40,100
+      </div>
+    </div>
+
+    <div class="kpi-card" style="border-top-color: var(--color-warning);">
+      <div class="kpi-label">Accounts Receivable (Sundry Debtors)</div>
+      <div class="kpi-value text-warning">₹1,86,200.00</div>
+      <div class="kpi-change text-warning" style="font-size: var(--text-xs);">
+        ⚠ 3 Invoices overdue (>30 days)
+      </div>
+    </div>
+
+    <div class="kpi-card" style="border-top-color: var(--color-secondary);">
+      <div class="kpi-label">Accounts Payable (Sundry Creditors)</div>
+      <div class="kpi-value" style="color: var(--color-secondary);">₹94,500.00</div>
+      <div class="kpi-change text-muted" style="font-size: var(--text-xs);">
+        Due within 15 days: ₹42,000
+      </div>
+    </div>
+
+    <div class="kpi-card" style="border-top-color: var(--color-success);">
+      <div class="kpi-label">Net Profit (YTD 2026-27)</div>
+      <div class="kpi-value text-success">₹3,24,850.00</div>
+      <div class="kpi-change text-success" style="font-size: var(--text-xs);">
+        ▲ 8.2% operating profit margin
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 5. THREE CORE MODULES: Financials, Billing, Inventory -->
+  <!-- ============================================================== -->
+  <div class="modules-section">
+
+    <!-- Pillar 1: FINANCIAL CORE -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <h3>
+          <span style="color: var(--color-primary);">🏛️</span>
+          Financial Core
+        </h3>
+        <span class="badge badge-success">Balanced</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-stat-row">
+          <span class="text-muted">Trial Balance:</span>
+          <span class="amount" style="font-weight: 600;">₹45,80,000 = ₹45,80,000</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Active Period:</span>
+          <span><strong>Nov 2026</strong> (Ends in 21 days)</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Unposted Drafts:</span>
+          <span><span class="badge badge-default">0 Drafts</span> (All posted)</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Bank Reconciliation:</span>
+          <span class="text-success">Matched: ₹1,23,400 ✓</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Immutable Audit Log:</span>
+          <span class="text-muted">148 events logged today</span>
+        </div>
+      </div>
+      <div class="module-card-footer">
+        <a href="journal-entry.html" class="btn btn-secondary btn-sm">+ Journal</a>
+        <a href="#" class="btn btn-secondary btn-sm">Trial Balance →</a>
+      </div>
+    </div>
+
+    <!-- Pillar 2: BILLING & SALES -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <h3>
+          <span style="color: var(--color-warning);">📑</span>
+          Billing & Invoicing
+        </h3>
+        <span class="badge badge-default">8 Invoices This Month</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-stat-row">
+          <span class="text-muted">Sales Invoiced (Nov):</span>
+          <span class="amount" style="font-weight: 600; color: var(--color-primary);">₹1,84,500.00</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Payments Collected:</span>
+          <span class="amount text-success">₹96,000.00</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Outstanding AR:</span>
+          <span class="amount text-warning">₹88,500.00</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Credit Notes Issued:</span>
+          <span class="amount">₹2,360.00 (1 note)</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Auto-GL Posting:</span>
+          <span class="text-success">100% Automated</span>
+        </div>
+      </div>
+      <div class="module-card-footer">
+        <a href="#" class="btn btn-secondary btn-sm">+ Sales Bill</a>
+        <a href="#" class="btn btn-secondary btn-sm">Receive Money →</a>
+      </div>
+    </div>
+
+    <!-- Pillar 3: INVENTORY & STOCK -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <h3>
+          <span style="color: var(--color-secondary);">📦</span>
+          Inventory & Stock
+        </h3>
+        <span class="badge badge-warning">2 Alerts</span>
+      </div>
+      <div class="module-card-body">
+        <div class="module-stat-row">
+          <span class="text-muted">Total Stock Valuation:</span>
+          <span class="amount" style="font-weight: 600; color: var(--color-secondary);">₹14,25,800.00</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Valuation Method:</span>
+          <span><strong>WAC</strong> (Weighted Average Cost)</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Active Warehouses:</span>
+          <span><strong>Main Godown</strong>, Retail Store</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">Items Below Reorder:</span>
+          <span class="text-danger" style="font-weight: 600;">2 Items (Steel Rod, Wire)</span>
+        </div>
+        <div class="module-stat-row">
+          <span class="text-muted">COGS Automated:</span>
+          <span class="text-success">On Invoice Post ✓</span>
+        </div>
+      </div>
+      <div class="module-card-footer">
+        <a href="#" class="btn btn-secondary btn-sm">+ Stock Inward</a>
+        <a href="#" class="btn btn-secondary btn-sm">Stock Register →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 6. CLASSICAL RECENT TRANSACTIONS LEDGER (Double-Entry Log) -->
+  <!-- ============================================================== -->
+  <div class="card" style="margin-bottom: var(--space-6);">
+    <div class="card-header" style="background: var(--color-bg-alt);">
+      <div>
+        <h2 class="card-title" style="display: flex; align-items: center; gap: var(--space-2);">
+          <span>📖</span>
+          General Ledger Journal Log (Recent Financial Movements)
+        </h2>
+        <span style="font-size: var(--text-xs); color: var(--color-text-muted);">
+          All entries posted are immutable. Showing latest audited transactions for Acme Traders.
+        </span>
+      </div>
+      <div style="display: flex; gap: var(--space-2);">
+        <input type="date" value="2026-11-09" class="form-input" style="padding: 2px 6px; font-size: var(--text-xs); height: 28px; width: 130px;">
+        <button class="btn btn-secondary btn-sm">Filter</button>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="data-table" style="border-radius: 0; border: none; border-bottom: 1px solid var(--color-border);">
+        <thead>
+          <tr>
+            <th style="width: 100px;">Date</th>
+            <th style="width: 130px;">Voucher Ref</th>
+            <th style="width: 110px;">Module</th>
+            <th>Account Head / Particulars</th>
+            <th>Narration & Business Context</th>
+            <th class="text-right" style="width: 130px;">Debit (₹)</th>
+            <th class="text-right" style="width: 130px;">Credit (₹)</th>
+            <th style="width: 90px; text-align: center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09 Nov 2026</td>
+            <td><code class="ledger-badge">INV-00142</code></td>
+            <td><span class="badge badge-default">Billing</span></td>
+            <td><strong>1101 — Ramesh Traders (AR)</strong><br><small class="text-muted">Cr. 4001 Sales, 2002 GST</small></td>
+            <td>Sales invoice #142 for 10 units Widget-A</td>
+            <td class="amount">11,800.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+          <tr>
+            <td>09 Nov 2026</td>
+            <td><code class="ledger-badge">COGS-00142</code></td>
+            <td><span class="badge badge-default">Inventory</span></td>
+            <td><strong>5101 — Cost of Goods Sold</strong><br><small class="text-muted">Cr. 1301 Inventory Stock</small></td>
+            <td>Auto COGS movement from Main Warehouse</td>
+            <td class="amount">7,500.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+          <tr>
+            <td>09 Nov 2026</td>
+            <td><code class="ledger-badge">PAY-00891</code></td>
+            <td><span class="badge badge-default">Payment</span></td>
+            <td><strong>1002 — HDFC Bank</strong><br><small class="text-muted">Cr. 1101 Ramesh Traders (AR)</small></td>
+            <td>NEFT payment receipt against INV-00142</td>
+            <td class="amount">5,000.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+          <tr>
+            <td>08 Nov 2026</td>
+            <td><code class="ledger-badge">CN-00012</code></td>
+            <td><span class="badge badge-default">Return</span></td>
+            <td><strong>4002 — Sales Returns & Allowances</strong><br><small class="text-muted">Cr. 1101 Ramesh Traders</small></td>
+            <td>Credit Note — 2 damaged widgets returned</td>
+            <td class="amount">2,360.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+          <tr>
+            <td>08 Nov 2026</td>
+            <td><code class="ledger-badge">PINV-00049</code></td>
+            <td><span class="badge badge-default">Purchase</span></td>
+            <td><strong>1301 — Raw Materials Inventory</strong><br><small class="text-muted">Cr. 2101 ABC Suppliers (AP)</small></td>
+            <td>Purchase bill for raw steel from ABC Suppliers</td>
+            <td class="amount">59,000.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+          <tr>
+            <td>07 Nov 2026</td>
+            <td><code class="ledger-badge">JE-00089</code></td>
+            <td><span class="badge badge-default">Financial</span></td>
+            <td><strong>5001 — Office Rent Expense</strong><br><small class="text-muted">Cr. 1002 HDFC Bank</small></td>
+            <td>November office rent paid via banking transfer</td>
+            <td class="amount">45,000.00</td>
+            <td class="amount">—</td>
+            <td style="text-align: center;"><span class="badge badge-success">POSTED</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr style="background: var(--color-bg-alt); font-weight: bold;">
+            <td colspan="5" style="text-align: right; font-family: var(--font-heading);">
+              Day Total (Selected Range):
+            </td>
+            <td class="amount double-underline" style="font-weight: 700; color: var(--color-primary);">
+              ₹1,30,660.00
+            </td>
+            <td class="amount double-underline" style="font-weight: 700; color: var(--color-primary);">
+              ₹1,30,660.00
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-success">BALANCED</span>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="table-footer-summary">
+      <span class="text-muted">Showing 6 audited journal entries · Page 1 of 1</span>
+      <div style="display: flex; gap: var(--space-3); align-items: center;">
+        <span class="text-muted">Ledger Integrity: <strong class="text-success">Verified (0 Discrepancy)</strong></span>
+        <a href="#" style="font-weight: 600;">View Complete General Ledger →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert Banner -->
+  <div class="alert alert-warning" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <strong>⚠️ Inventory Reorder Warning:</strong> 2 items (Steel Wire 4mm, Heavy Bearing 6205) are below the safety threshold.
+    </div>
+    <a href="#" class="btn btn-secondary btn-sm" style="background:#ffffff;">Review Reorder Stock →</a>
+  </div>
+
+</main>
+
+<!-- Simple Footer -->
+<footer style="margin-top: auto; background: var(--color-bg-alt); border-top: 1px solid var(--color-border); padding: var(--space-3) var(--space-6); font-size: var(--text-xs); color: var(--color-text-muted); display: flex; justify-content: space-between;">
+  <div>SAISA Enterprise Accounting Core v1.0 · Multi-Tenant · Double-Entry Ledger</div>
+  <div>Session: <span class="text-success">Authenticated (JWT Active)</span> · Node: Production-01</div>
+</footer>
+
+</body>
+</html>

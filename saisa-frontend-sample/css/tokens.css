@@ -1,0 +1,102 @@
+/* ============================================================
+   SAISA Design Tokens — Classical Accounting Look
+   All colors, spacing, typography in one place.
+   ============================================================ */
+
+:root {
+  /* ---------- Colors — Classical palette ---------- */
+
+  /* Brand — deep navy blue (trust, finance, professional) */
+  --color-primary:        #1e3a5f;
+  --color-primary-hover:  #162c47;
+  --color-primary-light:  #e8eef6;
+  --color-primary-border: #b8c8db;
+
+  /* Secondary — warm maroon (accents, important numbers) */
+  --color-secondary:        #7a2e2e;
+  --color-secondary-hover:  #5e2323;
+  --color-secondary-light:  #f5e8e8;
+
+  /* Success — forest green (paid, balanced, positive) */
+  --color-success:        #2d6a4f;
+  --color-success-light:  #e3f0ea;
+
+  /* Warning — amber (overdue, attention) */
+  --color-warning:        #b8860b;
+  --color-warning-light:  #fdf6e3;
+
+  /* Danger — brick red (errors, losses, negative) */
+  --color-danger:        #a83232;
+  --color-danger-light:  #f9e8e8;
+
+  /* Neutrals — warm grays (paper feel) */
+  --color-bg:              #faf8f3;   /* cream page background */
+  --color-bg-alt:          #f5f2ea;   /* slightly darker panels */
+  --color-surface:         #ffffff;   /* card backgrounds */
+  --color-surface-hover:   #fafaf7;
+
+  --color-border:          #e0dcd0;
+  --color-border-strong:   #c9c2b3;
+
+  --color-text:            #2b2b28;
+  --color-text-muted:      #6b6b62;
+  --color-text-subtle:     #999999;
+
+  /* Table striping */
+  --color-row-zebra:       #f9f7f1;
+  --color-row-hover:       #f0ece0;
+
+  /* ---------- Typography ---------- */
+
+  --font-heading: 'Georgia', 'Merriweather', 'Times New Roman', serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter',
+                  'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Monaco', 'Consolas',
+                  'Courier New', monospace;
+
+  --text-xs:   0.75rem;   /* 12px */
+  --text-sm:   0.875rem;  /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg:   1.125rem;  /* 18px */
+  --text-xl:   1.25rem;   /* 20px */
+  --text-2xl:  1.5rem;    /* 24px */
+  --text-3xl:  1.875rem;  /* 30px */
+
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* ---------- Spacing ---------- */
+
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+
+  /* ---------- Radii ---------- */
+
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  /* ---------- Shadows — subtle, not trendy ---------- */
+
+  --shadow-sm:  0 1px 2px rgba(43, 43, 40, 0.06);
+  --shadow-md:  0 2px 4px rgba(43, 43, 40, 0.08),
+                0 1px 2px rgba(43, 43, 40, 0.04);
+  --shadow-lg:  0 4px 12px rgba(43, 43, 40, 0.10),
+                0 2px 4px rgba(43, 43, 40, 0.06);
+
+  /* ---------- Layout ---------- */
+
+  --sidebar-width:     240px;
+  --topbar-height:     56px;
+  --container-max:     1280px;
+}
+
