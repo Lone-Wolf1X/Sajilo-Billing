@@ -5,6 +5,7 @@ import com.saisa.billing.application.reconciliation.ReconciliationReportService;
 import com.saisa.billing.domain.exception.InvalidBankReconciliationException;
 import com.saisa.billing.domain.reconciliation.BankStatementLine;
 import com.saisa.billing.infrastructure.persistence.BankStatementLineRepository;
+import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -84,6 +85,7 @@ public class BankReconciliationController {
 
     @PostMapping("/match")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "BANK_RECON_MATCH", entityType = "BankStatementLine")
     public BankStatementLine manualMatch(@RequestBody ManualMatchRequest req) {
         return reconService.manualMatch(
             TenantContext.getCurrentTenantId(),
@@ -114,3 +116,4 @@ public class BankReconciliationController {
             asOf != null ? asOf : LocalDate.now());
     }
 }
+

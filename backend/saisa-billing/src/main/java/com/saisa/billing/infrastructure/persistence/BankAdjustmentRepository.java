@@ -10,3 +10,4 @@ public interface BankAdjustmentRepository extends JpaRepository<BankAdjustment, 
 
     Optional<BankAdjustment> findByTenantIdAndIdempotencyKey(Long tenantId, String idempotencyKey);
 }
+

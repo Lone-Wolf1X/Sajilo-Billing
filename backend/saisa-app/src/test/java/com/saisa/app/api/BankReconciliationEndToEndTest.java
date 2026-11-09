@@ -217,3 +217,4 @@ class BankReconciliationEndToEndTest {
         return json.readTree(r.getResponse().getContentAsString()).get("id").asLong();
     }
 }
+

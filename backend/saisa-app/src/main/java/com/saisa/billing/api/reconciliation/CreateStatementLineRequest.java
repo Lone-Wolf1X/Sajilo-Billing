@@ -12,3 +12,4 @@ public record CreateStatementLineRequest(
     String creditAmount,
     String runningBalance
 ) {}
+

@@ -17,3 +17,4 @@ public interface BankStatementLineRepository extends JpaRepository<BankStatement
     boolean existsByTenantIdAndMatchedPaymentIdAndStatus(
         Long tenantId, Long matchedPaymentId, StatementLineStatus status);
 }
+

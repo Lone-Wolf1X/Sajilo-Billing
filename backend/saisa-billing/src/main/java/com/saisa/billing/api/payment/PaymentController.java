@@ -5,6 +5,7 @@ import com.saisa.billing.domain.exception.InvalidPaymentException;
 import com.saisa.billing.domain.payment.Payment;
 import com.saisa.billing.domain.payment.PaymentAllocation;
 import com.saisa.billing.infrastructure.persistence.PaymentRepository;
+import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ public class PaymentController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "PAYMENT_POSTED", entityType = "Payment")
     public ResponseEntity<PaymentResponse> create(@Valid @RequestBody CreatePaymentRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();

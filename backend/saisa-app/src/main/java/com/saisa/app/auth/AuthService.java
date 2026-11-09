@@ -17,9 +17,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.saisa.common.audit.AuditLogService;
 import com.saisa.financial.domain.account.AccountType;
 import com.saisa.financial.domain.account.ChartOfAccount;
 import com.saisa.financial.infrastructure.persistence.ChartOfAccountRepository;
+import java.util.Map;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -33,6 +36,7 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final AuditLogService auditLog;
 
     public AuthService(TenantRepository tenantRepo,
                        UserRepository userRepo,
@@ -41,7 +45,8 @@ public class AuthService {
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authManager,
                        JwtService jwtService,
-                       RefreshTokenService refreshTokenService) {
+                       RefreshTokenService refreshTokenService,
+                       AuditLogService auditLog) {
         this.tenantRepo = tenantRepo;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -50,6 +55,7 @@ public class AuthService {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.auditLog = auditLog;
     }
 
     @Transactional
@@ -77,6 +83,9 @@ public class AuthService {
         admin.setFullName(req.fullName());
         admin.setRoles(Set.of(adminRole));
         admin = userRepo.save(admin);
+
+        auditLog.success("TENANT_REGISTERED", "Tenant", tenant.getId(),
+            Map.of("tenantCode", req.tenantCode(), "companyName", req.companyName()));
 
         return issueTokens(admin);
     }
@@ -111,24 +120,33 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest req) {
-        Tenant tenant = tenantRepo.findByTenantCode(req.tenantCode())
-            .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
-        if (!tenant.isActive()) {
-            throw new IllegalArgumentException("Tenant is not active");
+        try {
+            Tenant tenant = tenantRepo.findByTenantCode(req.tenantCode())
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+            if (!tenant.isActive()) {
+                throw new BadCredentialsException("Tenant is not active");
+            }
+
+            // Delegate password verification + load user via Spring Security
+            var auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    req.tenantCode() + ":" + req.username(), req.password()));
+
+            User user = userRepo.findByTenantIdAndUsername(tenant.getId(), req.username())
+                .orElseThrow(() -> new IllegalStateException("Authenticated user missing"));
+
+            user.setLastLoginAt(Instant.now());
+            user.setFailedLoginAttempts(0);
+
+            auditLog.success("LOGIN_SUCCESS", "User", user.getId(),
+                Map.of("tenantCode", req.tenantCode(), "username", req.username()));
+
+            return issueTokens(user);
+        } catch (BadCredentialsException e) {
+            auditLog.failure("LOGIN_FAILED", "User", null,
+                Map.of("tenantCode", req.tenantCode(), "username", req.username()));
+            throw e;
         }
-
-        // Delegate password verification + load user via Spring Security
-        var auth = authManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                req.tenantCode() + ":" + req.username(), req.password()));
-
-        User user = userRepo.findByTenantIdAndUsername(tenant.getId(), req.username())
-            .orElseThrow(() -> new IllegalStateException("Authenticated user missing"));
-
-        user.setLastLoginAt(Instant.now());
-        user.setFailedLoginAttempts(0);
-
-        return issueTokens(user);
     }
 
     private AuthResponse issueTokens(User user) {

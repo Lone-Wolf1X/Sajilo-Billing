@@ -7,6 +7,7 @@ import com.saisa.billing.domain.invoice.SalesInvoice;
 import com.saisa.billing.domain.invoice.SalesInvoiceLine;
 import com.saisa.billing.infrastructure.persistence.CustomerRepository;
 import com.saisa.billing.infrastructure.persistence.SalesInvoiceRepository;
+import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -35,6 +36,7 @@ public class SalesInvoiceController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "SALES_INVOICE_CREATED", entityType = "SalesInvoice")
     public ResponseEntity<SalesInvoiceResponse> create(
             @Valid @RequestBody CreateSalesInvoiceRequest req) {
 

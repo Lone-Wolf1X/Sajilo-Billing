@@ -48,3 +48,4 @@ public class BankAdjustment {
     @Column(name = "created_by")
     private Long createdBy;
 }
+

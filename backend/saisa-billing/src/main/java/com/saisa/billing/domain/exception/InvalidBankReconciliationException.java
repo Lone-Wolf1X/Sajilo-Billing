@@ -5,3 +5,4 @@ public class InvalidBankReconciliationException extends RuntimeException {
         super(message);
     }
 }
+

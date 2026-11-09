@@ -4,6 +4,7 @@ import com.saisa.billing.application.creditnote.CreditNoteService;
 import com.saisa.billing.domain.creditnote.CreditNote;
 import com.saisa.billing.domain.creditnote.CreditNoteLine;
 import com.saisa.billing.infrastructure.persistence.CreditNoteRepository;
+import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class CreditNoteController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "CREDIT_NOTE_POSTED", entityType = "CreditNote")
     public ResponseEntity<CreditNoteResponse> create(
             @Valid @RequestBody CreateCreditNoteRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();

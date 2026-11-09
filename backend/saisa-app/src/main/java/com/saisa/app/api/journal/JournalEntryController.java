@@ -2,6 +2,7 @@ package com.saisa.app.api.journal;
 
 import com.saisa.app.api.common.AuthenticatedUser;
 import com.saisa.app.api.common.TenantGuard;
+import com.saisa.common.audit.Auditable;
 import com.saisa.financial.application.posting.JournalPostingService;
 import com.saisa.financial.application.reversal.ReversalService;
 import com.saisa.financial.domain.account.ChartOfAccount;
@@ -118,6 +119,7 @@ public class JournalEntryController {
 
     @PostMapping("/{id}/post")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "JOURNAL_POSTED", entityType = "JournalEntry")
     public JournalEntryResponse post(@PathVariable Long id) {
         JournalEntry draft = journalRepo.findByIdWithLines(id)
             .orElseThrow(() -> new InvalidJournalEntryException("Entry not found: " + id));
@@ -136,6 +138,7 @@ public class JournalEntryController {
 
     @PostMapping("/{id}/reverse")
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @Auditable(action = "JOURNAL_REVERSED", entityType = "JournalEntry")
     public JournalEntryResponse reverse(@PathVariable Long id,
                                         @RequestBody ReverseRequest req) {
         JournalEntry original = journalRepo.findById(id)

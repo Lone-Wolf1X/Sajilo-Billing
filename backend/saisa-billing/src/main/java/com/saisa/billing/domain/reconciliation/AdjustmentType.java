@@ -6,3 +6,4 @@ public enum AdjustmentType {
     CORRECTION_IN,     // money in (fix)
     CORRECTION_OUT     // money out (fix)
 }
+

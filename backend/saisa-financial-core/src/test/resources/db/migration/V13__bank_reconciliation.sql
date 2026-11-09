@@ -60,3 +60,4 @@ CREATE INDEX idx_bsl_status ON bank_statement_lines(tenant_id, status);
 CREATE INDEX idx_bsl_payment ON bank_statement_lines(matched_payment_id) WHERE matched_payment_id IS NOT NULL;
 
 CREATE INDEX idx_adj_tenant_bank_date ON bank_adjustments(tenant_id, bank_account_id, adjustment_date);
+

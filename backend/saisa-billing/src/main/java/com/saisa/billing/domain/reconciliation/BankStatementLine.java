@@ -63,3 +63,4 @@ public class BankStatementLine {
     @Column(name = "created_by")
     private Long createdBy;
 }
+
