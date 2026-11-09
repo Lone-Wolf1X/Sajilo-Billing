@@ -88,7 +88,9 @@ public class AuthService {
         seedAccount(tenantId, "GST_OUTPUT", "GST Output Payable", AccountType.LIABILITY);
         seedAccount(tenantId, "GST_INPUT", "GST Input Credit", AccountType.ASSET);
         seedAccount(tenantId, "SALES", "Sales Revenue", AccountType.INCOME);
+        seedAccount(tenantId, "SALES_RETURN", "Sales Returns", AccountType.INCOME);
         seedAccount(tenantId, "PURCHASE", "Purchase Expense", AccountType.EXPENSE);
+        seedAccount(tenantId, "PURCHASE_RETURN", "Purchase Returns", AccountType.EXPENSE);
         seedAccount(tenantId, "COGS", "Cost of Goods Sold", AccountType.EXPENSE);
         seedAccount(tenantId, "CASH", "Cash", AccountType.ASSET);
         seedAccount(tenantId, "BANK", "Bank", AccountType.ASSET);

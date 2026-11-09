@@ -21,7 +21,9 @@ public final class SystemAccountCode {
 
     // P&L
     public static final String SALES_REVENUE = "SALES";
+    public static final String SALES_RETURN = "SALES_RETURN";
     public static final String PURCHASE_EXPENSE = "PURCHASE";
+    public static final String PURCHASE_RETURN = "PURCHASE_RETURN";
     public static final String COGS = "COGS";
 
     private SystemAccountCode() {}

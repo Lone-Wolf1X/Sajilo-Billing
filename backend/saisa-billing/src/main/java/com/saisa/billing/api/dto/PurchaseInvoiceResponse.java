@@ -38,7 +38,7 @@ public record PurchaseInvoiceResponse(
 
     public static PurchaseInvoiceResponse from(PurchaseInvoice i, List<Line> lines) {
         BigDecimal paid = i.getAmountPaid() != null ? i.getAmountPaid() : BigDecimal.ZERO;
-        BigDecimal outstanding = i.getTotalAmount() != null ? i.getTotalAmount().subtract(paid) : BigDecimal.ZERO;
+        BigDecimal outstanding = i.getAmountOutstanding();
         return new PurchaseInvoiceResponse(
             i.getId(),
             i.getInvoiceNumber(),

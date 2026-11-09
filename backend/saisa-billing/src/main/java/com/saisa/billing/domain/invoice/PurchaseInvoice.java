@@ -60,6 +60,15 @@ public class PurchaseInvoice extends BaseEntity {
     @Column(name = "amount_paid", nullable = false, precision = 20, scale = 4)
     private BigDecimal amountPaid = BigDecimal.ZERO;
 
+    @Column(name = "amount_credited", nullable = false, precision = 20, scale = 4)
+    private BigDecimal amountCredited = BigDecimal.ZERO;
+
+    public BigDecimal getAmountOutstanding() {
+        BigDecimal paid = amountPaid != null ? amountPaid : BigDecimal.ZERO;
+        BigDecimal credited = amountCredited != null ? amountCredited : BigDecimal.ZERO;
+        return totalAmount != null ? totalAmount.subtract(paid).subtract(credited) : BigDecimal.ZERO;
+    }
+
     @Column(name = "currency", nullable = false, length = 3)
     private String currency = "INR";
 

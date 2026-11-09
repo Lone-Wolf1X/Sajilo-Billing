@@ -41,12 +41,12 @@ public class AgingService {
             SELECT
                 c.id, c.customer_code, c.customer_name,
                 i.id, i.invoice_number, i.invoice_date, i.due_date,
-                i.total_amount, i.amount_paid
+                i.total_amount, i.amount_paid, i.amount_credited
             FROM sales_invoices i
             JOIN customers c ON c.id = i.customer_id
             WHERE i.tenant_id = :tenantId
               AND i.status = 'POSTED'
-              AND i.total_amount > i.amount_paid
+              AND i.total_amount > (i.amount_paid + i.amount_credited)
             ORDER BY c.customer_name, i.invoice_date
             """;
 
@@ -63,12 +63,12 @@ public class AgingService {
             SELECT
                 v.id, v.vendor_code, v.vendor_name,
                 i.id, i.invoice_number, i.invoice_date, i.due_date,
-                i.total_amount, i.amount_paid
+                i.total_amount, i.amount_paid, i.amount_credited
             FROM purchase_invoices i
             JOIN vendors v ON v.id = i.vendor_id
             WHERE i.tenant_id = :tenantId
               AND i.status = 'POSTED'
-              AND i.total_amount > i.amount_paid
+              AND i.total_amount > (i.amount_paid + i.amount_credited)
             ORDER BY v.vendor_name, i.invoice_date
             """;
         @SuppressWarnings("unchecked")
@@ -95,7 +95,8 @@ public class AgingService {
                 : ((r[6] instanceof java.sql.Date d) ? d.toLocalDate() : (LocalDate) r[6]);
             BigDecimal tot = (BigDecimal) r[7];
             BigDecimal paid = r[8] != null ? (BigDecimal) r[8] : BigDecimal.ZERO;
-            BigDecimal outstanding = tot.subtract(paid);
+            BigDecimal credited = r[9] != null ? (BigDecimal) r[9] : BigDecimal.ZERO;
+            BigDecimal outstanding = tot.subtract(paid).subtract(credited);
 
             long daysOverdue = ChronoUnit.DAYS.between(dueDate, asOfDate);
             if (daysOverdue < 0) daysOverdue = 0;
