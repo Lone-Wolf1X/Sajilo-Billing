@@ -25,3 +25,4 @@ public class JournalEntryQueryService {
             PageRequest.of(0, Math.min(limit, 200)));
     }
 }
+

@@ -3,7 +3,10 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ChartOfAccountsPage } from './pages/accounts/ChartOfAccountsPage';
+import { JournalEntriesPage } from './pages/journal/JournalEntriesPage';
 import { JournalEntryFormPage } from './pages/journal/JournalEntryFormPage';
+import { JournalEntryDetailPage } from './pages/journal/JournalEntryDetailPage';
+import { GeneralLedgerPage } from './pages/ledger/GeneralLedgerPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -39,12 +42,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'journal-entries',
-            element: (
-              <ModulePlaceholderPage
-                title="Journal Entries & Vouchers"
-                stepName="Step 16 Part 3B"
-              />
-            ),
+            element: <JournalEntriesPage />,
           },
           {
             path: 'journal-entries/new',
@@ -52,12 +50,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'journal-entries/:id',
-            element: (
-              <ModulePlaceholderPage
-                title="Journal Entry Details"
-                stepName="Step 16 Part 3B"
-              />
-            ),
+            element: <JournalEntryDetailPage />,
           },
           {
             path: 'journal-entries/contra',
@@ -70,12 +63,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'ledger',
-            element: (
-              <ModulePlaceholderPage
-                title="General Ledger Statement"
-                stepName="Step 16: Financial Core UI"
-              />
-            ),
+            element: <GeneralLedgerPage />,
           },
           {
             path: 'periods',

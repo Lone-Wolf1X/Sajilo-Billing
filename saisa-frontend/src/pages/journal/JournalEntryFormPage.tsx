@@ -46,3 +46,4 @@ export const JournalEntryFormPage: React.FC = () => {
     </div>
   );
 };
+

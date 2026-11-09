@@ -304,3 +304,4 @@ export const JournalEntryForm: React.FC = () => {
     </form>
   );
 };
+

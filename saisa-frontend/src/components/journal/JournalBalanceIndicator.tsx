@@ -49,3 +49,4 @@ export const JournalBalanceIndicator: React.FC<Props> = ({
     </div>
   );
 };
+

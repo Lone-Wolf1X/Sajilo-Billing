@@ -1,0 +1,70 @@
+/* Print-specific overrides */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+  }
+
+  main,
+  .main-content {
+    background: #ffffff !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .data-table {
+    border: 1px solid #000 !important;
+    font-size: 9.5pt !important;
+    page-break-inside: auto;
+    width: 100% !important;
+  }
+
+  .data-table thead {
+    display: table-header-group;
+  }
+
+  .data-table th {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    border: 1px solid #000 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .data-table td {
+    border: 1px solid #777777 !important;
+    padding: 4pt 6pt !important;
+  }
+
+  .data-table tfoot td {
+    border-top: 3px double #000000 !important;
+    font-weight: bold;
+  }
+
+  .ledger-print-container {
+    page-break-inside: avoid;
+  }
+
+  .ledger-print-container h2,
+  .ledger-print-container h3 {
+    color: #000000 !important;
+  }
+
+  @page {
+    margin: 1.2cm;
+    size: A4 portrait;
+  }
+}
