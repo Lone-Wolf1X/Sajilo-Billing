@@ -6,9 +6,9 @@ export interface Item {
   unitOfMeasure: string;
   hsnCode?: string | null;
   tracksInventory: boolean;
-  salePrice?: number | null;
-  purchasePrice?: number | null;
-  reorderLevel?: number | null;
+  salePrice?: number | string | null;
+  purchasePrice?: number | string | null;
+  reorderLevel?: number | string | null;
   active: boolean;
 }
 
@@ -19,8 +19,18 @@ export interface CreateItemRequest {
   unitOfMeasure?: string;
   hsnCode?: string;
   tracksInventory?: boolean;
-  salePrice?: number;
-  purchasePrice?: number;
-  reorderLevel?: number;
+  salePrice?: number | string;
+  purchasePrice?: number | string;
+  reorderLevel?: number | string;
 }
 
+export interface UpdateItemRequest {
+  name?: string;
+  description?: string;
+  unitOfMeasure?: string;
+  hsnCode?: string;
+  salePrice?: number | string;
+  purchasePrice?: number | string;
+  reorderLevel?: number | string;
+  active?: boolean;
+}

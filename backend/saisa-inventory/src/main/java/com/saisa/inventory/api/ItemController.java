@@ -3,6 +3,7 @@ package com.saisa.inventory.api;
 import com.saisa.common.tenant.TenantContext;
 import com.saisa.inventory.api.dto.CreateItemRequest;
 import com.saisa.inventory.api.dto.ItemResponse;
+import com.saisa.inventory.api.dto.UpdateItemRequest;
 import com.saisa.inventory.domain.item.Item;
 import com.saisa.inventory.infrastructure.persistence.ItemRepository;
 import jakarta.validation.Valid;
@@ -59,6 +60,32 @@ public class ItemController {
 
         Item saved = itemRepo.save(item);
         return ResponseEntity.status(HttpStatus.CREATED).body(ItemResponse.from(saved));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    public ItemResponse update(@PathVariable Long id, @Valid @RequestBody UpdateItemRequest req) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+
+        Item item = itemRepo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found: " + id));
+        if (!item.getTenantId().equals(tenantId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
+        }
+
+        if (req.name() != null) item.setName(req.name());
+        if (req.description() != null) item.setDescription(req.description());
+        if (req.hsnCode() != null) item.setHsnCode(req.hsnCode());
+        if (req.unitOfMeasure() != null && !req.unitOfMeasure().isBlank()) item.setUnitOfMeasure(req.unitOfMeasure());
+        if (req.salePrice() != null) item.setSalePrice(req.salePrice());
+        if (req.purchasePrice() != null) item.setPurchasePrice(req.purchasePrice());
+        if (req.reorderLevel() != null) item.setReorderLevel(req.reorderLevel());
+        if (req.active() != null) item.setActive(req.active());
+
+        item.setUpdatedBy(TenantContext.getCurrentUserId());
+        Item saved = itemRepo.save(item);
+
+        return ItemResponse.from(saved);
     }
 
     @GetMapping

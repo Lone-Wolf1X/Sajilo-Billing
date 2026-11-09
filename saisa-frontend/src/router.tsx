@@ -24,6 +24,7 @@ import { CreditNoteDetailPage } from './pages/creditnote/CreditNoteDetailPage';
 import { DebitNoteFormPage } from './pages/debitnote/DebitNoteFormPage';
 import { DebitNotesPage } from './pages/debitnote/DebitNotesPage';
 import { DebitNoteDetailPage } from './pages/debitnote/DebitNoteDetailPage';
+import { ItemsPage } from './pages/items/ItemsPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -189,13 +190,12 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: 'items',
+            element: <ItemsPage />,
+          },
+          {
             path: 'inventory/items',
-            element: (
-              <ModulePlaceholderPage
-                title="Stock Items & SKU Catalog [F10]"
-                stepName="Step 18: Inventory & Purchasing UI"
-              />
-            ),
+            element: <ItemsPage />,
           },
           {
             path: 'inventory/warehouses',

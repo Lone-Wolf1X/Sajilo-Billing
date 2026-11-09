@@ -101,6 +101,8 @@ public class AuthService {
         seedAccount(tenantId, "PURCHASE", "Purchase Expense", AccountType.EXPENSE);
         seedAccount(tenantId, "PURCHASE_RETURN", "Purchase Returns", AccountType.EXPENSE);
         seedAccount(tenantId, "COGS", "Cost of Goods Sold", AccountType.EXPENSE);
+        seedAccount(tenantId, "INVENTORY_GAIN", "Inventory Adjustment Gain", AccountType.INCOME);
+        seedAccount(tenantId, "INVENTORY_LOSS", "Inventory Adjustment Loss", AccountType.EXPENSE);
         seedAccount(tenantId, "BANK_CHARGES", "Bank Charges", AccountType.EXPENSE);
         seedAccount(tenantId, "INTEREST_INCOME", "Interest Income", AccountType.INCOME);
         seedAccount(tenantId, "SUSPENSE", "Suspense Account", AccountType.LIABILITY);

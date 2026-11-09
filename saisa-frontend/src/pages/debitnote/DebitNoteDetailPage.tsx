@@ -376,3 +376,4 @@ export const DebitNoteDetailPage: React.FC = () => {
     </div>
   );
 };
+

@@ -2,6 +2,7 @@ package com.saisa.inventory.api;
 
 import com.saisa.common.tenant.TenantContext;
 import com.saisa.inventory.api.dto.CreateWarehouseRequest;
+import com.saisa.inventory.api.dto.UpdateWarehouseRequest;
 import com.saisa.inventory.api.dto.WarehouseResponse;
 import com.saisa.inventory.domain.warehouse.Warehouse;
 import com.saisa.inventory.infrastructure.persistence.WarehouseRepository;
@@ -47,6 +48,27 @@ public class WarehouseController {
 
         Warehouse saved = warehouseRepo.save(wh);
         return ResponseEntity.status(HttpStatus.CREATED).body(WarehouseResponse.from(saved));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    public WarehouseResponse update(@PathVariable Long id, @Valid @RequestBody UpdateWarehouseRequest req) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+
+        Warehouse wh = warehouseRepo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Warehouse not found"));
+        if (!wh.getTenantId().equals(tenantId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Warehouse not found");
+        }
+
+        if (req.name() != null) wh.setName(req.name());
+        if (req.address() != null) wh.setAddress(req.address());
+        if (req.isDefault() != null) wh.setDefaultWarehouse(req.isDefault());
+        if (req.active() != null) wh.setActive(req.active());
+
+        wh.setUpdatedBy(TenantContext.getCurrentUserId());
+        Warehouse saved = warehouseRepo.save(wh);
+        return WarehouseResponse.from(saved);
     }
 
     @GetMapping

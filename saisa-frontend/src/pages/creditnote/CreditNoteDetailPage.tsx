@@ -376,3 +376,4 @@ export const CreditNoteDetailPage: React.FC = () => {
     </div>
   );
 };
+

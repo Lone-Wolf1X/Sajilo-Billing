@@ -1,5 +1,5 @@
 import apiClient from '../lib/axios';
-import type { Item } from '../types/item';
+import type { Item, CreateItemRequest, UpdateItemRequest } from '../types/item';
 
 export const itemsService = {
   async list(): Promise<Item[]> {
@@ -11,5 +11,14 @@ export const itemsService = {
     const res = await apiClient.get<Item>(`/api/v1/items/${id}`);
     return res.data;
   },
-};
 
+  async create(payload: CreateItemRequest): Promise<Item> {
+    const res = await apiClient.post<Item>('/api/v1/items', payload);
+    return res.data;
+  },
+
+  async update(id: number, payload: UpdateItemRequest): Promise<Item> {
+    const res = await apiClient.put<Item>(`/api/v1/items/${id}`, payload);
+    return res.data;
+  },
+};
