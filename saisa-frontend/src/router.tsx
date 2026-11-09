@@ -7,6 +7,8 @@ import { JournalEntriesPage } from './pages/journal/JournalEntriesPage';
 import { JournalEntryFormPage } from './pages/journal/JournalEntryFormPage';
 import { JournalEntryDetailPage } from './pages/journal/JournalEntryDetailPage';
 import { GeneralLedgerPage } from './pages/ledger/GeneralLedgerPage';
+import { SalesInvoicesPage } from './pages/invoices/SalesInvoicesPage';
+import { SalesInvoiceFormPage } from './pages/invoices/SalesInvoiceFormPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -86,21 +88,11 @@ export const router = createBrowserRouter([
           // Billing & Invoices
           {
             path: 'invoices',
-            element: (
-              <ModulePlaceholderPage
-                title="Sales Invoices"
-                stepName="Step 17: Billing & Invoicing UI"
-              />
-            ),
+            element: <SalesInvoicesPage />,
           },
           {
             path: 'invoices/new',
-            element: (
-              <ModulePlaceholderPage
-                title="New Sales Invoice [F8]"
-                stepName="Step 17: Billing & Invoicing UI"
-              />
-            ),
+            element: <SalesInvoiceFormPage />,
           },
           {
             path: 'payments/receipt',
