@@ -87,3 +87,4 @@ export interface SetupStatus {
   setupCompletedAt?: string;
   setupStep: number;
 }
+

@@ -38,6 +38,19 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     Optional<JournalEntry> findByTenantIdAndReferenceTypeAndReferenceId(Long tenantId, String referenceType, Long referenceId);
 
     @Query("""
+        SELECT j FROM JournalEntry j
+        LEFT JOIN FETCH j.lines
+        WHERE j.tenantId = :tenantId
+          AND j.referenceType = :referenceType
+          AND j.referenceId = :referenceId
+        ORDER BY j.id DESC
+        """)
+    List<JournalEntry> findByTenantIdAndReferenceWithLines(
+        @Param("tenantId") Long tenantId,
+        @Param("referenceType") String referenceType,
+        @Param("referenceId") Long referenceId);
+
+    @Query("""
         SELECT je FROM JournalEntry je
         WHERE je.tenantId = :tenantId
           AND (:fromDate IS NULL OR je.entryDate >= :fromDate)

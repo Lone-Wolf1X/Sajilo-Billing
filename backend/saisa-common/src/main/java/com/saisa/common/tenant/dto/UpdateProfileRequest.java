@@ -31,3 +31,4 @@ public record UpdateProfileRequest(
     String authorizedPersonEmail,
     Integer setupStep
 ) {}
+

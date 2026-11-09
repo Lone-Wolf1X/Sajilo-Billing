@@ -108,6 +108,14 @@ public class AuthService {
         seedAccount(tenantId, "SUSPENSE", "Suspense Account", AccountType.LIABILITY);
         seedAccount(tenantId, "CASH", "Cash", AccountType.ASSET);
         seedAccount(tenantId, "BANK", "Bank", AccountType.ASSET);
+        // Phase 2 setup accounts (Opening Balance)
+        seedAccount(tenantId, "FIXED_ASSETS", "Fixed Assets", AccountType.ASSET);
+        seedAccount(tenantId, "INVESTMENTS", "Investments", AccountType.ASSET);
+        seedAccount(tenantId, "OTHER_ASSETS", "Other Assets", AccountType.ASSET);
+        seedAccount(tenantId, "BANK_LOANS", "Bank Loans", AccountType.LIABILITY);
+        seedAccount(tenantId, "OTHER_LIABILITIES", "Other Liabilities", AccountType.LIABILITY);
+        seedAccount(tenantId, "CAPITAL", "Owner's Capital", AccountType.EQUITY);
+        seedAccount(tenantId, "RETAINED_EARNINGS", "Retained Earnings", AccountType.EQUITY);
     }
 
     private void seedAccount(Long tenantId, String code, String name, AccountType type) {

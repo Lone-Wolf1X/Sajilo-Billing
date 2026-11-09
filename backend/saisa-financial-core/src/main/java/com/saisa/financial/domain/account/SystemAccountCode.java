@@ -31,6 +31,15 @@ public final class SystemAccountCode {
     public static final String INTEREST_INCOME = "INTEREST_INCOME";
     public static final String SUSPENSE = "SUSPENSE";
 
+    // ========== Opening Balance Accounts (Phase 2 Setup) ==========
+    public static final String FIXED_ASSETS = "FIXED_ASSETS";
+    public static final String INVESTMENTS = "INVESTMENTS";
+    public static final String OTHER_ASSETS = "OTHER_ASSETS";
+    public static final String BANK_LOANS = "BANK_LOANS";
+    public static final String OTHER_LIABILITIES = "OTHER_LIABILITIES";
+    public static final String CAPITAL = "CAPITAL";
+    public static final String RETAINED_EARNINGS = "RETAINED_EARNINGS";
+
     private SystemAccountCode() {}
 }
 

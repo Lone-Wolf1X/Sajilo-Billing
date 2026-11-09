@@ -9,3 +9,4 @@ public enum BusinessNature {
     MIXED,
     OTHER
 }
+
