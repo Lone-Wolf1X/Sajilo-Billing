@@ -18,3 +18,4 @@ export const bankAccountsService = {
     return res.data;
   },
 };
+

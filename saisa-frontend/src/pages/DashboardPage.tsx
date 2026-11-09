@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -7,8 +7,30 @@ import {
   PackageCheck,
 } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { useArAging, useApAging } from '../hooks/useAging';
+import { useBankAccounts } from '../hooks/useBankAccounts';
 
 export const DashboardPage: React.FC = () => {
+  const { data: arAging } = useArAging();
+  const { data: apAging } = useApAging();
+  const { bankAccounts = [] } = useBankAccounts();
+
+  const totalReceivables = Number(arAging?.totalOutstanding) || 0;
+  const overdueAR =
+    (Number(arAging?.bucket31To60) || 0) +
+    (Number(arAging?.bucket61To90) || 0) +
+    (Number(arAging?.bucket90Plus) || 0);
+  const overdueARCount =
+    arAging?.rows?.filter((r) => r.daysOverdue > 30).length || 0;
+
+  const totalPayables = Number(apAging?.totalOutstanding) || 0;
+  const upcomingAP = Number(apAging?.bucket0To30) || 0;
+
+  const defaultBank = useMemo(
+    () => bankAccounts.find((b) => b.defaultAccount) || bankAccounts[0],
+    [bankAccounts]
+  );
+
   return (
     <div className="space-y-6">
       {/* 1. Executive Summary Ribbon (4 Metric Cards) */}
@@ -17,16 +39,28 @@ export const DashboardPage: React.FC = () => {
         <div className="card p-4 hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start text-xs text-paper-muted uppercase tracking-wider font-semibold">
             <span>Total Receivables</span>
-            <span className="text-ledger-green bg-ledger-green-light px-1.5 py-0.5 rounded text-[10px]">
-              +12.4% vs LM
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] ${
+                overdueARCount > 0
+                  ? 'bg-rose-100 text-rose-800'
+                  : 'bg-emerald-100 text-emerald-800'
+              }`}
+            >
+              {overdueARCount > 0 ? `${overdueARCount} Overdue` : 'Current'}
             </span>
           </div>
           <div className="text-2xl font-bold font-mono text-brand-navy mt-1">
-            {formatMoney(248500.0)}
+            {formatMoney(totalReceivables)}
           </div>
           <div className="text-xs text-paper-muted mt-2 flex items-center justify-between border-t border-dashed border-paper-border pt-1.5">
             <span>Overdue (&gt;30d):</span>
-            <span className="font-mono text-ledger-red font-medium">₹18,200.00</span>
+            <span
+              className={`font-mono font-medium ${
+                overdueAR > 0 ? 'text-ledger-red' : 'text-paper-muted'
+              }`}
+            >
+              {formatMoney(overdueAR)}
+            </span>
           </div>
         </div>
 
@@ -35,30 +69,36 @@ export const DashboardPage: React.FC = () => {
           <div className="flex justify-between items-start text-xs text-paper-muted uppercase tracking-wider font-semibold">
             <span>Total Payables</span>
             <span className="text-ledger-amber bg-ledger-amber-light px-1.5 py-0.5 rounded text-[10px]">
-              Due in 7 days
+              Accounts Payable
             </span>
           </div>
           <div className="text-2xl font-bold font-mono text-brand-maroon mt-1">
-            {formatMoney(112400.0)}
+            {formatMoney(totalPayables)}
           </div>
           <div className="text-xs text-paper-muted mt-2 flex items-center justify-between border-t border-dashed border-paper-border pt-1.5">
-            <span>Upcoming (Vendor AP):</span>
-            <span className="font-mono text-paper-text font-medium">₹45,000.00</span>
+            <span>Current (0-30d):</span>
+            <span className="font-mono text-paper-text font-medium">
+              {formatMoney(upcomingAP)}
+            </span>
           </div>
         </div>
 
         {/* Card 3: Bank & Cash */}
         <div className="card p-4 hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start text-xs text-paper-muted uppercase tracking-wider font-semibold">
-            <span>Cash & Bank Balance</span>
-            <span className="text-ledger-green font-semibold">Reconciled ✓</span>
+            <span>Cash & Bank Register</span>
+            <span className="text-ledger-green font-semibold">
+              {bankAccounts.length} Account(s)
+            </span>
           </div>
           <div className="text-2xl font-bold font-mono text-ledger-green mt-1">
             {formatMoney(385920.0)}
           </div>
           <div className="text-xs text-paper-muted mt-2 flex items-center justify-between border-t border-dashed border-paper-border pt-1.5">
-            <span>HDFC Operating:</span>
-            <span className="font-mono text-paper-text font-medium">₹3,42,120.00</span>
+            <span>Primary Operating:</span>
+            <span className="font-mono text-paper-text font-medium truncate max-w-[150px]">
+              {defaultBank ? defaultBank.accountName : 'Cash Account'}
+            </span>
           </div>
         </div>
 

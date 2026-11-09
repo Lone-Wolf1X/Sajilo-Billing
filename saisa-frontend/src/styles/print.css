@@ -54,8 +54,17 @@
     font-weight: bold;
   }
 
-  .ledger-print-container {
+  .ledger-print-container,
+  .payment-print-container {
     page-break-inside: avoid;
+  }
+
+  .payment-print-container {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
   }
 
   .ledger-print-container h2,

@@ -13,6 +13,9 @@ import { SalesInvoiceDetailPage } from './pages/invoices/SalesInvoiceDetailPage'
 import { PurchaseInvoicesPage } from './pages/invoices/PurchaseInvoicesPage';
 import { PurchaseInvoiceFormPage } from './pages/invoices/PurchaseInvoiceFormPage';
 import { PaymentFormPage } from './pages/payments/PaymentFormPage';
+import { PaymentsPage } from './pages/payments/PaymentsPage';
+import { PaymentDetailPage } from './pages/payments/PaymentDetailPage';
+import { BankAccountsPage } from './pages/bankAccounts/BankAccountsPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -103,12 +106,28 @@ export const router = createBrowserRouter([
             element: <SalesInvoiceDetailPage />,
           },
           {
+            path: 'payments',
+            element: <PaymentsPage />,
+          },
+          {
             path: 'payments/receipt',
             element: <PaymentFormPage mode="receipt" />,
           },
           {
             path: 'payments/new-receipt',
             element: <PaymentFormPage mode="receipt" />,
+          },
+          {
+            path: 'payments/vendor',
+            element: <PaymentFormPage mode="payment" />,
+          },
+          {
+            path: 'payments/new-payment',
+            element: <PaymentFormPage mode="payment" />,
+          },
+          {
+            path: 'payments/:id',
+            element: <PaymentDetailPage />,
           },
           {
             path: 'credit-notes',
@@ -136,14 +155,6 @@ export const router = createBrowserRouter([
           {
             path: 'purchase-invoices/new',
             element: <PurchaseInvoiceFormPage />,
-          },
-          {
-            path: 'payments/vendor',
-            element: <PaymentFormPage mode="payment" />,
-          },
-          {
-            path: 'payments/new-payment',
-            element: <PaymentFormPage mode="payment" />,
           },
           {
             path: 'vendors',
@@ -202,12 +213,11 @@ export const router = createBrowserRouter([
           // Banking
           {
             path: 'banking/accounts',
-            element: (
-              <ModulePlaceholderPage
-                title="Bank Account Register"
-                stepName="Step 20: Bank Reconciliation UI"
-              />
-            ),
+            element: <BankAccountsPage />,
+          },
+          {
+            path: 'bank-accounts',
+            element: <BankAccountsPage />,
           },
           {
             path: 'banking/reconcile',

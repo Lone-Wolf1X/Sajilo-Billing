@@ -261,3 +261,4 @@ export const InvoiceAllocationTable: React.FC<Props> = ({
     </div>
   );
 };
+

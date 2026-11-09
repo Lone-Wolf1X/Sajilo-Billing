@@ -23,3 +23,4 @@ export interface AgingReport {
   bucket90Plus: number | string;
   totalOutstanding: number | string;
 }
+

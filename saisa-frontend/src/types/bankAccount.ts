@@ -19,3 +19,4 @@ export interface CreateBankAccountRequest {
   glAccountId: number;
   defaultAccount?: boolean;
 }
+
