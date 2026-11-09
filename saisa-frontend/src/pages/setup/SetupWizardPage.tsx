@@ -8,11 +8,8 @@ import {
   UserCheck,
   CheckCircle2,
   ArrowRight,
-  ArrowLeft,
   Clock,
   Sparkles,
-  Warehouse,
-  Boxes,
   Check,
 } from 'lucide-react';
 import {
@@ -26,6 +23,7 @@ import {
   AddressValue,
 } from '../../components/setup/CascadingAddressSelector';
 import { OpeningBalancesStep } from '../../components/setup/OpeningBalancesStep';
+import { Phase3InventoryStep } from '../../components/setup/Phase3InventoryStep';
 import type { IncorporationType, BusinessNature } from '../../types/setup';
 import rawAuthorities from '../../data/registration_authorities.json';
 
@@ -154,16 +152,6 @@ export const SetupWizardPage: React.FC = () => {
       }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || 'Failed to save company profile.');
-    }
-  };
-
-  const handleFinishAll = async () => {
-    try {
-      await completeMutation.mutateAsync();
-      toast.success('🎉 बधाई छ! सम्पूर्ण सेटअप सफलतापूर्वक सम्पन्न भयो।');
-      navigate('/dashboard');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to complete setup.');
     }
   };
 
@@ -643,81 +631,14 @@ export const SetupWizardPage: React.FC = () => {
 
       {/* PHASE 3: Inventory Quickstart Step */}
       {currentStep === 3 && (
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-lg p-6 shadow-sm">
-            <div className="flex items-start gap-4 pb-5 border-b border-neutral-200 dark:border-neutral-800">
-              <div className="w-12 h-12 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-700 dark:text-blue-300 flex-shrink-0">
-                <Boxes className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-semibold mb-1">
-                  <Warehouse className="w-3.5 h-3.5" />
-                  <span>चरण ३: मौज्दात तथा गोदाम (Phase 3: Inventory Quickstart)</span>
-                </div>
-                <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-neutral-100">
-                  गोदाम र सामान व्यवस्थापन (Warehouse & Items Ready)
-                </h2>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-                  तपाईंको कम्पनीको मुख्य गोदाम (Main Godown) स्वचालित रूपमा दर्ता भइसकेको छ। अब नयाँ सामानहरू थप्न र मौज्दात व्यवस्थापन गर्न सक्नुहुन्छ।
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-              <div className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30">
-                <div className="flex items-center gap-2 mb-2 font-serif font-bold text-neutral-900 dark:text-neutral-100">
-                  <Warehouse className="w-4 h-4 text-primary-600" />
-                  <span>मुख्य गोदाम (Main Godown)</span>
-                </div>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  सबै बिक्री, खरिद र सामान भण्डारणको मुख्य ठेगाना सक्रिय छ। नयाँ गोदाम आवश्यक परे गोदाम सूचीबाट थप्न सकिनेछ।
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30">
-                <div className="flex items-center gap-2 mb-2 font-serif font-bold text-neutral-900 dark:text-neutral-100">
-                  <Boxes className="w-4 h-4 text-emerald-600" />
-                  <span>सामान सूची (Items Catalog)</span>
-                </div>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                  उत्पादन, खरिद दर, बिक्री दर तथा प्रारम्भिक मौज्दात संख्या सिधै सामान व्यवस्थापन खण्डबाट प्रविष्टि गर्नुहोस्।
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
-              <button
-                type="button"
-                onClick={() => goToStep(2)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>प्रारम्भिक मौज्दातमा फर्कनुहोस् (Back to Opening Balances)</span>
-              </button>
-
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => navigate('/items')}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 rounded border border-neutral-300 dark:border-neutral-700 transition-colors"
-                >
-                  सामानहरू व्यवस्थापन गर्नुहोस् (Go to Items)
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleFinishAll}
-                  disabled={completeMutation.isPending}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>सेटअप सम्पन्न गर्नुहोस् (Finish Setup & Enter)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Phase3InventoryStep
+          businessNature={profile?.businessNature || businessNature}
+          onBack={() => goToStep(2)}
+          onComplete={() => {
+            toast.success('🎉 बधाई छ! सम्पूर्ण सेटअप सफलतापूर्वक सम्पन्न भयो।');
+            navigate('/dashboard');
+          }}
+        />
       )}
     </div>
   );

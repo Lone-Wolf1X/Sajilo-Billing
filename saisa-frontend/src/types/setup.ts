@@ -116,4 +116,33 @@ export interface OpeningBalanceResponse {
   balanced: boolean;
 }
 
+export interface OpeningStockLine {
+  itemId: number;
+  quantity: string | number;
+  unitCost: string | number;
+}
+
+export interface OpeningStockRequest {
+  openingDate: string;
+  warehouseId: number;
+  lines: OpeningStockLine[];
+}
+
+export interface OpeningStockResponse {
+  posted: boolean;
+  journalEntryId: number | null;
+  journalEntryNumber: string | null;
+  openingDate: string | null;
+  warehouseId: number | null;
+  itemCount: number;
+  totalQuantity: number | string;
+  totalValue: number | string;
+}
+
+export interface BulkItemResponse {
+  createdCount: number;
+  items: any[];
+}
+
+
 

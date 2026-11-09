@@ -61,3 +61,18 @@ export function useUpdateItem() {
     },
   });
 }
+
+export function useCreateBulkItems() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (items: CreateItemRequest[]) => itemsService.createBulk(items),
+    onSuccess: (resp) => {
+      qc.invalidateQueries({ queryKey: ITEMS_QUERY_KEY });
+      toast.success(`Successfully created ${resp.createdCount} items`);
+    },
+    onError: (err: unknown) => {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(msg ?? 'Failed to create items in bulk');
+    },
+  });
+}

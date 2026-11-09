@@ -17,6 +17,11 @@ export const itemsService = {
     return res.data;
   },
 
+  async createBulk(items: CreateItemRequest[]): Promise<{ createdCount: number; items: Item[] }> {
+    const res = await apiClient.post<{ createdCount: number; items: Item[] }>('/api/v1/items/bulk', { items });
+    return res.data;
+  },
+
   async update(id: number, payload: UpdateItemRequest): Promise<Item> {
     const res = await apiClient.put<Item>(`/api/v1/items/${id}`, payload);
     return res.data;

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { setupService } from '../services/setupService';
-import type { UpdateProfileRequest, OpeningBalanceRequest } from '../types/setup';
+import type { UpdateProfileRequest, OpeningBalanceRequest, OpeningStockRequest } from '../types/setup';
 
 export const useCompanyProfile = () => {
   return useQuery({
@@ -86,6 +86,38 @@ export const useResetOpeningBalance = () => {
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message ?? 'Failed to reset opening balance');
+    },
+  });
+};
+
+export const useOpeningStock = () => {
+  return useQuery({
+    queryKey: ['setup', 'opening-stock'],
+    queryFn: () => setupService.getOpeningStock(),
+    staleTime: 0,
+  });
+};
+
+export const usePostOpeningStock = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: OpeningStockRequest) => setupService.postOpeningStock(payload),
+    onSuccess: (resp) => {
+      queryClient.invalidateQueries({ queryKey: ['setup'] });
+      queryClient.invalidateQueries({ queryKey: ['items'] });
+      queryClient.invalidateQueries({ queryKey: ['stock'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+      queryClient.invalidateQueries({ queryKey: ['trial-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['balance-sheet'] });
+      toast.success(
+        resp.journalEntryNumber
+          ? `Opening stock posted as voucher ${resp.journalEntryNumber}`
+          : 'Opening stock recorded successfully'
+      );
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to post opening stock');
     },
   });
 };

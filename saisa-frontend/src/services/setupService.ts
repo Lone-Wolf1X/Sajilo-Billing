@@ -5,6 +5,8 @@ import type {
   SetupStatus,
   OpeningBalanceRequest,
   OpeningBalanceResponse,
+  OpeningStockRequest,
+  OpeningStockResponse,
 } from '../types/setup';
 
 export const setupService = {
@@ -59,5 +61,15 @@ export const setupService = {
     await apiClient.delete('/api/v1/setup/opening-balances', {
       params: { reason },
     });
+  },
+
+  async getOpeningStock(): Promise<OpeningStockResponse> {
+    const res = await apiClient.get<OpeningStockResponse>('/api/v1/setup/opening-stock');
+    return res.data;
+  },
+
+  async postOpeningStock(payload: OpeningStockRequest): Promise<OpeningStockResponse> {
+    const res = await apiClient.post<OpeningStockResponse>('/api/v1/setup/opening-stock', payload);
+    return res.data;
   },
 };
