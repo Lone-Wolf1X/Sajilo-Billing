@@ -132,3 +132,4 @@ export const GeneralLedgerPage: React.FC = () => {
     </div>
   );
 };
+

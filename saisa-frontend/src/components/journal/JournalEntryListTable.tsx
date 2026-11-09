@@ -75,3 +75,4 @@ export const JournalEntryListTable: React.FC<Props> = ({ entries }) => {
     </Table>
   );
 };
+

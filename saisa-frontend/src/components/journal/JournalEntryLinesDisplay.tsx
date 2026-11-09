@@ -101,3 +101,4 @@ export const JournalEntryLinesDisplay: React.FC<Props> = ({
     </div>
   );
 };
+

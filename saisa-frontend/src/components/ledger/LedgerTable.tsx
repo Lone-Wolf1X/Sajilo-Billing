@@ -173,3 +173,4 @@ export const LedgerTable: React.FC<Props> = ({
     </div>
   );
 };
+

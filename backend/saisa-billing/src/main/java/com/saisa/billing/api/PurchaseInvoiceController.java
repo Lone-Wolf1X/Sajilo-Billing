@@ -3,6 +3,7 @@ package com.saisa.billing.api;
 import com.saisa.billing.api.dto.CreatePurchaseInvoiceRequest;
 import com.saisa.billing.api.dto.PurchaseInvoiceResponse;
 import com.saisa.billing.application.BillingService;
+import com.saisa.billing.domain.invoice.InvoiceStatus;
 import com.saisa.billing.domain.invoice.PurchaseInvoice;
 import com.saisa.billing.domain.invoice.PurchaseInvoiceLine;
 import com.saisa.billing.infrastructure.persistence.PurchaseInvoiceRepository;
@@ -10,6 +11,9 @@ import com.saisa.billing.infrastructure.persistence.VendorRepository;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +35,24 @@ public class PurchaseInvoiceController {
         this.billingService = billingService;
         this.purchaseRepo = purchaseRepo;
         this.vendorRepo = vendorRepo;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<PurchaseInvoiceResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) Long vendorId,
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(defaultValue = "50") int limit) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        List<PurchaseInvoice> invoices = purchaseRepo.findWithFilters(
+            tenantId, from, to, vendorId, status,
+            PageRequest.of(0, Math.min(limit, 200)));
+
+        return invoices.stream()
+            .map(i -> PurchaseInvoiceResponse.from(i, List.of()))
+            .toList();
     }
 
     @PostMapping

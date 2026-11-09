@@ -23,6 +23,16 @@ public class CustomerController {
         this.customerRepo = customerRepo;
     }
 
+    @GetMapping
+    @Transactional(readOnly = true)
+    public java.util.List<CustomerResponse> list() {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        return customerRepo.findByTenantIdOrderByCustomerName(tenantId)
+            .stream()
+            .map(CustomerResponse::from)
+            .toList();
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<CustomerResponse> create(@Valid @RequestBody CreateCustomerRequest req) {

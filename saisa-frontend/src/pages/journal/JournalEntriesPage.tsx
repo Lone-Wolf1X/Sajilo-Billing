@@ -156,3 +156,4 @@ export const JournalEntriesPage: React.FC = () => {
     </div>
   );
 };
+

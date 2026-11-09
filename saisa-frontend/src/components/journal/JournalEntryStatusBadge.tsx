@@ -31,3 +31,4 @@ export const JournalEntryStatusBadge: React.FC<{ status: EntryStatus }> = ({
     </span>
   );
 };
+

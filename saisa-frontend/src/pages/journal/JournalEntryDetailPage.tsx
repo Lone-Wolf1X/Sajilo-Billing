@@ -222,3 +222,4 @@ export const JournalEntryDetailPage: React.FC = () => {
     </div>
   );
 };
+

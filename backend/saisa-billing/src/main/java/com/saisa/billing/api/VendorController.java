@@ -23,6 +23,16 @@ public class VendorController {
         this.vendorRepo = vendorRepo;
     }
 
+    @GetMapping
+    @Transactional(readOnly = true)
+    public java.util.List<VendorResponse> list() {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        return vendorRepo.findByTenantIdOrderByVendorName(tenantId)
+            .stream()
+            .map(VendorResponse::from)
+            .toList();
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<VendorResponse> create(@Valid @RequestBody CreateVendorRequest req) {

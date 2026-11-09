@@ -77,3 +77,4 @@ export const LedgerFilterBar: React.FC<Props> = ({
     </div>
   );
 };
+

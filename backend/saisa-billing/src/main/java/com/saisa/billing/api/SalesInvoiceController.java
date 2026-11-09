@@ -3,6 +3,7 @@ package com.saisa.billing.api;
 import com.saisa.billing.api.dto.CreateSalesInvoiceRequest;
 import com.saisa.billing.api.dto.SalesInvoiceResponse;
 import com.saisa.billing.application.BillingService;
+import com.saisa.billing.domain.invoice.InvoiceStatus;
 import com.saisa.billing.domain.invoice.SalesInvoice;
 import com.saisa.billing.domain.invoice.SalesInvoiceLine;
 import com.saisa.billing.infrastructure.persistence.CustomerRepository;
@@ -11,6 +12,9 @@ import com.saisa.common.audit.Auditable;
 import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +36,24 @@ public class SalesInvoiceController {
         this.billingService = billingService;
         this.salesRepo = salesRepo;
         this.customerRepo = customerRepo;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<SalesInvoiceResponse> list(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) Long customerId,
+            @RequestParam(required = false) InvoiceStatus status,
+            @RequestParam(defaultValue = "50") int limit) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        List<SalesInvoice> invoices = salesRepo.findWithFilters(
+            tenantId, from, to, customerId, status,
+            PageRequest.of(0, Math.min(limit, 200)));
+
+        return invoices.stream()
+            .map(i -> SalesInvoiceResponse.from(i, List.of()))
+            .toList();
     }
 
     @PostMapping
