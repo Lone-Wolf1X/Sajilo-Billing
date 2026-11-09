@@ -13,3 +13,4 @@ public record UpdateItemRequest(
     BigDecimal reorderLevel,
     Boolean active
 ) {}
+

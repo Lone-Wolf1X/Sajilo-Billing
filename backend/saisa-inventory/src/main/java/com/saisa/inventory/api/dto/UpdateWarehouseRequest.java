@@ -8,3 +8,4 @@ public record UpdateWarehouseRequest(
     Boolean isDefault,
     Boolean active
 ) {}
+

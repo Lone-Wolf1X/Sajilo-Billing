@@ -138,6 +138,19 @@ const MENU_ITEMS: NavMenu[] = [
       },
     ],
   },
+  {
+    id: 'settings',
+    title: 'Company Setup',
+    sections: [
+      {
+        header: 'Master Profile & Onboarding',
+        items: [
+          { label: 'Business Profile Wizard', badge: 'Setup', to: '/setup' },
+          { label: 'Tax & Registered Office', to: '/settings/company-profile' },
+        ],
+      },
+    ],
+  },
 ];
 
 export const MainNav: React.FC = () => {

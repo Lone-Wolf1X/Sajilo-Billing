@@ -254,3 +254,4 @@ public class StockAdjustmentService {
         return p.getId();
     }
 }
+

@@ -1,0 +1,141 @@
+{
+  "salutations": [
+    { "value": "Mr.", "label_en": "Mr.", "label_np": "श्री" },
+    { "value": "Mrs.", "label_en": "Mrs.", "label_np": "श्रीमती" },
+    { "value": "Ms.", "label_en": "Ms.", "label_np": "सुश्री" },
+    { "value": "Miss", "label_en": "Miss.", "label_np": "सुश्री" },
+    { "value": "Dr.", "label_en": "Dr.", "label_np": "डा." },
+    { "value": "Prof.", "label_en": "Prof.", "label_np": "प्रा." },
+    { "value": "M/S", "label_en": "M/S", "label_np": "मेसर्स" }
+  ],
+  "genders": [
+    { "value": "Male", "label_en": "Male", "label_np": "पुरुष" },
+    { "value": "Female", "label_en": "Female", "label_np": "महिला" },
+    { "value": "Other", "label_en": "Other", "label_np": "अन्य" }
+  ],
+  "marital_statuses": [
+    { "value": "Unmarried", "label_en": "Unmarried", "label_np": "अविवाहित" },
+    { "value": "Married", "label_en": "Married", "label_np": "विवाहित" },
+    { "value": "Divorced", "label_en": "Divorced", "label_np": "पारपाचुके" },
+    { "value": "Widowed", "label_en": "Widowed", "label_np": "एकल / विधवा / विधुर" }
+  ],
+  "identification_types": [
+    { "value": "Citizenship", "label_en": "Citizenship Certificate", "label_np": "नागरिकता प्रमाणपत्र" },
+    { "value": "NID", "label_en": "National Identity Card", "label_np": "राष्ट्रिय परिचयपत्र" },
+    { "value": "Passport", "label_en": "Passport", "label_np": "राहदानी" },
+    { "value": "PAN", "label_en": "Permanent Account Number", "label_np": "स्थायी लेखा नम्बर" },
+    { "value": "VoterID", "label_en": "Voter ID Card", "label_np": "मतदाता परिचयपत्र" }
+  ],
+  "citizenship_authorities": [
+    { "value": "District Administration Office", "label_en": "District Administration Office (DAO)", "label_np": "जिल्ला प्रशासन कार्यालय" },
+    { "value": "Area Administration Office", "label_en": "Area Administration Office (AAO)", "label_np": "इलाका प्रशासन कार्यालय" },
+    { "value": "Border Administration Office", "label_en": "Border Administration Office", "label_np": "सीमा प्रशासन कार्यालय" }
+  ],
+  "pratilipi_types": [
+    { "value": "Pratham Pratilipi (1st Copy)", "label_en": "1st Copy", "label_np": "प्रथम प्रतिलिपि" },
+    { "value": "Dosro Pratilipi (2nd Copy)", "label_en": "2nd Copy", "label_np": "दोस्रो प्रतिलिपि" },
+    { "value": "Tesro Pratilipi (3rd Copy)", "label_en": "3rd Copy", "label_np": "तेस्रो प्रतिलिपि" },
+    { "value": "Chautho Pratilipi (4th Copy)", "label_en": "4th Copy", "label_np": "चौथो प्रतिलिपि" },
+    { "value": "Pachau Pratilipi (5th Copy)", "label_en": "5th Copy", "label_np": "पाँचौ प्रतिलिपि" },
+    { "value": "Chhaithau Pratilipi (6th Copy)", "label_en": "6th Copy", "label_np": "छैटौं प्रतिलिपि" },
+    { "value": "Sataun Pratilipi (7th Copy)", "label_en": "7th Copy", "label_np": "सातौं प्रतिलिपि" },
+    { "value": "Athaun Pratilipi (8th Copy)", "label_en": "8th Copy", "label_np": "आठौं प्रतिलिपि" },
+    { "value": "Nawaun Pratilipi (9th Copy)", "label_en": "9th Copy", "label_np": "नवौं प्रतिलिपि" },
+    { "value": "Dasau Pratilipi (10th Copy)", "label_en": "10th Copy", "label_np": "दशौं प्रतिलिपि" }
+  ],
+  "reissue_reasons": [
+    { "value": "Lost", "label_en": "Lost / Misplaced", "label_np": "हराएको" },
+    { "value": "Damaged", "label_en": "Damaged / Torn / Faded", "label_np": "च्यातिएको / अस्पष्ट भएको" },
+    { "value": "Correction", "label_en": "Details Correction / Amendment", "label_np": "विवरण संशोधन" },
+    { "value": "AddressChange", "label_en": "Migration / Address Change", "label_np": "बसाइँसराइ" },
+    { "value": "Other", "label_en": "Other Reasons", "label_np": "अन्य" }
+  ],
+  "institutional_registration_types": [
+    { "value": "Proprietorship", "label_en": "Sole Proprietorship", "label_np": "एकलौटी फर्म" },
+    { "value": "Partnership", "label_en": "Partnership Firm", "label_np": "साझेदारी फर्म" },
+    { "value": "Private Limited", "label_en": "Private Limited Company", "label_np": "प्राइभेट लिमिटेड कम्पनी" },
+    { "value": "Limited", "label_en": "Public Limited Company", "label_np": "पब्लिक लिमिटेड कम्पनी" },
+    { "value": "Cooperative", "label_en": "Cooperative Society", "label_np": "सहकारी संस्था" },
+    { "value": "NGO", "label_en": "Non-Governmental Organization / Trust", "label_np": "गैरसरकारी संस्था / गुठी" },
+    { "value": "Government", "label_en": "Government Department / Corporation", "label_np": "सरकारी निकाय / संस्थान" },
+    { "value": "Other", "label_en": "Other Entity", "label_np": "अन्य निकाय" }
+  ],
+  "authorized_roles": [
+    { "value": "Proprietor", "label_en": "Proprietor / Owner", "label_np": "प्रोप्राइटर / धनी" },
+    { "value": "Partner", "label_en": "Managing Partner", "label_np": "साझेदार" },
+    { "value": "Chairman", "label_en": "Chairman / President", "label_np": "अध्यक्ष" },
+    { "value": "Managing Director", "label_en": "Managing Director (MD)", "label_np": "प्रबन्ध निर्देशक" },
+    { "value": "Director", "label_en": "Director", "label_np": "सञ्चालक" },
+    { "value": "CEO", "label_en": "Chief Executive Officer (CEO)", "label_np": "प्रमुख कार्यकारी अधिकृत" },
+    { "value": "Company Secretary", "label_en": "Company Secretary", "label_np": "कम्पनी सचिव" },
+    { "value": "Account Operator", "label_en": "Account Operator / Signatory", "label_np": "खाता सञ्चालक" },
+    { "value": "Authorized Representative", "label_en": "Authorized Representative (Power of Attorney)", "label_np": "अख्तियारप्राप्त प्रतिनिधि / वारेसनामा" },
+    { "value": "Trustee", "label_en": "Trustee", "label_np": "ट्रस्टी / संरक्षक" }
+  ],
+  "dishonour_reasons_nrb": [
+    {
+      "value": "Insufficient Balance",
+      "label_en": "Insufficient Balance / Fund Unavailable",
+      "label_np": "खातामा मौज्दात अपुग / पर्याप्त रकम नभएको",
+      "legal_clause": "NRB Directive 12/082 Sec 9(3)(k) & Cheque Dishonour Procedure 2082 Sec 4(b), 4(c)",
+      "notice_period_days": 45,
+      "notice_type": "Calendar Days"
+    },
+    {
+      "value": "Signature Mismatch",
+      "label_en": "Signature Differs / Mismatch",
+      "label_np": "दस्तखत फरक परेको",
+      "legal_clause": "NRB Directive 12/082 Sec 9(3)(kh)(2)",
+      "notice_period_days": 7,
+      "notice_type": "Working Days"
+    },
+    {
+      "value": "Stop Payment",
+      "label_en": "Payment Stopped by Drawer",
+      "label_np": "भुक्तानी रोक्का गरिएको (स्टप पेमेन्ट)",
+      "legal_clause": "NRB Directive 12/082 Sec 9(3)(kh)(3)",
+      "notice_period_days": 7,
+      "notice_type": "Working Days"
+    },
+    {
+      "value": "Account Closed",
+      "label_en": "Account Closed Prior to Presentment",
+      "label_np": "खाता बन्द गरिएको",
+      "legal_clause": "NRB Directive 12/082 Sec 9(3)(kh)(1)",
+      "notice_period_days": 0,
+      "notice_type": "Immediate CIB Action"
+    },
+    {
+      "value": "Post Dated Cheque",
+      "label_en": "Post-dated Cheque Presented Early",
+      "label_np": "समय नपुगेको (पोस्ट डेटेड) चेक",
+      "legal_clause": "Negotiable Instruments Act 2034",
+      "notice_period_days": null,
+      "notice_type": "Return Without Dishonour"
+    },
+    {
+      "value": "Stale Cheque",
+      "label_en": "Stale Cheque (Exceeded 6 Months Validity)",
+      "label_np": "मियाद गुज्रेको (६ महिना नाघेको) चेक",
+      "legal_clause": "Negotiable Instruments Act 2034 Sec 53",
+      "notice_period_days": null,
+      "notice_type": "Return Without Dishonour"
+    },
+    {
+      "value": "Amount Mismatch",
+      "label_en": "Amount in Words and Figures Differ",
+      "label_np": "अंक र अक्षरमा फरक परेको",
+      "legal_clause": "Negotiable Instruments Act 2034 Sec 18",
+      "notice_period_days": null,
+      "notice_type": "Return For Rectification"
+    },
+    {
+      "value": "Fraudulent/Fake Cheque",
+      "label_en": "Fake / Forged Cheque or Counterfeit Instrument",
+      "label_np": "नक्कली चेक वा जालसाजी",
+      "legal_clause": "NRB Directive 12/082 Sec 9(2)(ka)",
+      "notice_period_days": 0,
+      "notice_type": "Immediate Police & CIB Blacklisting"
+    }
+  ]
+}

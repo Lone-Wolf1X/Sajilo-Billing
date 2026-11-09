@@ -11,3 +11,4 @@ INSERT INTO chart_of_accounts (tenant_id, account_code, account_name, account_ty
 SELECT id, 'INVENTORY_LOSS', 'Inventory Adjustment Loss', 'EXPENSE', TRUE, TRUE, 0, NOW(), NOW()
 FROM tenants
 WHERE id NOT IN (SELECT tenant_id FROM chart_of_accounts WHERE account_code = 'INVENTORY_LOSS');
+

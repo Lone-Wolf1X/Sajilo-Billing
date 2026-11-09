@@ -25,6 +25,7 @@ import { DebitNoteFormPage } from './pages/debitnote/DebitNoteFormPage';
 import { DebitNotesPage } from './pages/debitnote/DebitNotesPage';
 import { DebitNoteDetailPage } from './pages/debitnote/DebitNoteDetailPage';
 import { ItemsPage } from './pages/items/ItemsPage';
+import { SetupWizardPage } from './pages/setup/SetupWizardPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -52,6 +53,14 @@ export const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <DashboardPage />,
+          },
+          {
+            path: 'setup',
+            element: <SetupWizardPage />,
+          },
+          {
+            path: 'settings/company-profile',
+            element: <SetupWizardPage />,
           },
           // Financial Core
           {
