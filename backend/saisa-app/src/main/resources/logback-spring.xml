@@ -5,11 +5,13 @@
     <property name="LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId:-no-cid}] %logger{36} - %msg%n"/>
 
-    <!-- Development: human-readable plaintext -->
+    <!-- Development: human-readable plaintext with sensitive data masking -->
     <springProfile name="dev,test,default">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="com.saisa.app.logging.MaskingPatternLayout">
+                    <pattern>${LOG_PATTERN}</pattern>
+                </layout>
             </encoder>
         </appender>
         <root level="INFO">

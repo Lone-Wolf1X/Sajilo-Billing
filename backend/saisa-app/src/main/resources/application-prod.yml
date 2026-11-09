@@ -1,0 +1,51 @@
+# ==============================================================================
+# SAISA Accounting - Production Configuration (profile: prod)
+# ==============================================================================
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:5}
+      idle-timeout: 300000        # 5 minutes
+      max-lifetime: 1800000       # 30 minutes
+      connection-timeout: 20000   # 20 seconds
+      leak-detection-threshold: 60000 # 1 minute
+      pool-name: SaisaHikariPool
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+    show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    clean-disabled: true
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+    include-exception: false
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+
+saisa:
+  security:
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+
