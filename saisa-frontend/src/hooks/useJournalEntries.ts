@@ -3,11 +3,20 @@ import { journalEntriesService } from '../services/journalEntriesService';
 import type {
   CreateJournalEntryRequest,
   ReverseJournalEntryRequest,
+  JournalEntryListParams,
 } from '../types/journalEntry';
 import { ACCOUNTS_QUERY_KEY } from './useAccounts';
 import { toast } from 'sonner';
 
 export const JOURNAL_ENTRIES_QUERY_KEY = ['journal-entries'];
+
+export function useJournalEntryList(params: JournalEntryListParams = {}) {
+  return useQuery({
+    queryKey: [...JOURNAL_ENTRIES_QUERY_KEY, params],
+    queryFn: () => journalEntriesService.list(params),
+    staleTime: 30_000,
+  });
+}
 
 export function useJournalEntry(id?: number) {
   return useQuery({
@@ -17,10 +26,9 @@ export function useJournalEntry(id?: number) {
   });
 }
 
-export function useJournalMutations() {
+export function useCreateJournalEntry() {
   const queryClient = useQueryClient();
-
-  const createMutation = useMutation({
+  return useMutation({
     mutationFn: (data: CreateJournalEntryRequest) =>
       journalEntriesService.create(data),
     onSuccess: (entry) => {
@@ -33,8 +41,11 @@ export function useJournalMutations() {
       toast.error(msg);
     },
   });
+}
 
-  const postMutation = useMutation({
+export function usePostJournalEntry() {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: (id: number) => journalEntriesService.post(id),
     onSuccess: (entry) => {
       queryClient.invalidateQueries({ queryKey: JOURNAL_ENTRIES_QUERY_KEY });
@@ -50,8 +61,11 @@ export function useJournalMutations() {
       toast.error(msg);
     },
   });
+}
 
-  const reverseMutation = useMutation({
+export function useReverseJournalEntry() {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: ({
       id,
       data,
@@ -71,6 +85,12 @@ export function useJournalMutations() {
       toast.error(msg);
     },
   });
+}
+
+export function useJournalMutations() {
+  const createMutation = useCreateJournalEntry();
+  const postMutation = usePostJournalEntry();
+  const reverseMutation = useReverseJournalEntry();
 
   return {
     createEntry: createMutation.mutateAsync,
@@ -81,4 +101,3 @@ export function useJournalMutations() {
     isReversing: reverseMutation.isPending,
   };
 }
-

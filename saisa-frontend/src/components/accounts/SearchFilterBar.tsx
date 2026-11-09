@@ -68,3 +68,4 @@ export const SearchFilterBar: React.FC<Props> = ({
     </div>
   );
 };
+

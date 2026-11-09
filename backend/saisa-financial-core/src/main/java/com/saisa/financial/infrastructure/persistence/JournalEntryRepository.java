@@ -2,8 +2,10 @@ package com.saisa.financial.infrastructure.persistence;
 
 import com.saisa.financial.domain.journal.EntryStatus;
 import com.saisa.financial.domain.journal.JournalEntry;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,5 +36,20 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
     Optional<JournalEntry> findByEntryNumberWithLines(@Param("tenantId") Long tenantId, @Param("entryNumber") String entryNumber);
 
     Optional<JournalEntry> findByTenantIdAndReferenceTypeAndReferenceId(Long tenantId, String referenceType, Long referenceId);
+
+    @Query("""
+        SELECT je FROM JournalEntry je
+        WHERE je.tenantId = :tenantId
+          AND (:fromDate IS NULL OR je.entryDate >= :fromDate)
+          AND (:toDate IS NULL OR je.entryDate <= :toDate)
+          AND (:status IS NULL OR je.status = :status)
+        ORDER BY je.entryDate DESC, je.id DESC
+        """)
+    List<JournalEntry> findWithFilters(
+        @Param("tenantId") Long tenantId,
+        @Param("fromDate") LocalDate fromDate,
+        @Param("toDate") LocalDate toDate,
+        @Param("status") EntryStatus status,
+        Pageable pageable);
 }
 

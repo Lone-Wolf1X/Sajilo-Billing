@@ -185,3 +185,4 @@ export const ChartOfAccountsPage: React.FC = () => {
     </div>
   );
 };
+

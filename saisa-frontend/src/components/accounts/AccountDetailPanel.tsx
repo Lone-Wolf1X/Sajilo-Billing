@@ -98,3 +98,4 @@ export const AccountDetailPanel: React.FC<Props> = ({ account, onEdit }) => {
     </div>
   );
 };
+

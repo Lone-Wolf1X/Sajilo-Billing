@@ -19,3 +19,4 @@ export const AccountTypeBadge: React.FC<{ type: AccountType }> = ({ type }) => {
     </span>
   );
 };
+

@@ -3,6 +3,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ChartOfAccountsPage } from './pages/accounts/ChartOfAccountsPage';
+import { JournalEntryFormPage } from './pages/journal/JournalEntryFormPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -41,16 +42,20 @@ export const router = createBrowserRouter([
             element: (
               <ModulePlaceholderPage
                 title="Journal Entries & Vouchers"
-                stepName="Step 16: Financial Core UI"
+                stepName="Step 16 Part 3B"
               />
             ),
           },
           {
             path: 'journal-entries/new',
+            element: <JournalEntryFormPage />,
+          },
+          {
+            path: 'journal-entries/:id',
             element: (
               <ModulePlaceholderPage
-                title="New Journal Voucher [F7]"
-                stepName="Step 16: Financial Core UI"
+                title="Journal Entry Details"
+                stepName="Step 16 Part 3B"
               />
             ),
           },

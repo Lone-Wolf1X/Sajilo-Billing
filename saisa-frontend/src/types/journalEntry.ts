@@ -7,7 +7,10 @@ export type EntryType =
   | 'CONTRA'
   | 'INVENTORY'
   | 'CLOSING'
-  | 'REVERSAL';
+  | 'REVERSAL'
+  | 'JOURNAL'
+  | 'ADJUSTMENT'
+  | 'OPENING';
 
 export type EntryStatus = 'DRAFT' | 'POSTED' | 'REVERSED';
 
@@ -37,6 +40,29 @@ export interface JournalEntry {
   lines: JournalLine[];
 }
 
+export interface JournalEntrySummary {
+  id: number;
+  entryNumber: string;
+  entryDate: string;
+  periodId: number;
+  entryType: EntryType;
+  status: EntryStatus;
+  description: string | null;
+  referenceType: string | null;
+  referenceId: number | null;
+  reversalOfId: number | null;
+  postedAt: string | null;
+  postedBy: number | null;
+  lines: JournalLine[]; // empty in list response
+}
+
+export interface JournalEntryListParams {
+  from?: string; // YYYY-MM-DD
+  to?: string;
+  status?: EntryStatus;
+  limit?: number;
+}
+
 export interface CreateJournalLineRequest {
   accountId: number;
   side: 'DEBIT' | 'CREDIT';
@@ -59,4 +85,3 @@ export interface ReverseJournalEntryRequest {
   reversalDate?: string;
   reason?: string;
 }
-
