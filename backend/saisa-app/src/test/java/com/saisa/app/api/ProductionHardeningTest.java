@@ -1,6 +1,5 @@
 package com.saisa.app.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
@@ -11,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import com.saisa.app.logging.MaskingPatternLayout;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -73,4 +71,3 @@ class ProductionHardeningTest {
         assertTrue(formatted.contains("\"refreshToken\":\"***\""));
     }
 }
-
