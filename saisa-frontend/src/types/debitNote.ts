@@ -56,3 +56,4 @@ export interface DebitNoteListParams {
   status?: DebitNoteStatus;
   limit?: number;
 }
+

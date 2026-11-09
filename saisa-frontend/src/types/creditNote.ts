@@ -56,3 +56,4 @@ export interface CreditNoteListParams {
   status?: CreditNoteStatus;
   limit?: number;
 }
+

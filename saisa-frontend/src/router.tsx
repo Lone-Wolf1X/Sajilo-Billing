@@ -19,6 +19,9 @@ import { BankAccountsPage } from './pages/bankAccounts/BankAccountsPage';
 import { ArAgingPage } from './pages/aging/ArAgingPage';
 import { ApAgingPage } from './pages/aging/ApAgingPage';
 import { CreditNoteFormPage } from './pages/creditnote/CreditNoteFormPage';
+import { CreditNotesPage } from './pages/creditnote/CreditNotesPage';
+import { DebitNoteFormPage } from './pages/debitnote/DebitNoteFormPage';
+import { DebitNotesPage } from './pages/debitnote/DebitNotesPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -138,39 +141,24 @@ export const router = createBrowserRouter([
           },
           {
             path: 'credit-notes',
-            element: (
-              <ModulePlaceholderPage
-                title="Credit Notes & Sales Returns"
-                stepName="Step 19: Credit Notes UI"
-              />
-            ),
+            element: <CreditNotesPage />,
           },
           {
             path: 'credit-notes/:id',
             element: (
               <ModulePlaceholderPage
                 title="Credit Note Voucher"
-                stepName="Step 19: Credit Notes UI"
+                stepName="Step 19C: Credit Notes UI"
               />
             ),
           },
           {
             path: 'debit-notes/new',
-            element: (
-              <ModulePlaceholderPage
-                title="New Debit Note (Purchase Return)"
-                stepName="Step 19B: Debit Notes UI"
-              />
-            ),
+            element: <DebitNoteFormPage />,
           },
           {
             path: 'debit-notes',
-            element: (
-              <ModulePlaceholderPage
-                title="Debit Notes & Purchase Returns"
-                stepName="Step 19B: Debit Notes UI"
-              />
-            ),
+            element: <DebitNotesPage />,
           },
           {
             path: 'debit-notes/:id',

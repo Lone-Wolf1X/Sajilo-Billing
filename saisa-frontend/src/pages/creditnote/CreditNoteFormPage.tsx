@@ -308,3 +308,4 @@ export const CreditNoteFormPage: React.FC = () => {
     </div>
   );
 };
+
