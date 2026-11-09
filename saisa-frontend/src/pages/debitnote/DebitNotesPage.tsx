@@ -265,3 +265,4 @@ export const DebitNotesPage: React.FC = () => {
     </div>
   );
 };
+

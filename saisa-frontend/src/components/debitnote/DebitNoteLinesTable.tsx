@@ -154,3 +154,4 @@ export const DebitNoteLinesTable: React.FC<Props> = ({ control, register, setVal
     </div>
   );
 };
+

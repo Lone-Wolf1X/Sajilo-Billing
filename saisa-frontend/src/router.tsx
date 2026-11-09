@@ -20,8 +20,10 @@ import { ArAgingPage } from './pages/aging/ArAgingPage';
 import { ApAgingPage } from './pages/aging/ApAgingPage';
 import { CreditNoteFormPage } from './pages/creditnote/CreditNoteFormPage';
 import { CreditNotesPage } from './pages/creditnote/CreditNotesPage';
+import { CreditNoteDetailPage } from './pages/creditnote/CreditNoteDetailPage';
 import { DebitNoteFormPage } from './pages/debitnote/DebitNoteFormPage';
 import { DebitNotesPage } from './pages/debitnote/DebitNotesPage';
+import { DebitNoteDetailPage } from './pages/debitnote/DebitNoteDetailPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -145,12 +147,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'credit-notes/:id',
-            element: (
-              <ModulePlaceholderPage
-                title="Credit Note Voucher"
-                stepName="Step 19C: Credit Notes UI"
-              />
-            ),
+            element: <CreditNoteDetailPage />,
           },
           {
             path: 'debit-notes/new',
@@ -162,12 +159,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'debit-notes/:id',
-            element: (
-              <ModulePlaceholderPage
-                title="Debit Note Voucher"
-                stepName="Step 19C: Debit Notes UI"
-              />
-            ),
+            element: <DebitNoteDetailPage />,
           },
           {
             path: 'customers',

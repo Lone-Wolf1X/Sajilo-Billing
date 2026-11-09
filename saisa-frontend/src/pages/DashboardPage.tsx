@@ -9,11 +9,38 @@ import {
 import { formatMoney } from '@/lib/utils';
 import { useArAging, useApAging } from '../hooks/useAging';
 import { useBankAccounts } from '../hooks/useBankAccounts';
+import { useCreditNotes } from '../hooks/useCreditNotes';
+import { useDebitNotes } from '../hooks/useDebitNotes';
 
 export const DashboardPage: React.FC = () => {
   const { data: arAging } = useArAging();
   const { data: apAging } = useApAging();
   const { bankAccounts = [] } = useBankAccounts();
+
+  const today = useMemo(() => new Date(), []);
+  const firstOfMonth = useMemo(
+    () => new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10),
+    [today]
+  );
+  const todayStr = useMemo(() => today.toISOString().slice(0, 10), [today]);
+
+  const { data: creditNotes = [] } = useCreditNotes({
+    from: firstOfMonth,
+    to: todayStr,
+    status: 'POSTED',
+    limit: 100,
+  });
+  const { data: debitNotes = [] } = useDebitNotes({
+    from: firstOfMonth,
+    to: todayStr,
+    status: 'POSTED',
+    limit: 100,
+  });
+
+  const salesReturnsTotal = creditNotes.reduce((s, n) => s + parseFloat(n.totalAmount || '0'), 0);
+  const purchaseReturnsTotal = debitNotes.reduce((s, n) => s + parseFloat(n.totalAmount || '0'), 0);
+  const salesReturnsCount = creditNotes.length;
+  const purchaseReturnsCount = debitNotes.length;
 
   const totalReceivables = Number(arAging?.totalOutstanding) || 0;
   const overdueAR =
@@ -33,8 +60,8 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 1. Executive Summary Ribbon (4 Metric Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 1. Executive Summary Ribbon (5 Metric Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {/* Card 1: Receivables */}
         <div className="card p-4 hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start text-xs text-paper-muted uppercase tracking-wider font-semibold">
@@ -116,6 +143,33 @@ export const DashboardPage: React.FC = () => {
             <span className="font-mono text-paper-text font-medium">₹4,76,200.00</span>
           </div>
         </div>
+
+        {/* Card 5: Returns (MTD) */}
+        <div className="card p-4 hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start text-xs text-paper-muted uppercase tracking-wider font-semibold">
+            <span>Returns (MTD)</span>
+            <span className="text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded text-[10px] font-semibold border border-amber-200">
+              {salesReturnsCount + purchaseReturnsCount} Note(s)
+            </span>
+          </div>
+          <div className="text-2xl font-bold font-mono text-brand-navy mt-1">
+            {formatMoney(salesReturnsTotal + purchaseReturnsTotal)}
+          </div>
+          <div className="text-xs text-paper-muted mt-2 space-y-1 border-t border-dashed border-paper-border pt-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px]">Sales:</span>
+              <span className="font-mono text-brand-burgundy font-medium text-[11px]">
+                {formatMoney(salesReturnsTotal)} ({salesReturnsCount})
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px]">Purchase:</span>
+              <span className="font-mono text-emerald-700 font-medium text-[11px]">
+                {formatMoney(purchaseReturnsTotal)} ({purchaseReturnsCount})
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 2. Three Pillars / Domain Grouping */}
@@ -187,7 +241,9 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="flex justify-between py-1.5">
               <span className="text-paper-muted">Credit Notes / Returns:</span>
-              <span className="font-mono text-paper-text">3 (₹7,080.00)</span>
+              <span className="font-mono text-paper-text font-medium">
+                {salesReturnsCount} ({formatMoney(salesReturnsTotal)})
+              </span>
             </div>
           </div>
           <div className="p-3 bg-paper-alt border-t border-paper-border flex justify-end gap-2 text-xs">

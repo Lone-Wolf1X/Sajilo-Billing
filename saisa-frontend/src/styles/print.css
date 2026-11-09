@@ -63,11 +63,15 @@
   }
 
   .ledger-print-container,
-  .payment-print-container {
+  .payment-print-container,
+  .credit-note-print-container,
+  .debit-note-print-container {
     page-break-inside: avoid;
   }
 
-  .payment-print-container {
+  .payment-print-container,
+  .credit-note-print-container,
+  .debit-note-print-container {
     border: none !important;
     border-radius: 0 !important;
     padding: 0 !important;
