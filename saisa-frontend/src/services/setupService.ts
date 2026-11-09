@@ -3,6 +3,8 @@ import type {
   CompanyProfile,
   UpdateProfileRequest,
   SetupStatus,
+  OpeningBalanceRequest,
+  OpeningBalanceResponse,
 } from '../types/setup';
 
 export const setupService = {
@@ -42,5 +44,20 @@ export const setupService = {
     >('/api/v1/setup/registration-authorities');
     return res.data;
   },
-};
 
+  async getOpeningBalance(): Promise<OpeningBalanceResponse> {
+    const res = await apiClient.get<OpeningBalanceResponse>('/api/v1/setup/opening-balances');
+    return res.data;
+  },
+
+  async postOpeningBalance(payload: OpeningBalanceRequest): Promise<OpeningBalanceResponse> {
+    const res = await apiClient.post<OpeningBalanceResponse>('/api/v1/setup/opening-balances', payload);
+    return res.data;
+  },
+
+  async resetOpeningBalance(reason: string): Promise<void> {
+    await apiClient.delete('/api/v1/setup/opening-balances', {
+      params: { reason },
+    });
+  },
+};

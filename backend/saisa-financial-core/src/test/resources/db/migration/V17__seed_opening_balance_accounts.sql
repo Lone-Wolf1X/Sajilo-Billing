@@ -59,3 +59,4 @@ FROM tenants t
 WHERE NOT EXISTS (
     SELECT 1 FROM chart_of_accounts c
     WHERE c.tenant_id = t.id AND c.account_code = 'RETAINED_EARNINGS');
+

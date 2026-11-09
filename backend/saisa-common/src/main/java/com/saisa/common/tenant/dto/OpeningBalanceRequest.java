@@ -35,3 +35,4 @@ public record OpeningBalanceRequest(
     String capital,             // -> CAPITAL
     String retainedEarnings     // -> RETAINED_EARNINGS (usually 0 for new business)
 ) {}
+

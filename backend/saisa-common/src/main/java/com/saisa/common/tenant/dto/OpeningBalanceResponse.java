@@ -15,3 +15,4 @@ public record OpeningBalanceResponse(
     BigDecimal totalEquity,
     boolean balanced
 ) {}
+

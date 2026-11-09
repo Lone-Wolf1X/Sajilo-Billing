@@ -88,3 +88,32 @@ export interface SetupStatus {
   setupStep: number;
 }
 
+export interface OpeningBalanceRequest {
+  openingDate: string;
+  cashInHand?: string;
+  bankBalance?: string;
+  accountsReceivable?: string;
+  fixedAssets?: string;
+  investments?: string;
+  otherAssets?: string;
+  accountsPayable?: string;
+  bankLoans?: string;
+  otherLiabilities?: string;
+  capital?: string;
+  retainedEarnings?: string;
+}
+
+export interface OpeningBalanceResponse {
+  posted: boolean;
+  journalEntryId: number | null;
+  journalEntryNumber: string | null;
+  openingDate: string | null;
+  totalDebits: number | string;
+  totalCredits: number | string;
+  totalAssets: number | string;
+  totalLiabilities: number | string;
+  totalEquity: number | string;
+  balanced: boolean;
+}
+
+
