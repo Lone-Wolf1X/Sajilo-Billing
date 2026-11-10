@@ -380,7 +380,35 @@ export const SetupWizardPage: React.FC = () => {
 
       {/* PHASE 1: Business Profile Form */}
       {currentStep === 1 && (
-        <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6">
+        <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-6 pb-20">
+          {/* Top Quick-Action Bar for Phase 1 */}
+          <div className="bg-white border-2 border-primary-200 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-neutral-800">
+              <span className="w-2.5 h-2.5 rounded-full bg-primary-600 animate-pulse flex-shrink-0" />
+              <span>
+                <strong>चरण १: व्यापार प्रोफाइल</strong> — विवरण भरेपछि अगाडि बढ्न <strong>"अर्को चरण"</strong> बटन थिच्नुहोस्।
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={() => goToStep(2)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm whitespace-nowrap"
+              >
+                <span>छोड्नुहोस् ➔ चरण २ (Skip to Step 2)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="submit"
+                disabled={updateMutation.isPending}
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2 text-xs font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow transition-colors disabled:opacity-50 whitespace-nowrap"
+              >
+                <span>अर्को चरण: मौज्दात (Next: Step 2)</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
           {/* SECTION 1: Unit / Company Master Information */}
           <div className="bg-white border border-neutral-300 rounded-lg p-6 shadow-sm">
             <div className="flex items-center gap-2 pb-3 mb-5 border-b border-neutral-200">
@@ -734,26 +762,41 @@ export const SetupWizardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Buttons Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
-            <button
-              type="button"
-              onClick={() => navigate('/dashboard')}
-              className="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
-            >
-              अहिलेलाई छोड्नुहोस् (Skip to Dashboard)
-            </button>
-
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/* Floating Sticky Action Buttons Bar */}
+          <div className="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md border-2 border-primary-600/40 rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
               <button
-                type="submit"
-                disabled={updateMutation.isPending}
-                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50"
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
               >
-                <span>सुरक्षित गरी प्रारम्भिक मौज्दातमा जानुहोस् (Save & Next: Opening Balances)</span>
+                अहिलेलाई छोड्नुहोस् (Exit to Dashboard)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => goToStep(2)}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
+              >
+                <span>प्रोफाइल पछि भर्छु ➔ चरण २ (Skip to Step 2)</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
+            <button
+              type="submit"
+              disabled={updateMutation.isPending}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-sm sm:text-base font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded-lg shadow-lg transition-transform active:scale-[0.99] disabled:opacity-50"
+            >
+              {updateMutation.isPending ? (
+                <span>सुरक्षित गर्दैछ... (Saving...)</span>
+              ) : (
+                <>
+                  <span>सुरक्षित गरी अर्को चरणमा जानुहोस् (Save & Next: Opening Balances)</span>
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
           </div>
         </form>
       )}

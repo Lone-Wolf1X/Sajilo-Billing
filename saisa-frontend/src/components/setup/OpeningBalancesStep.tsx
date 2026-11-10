@@ -447,14 +447,14 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
         </div>
       )}
 
-      {/* Action Buttons Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
+      {/* Sticky Action Buttons Bar */}
+      <div className="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md border-2 border-primary-600/30 rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>पछाडि फर्कनुहोस् (Back to Profile)</span>
@@ -465,7 +465,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
             <button
               type="button"
               onClick={onContinue}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
               title="यदि अहिले ओपनिङ ब्यालेन्स राख्न चाहनुहुन्न भने यो थिच्नुहोस्"
             >
               <span>रकम पछि हाल्छु ➔ अर्को चरण: मौज्दात (Skip to Step 3: Inventory)</span>
@@ -477,7 +477,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-sm sm:text-base font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded-lg shadow-lg transition-transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {postMutation.isPending ? (
             <span>प्रविष्टि गर्दैछ... (Posting...)</span>

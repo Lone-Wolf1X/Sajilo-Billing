@@ -531,12 +531,12 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
+          {/* Sticky Action Bar */}
+          <div className="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md border-2 border-primary-600/30 rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               type="button"
               onClick={onBack}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>पछाडि फर्कनुहोस् (Back to Opening Balances)</span>
@@ -546,7 +546,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setSubStep('FINISH')}
-                className="px-4 py-2 text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm"
+                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
               >
                 गोदाम नबनाई सम्पन्न गर्नुहोस् (Skip Warehouse & Finish)
               </button>
@@ -555,7 +555,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 type="button"
                 onClick={handleWarehouseContinue}
                 disabled={createWhMutation.isPending}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-sm sm:text-base font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded-lg shadow-lg transition-transform active:scale-[0.99] disabled:opacity-50"
               >
                 <span>गोदाम सुरक्षित गरी सामान सूचीमा जानुहोस् (Save & Next: Items)</span>
                 <ArrowRight className="w-4 h-4" />
@@ -713,12 +713,12 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
+          {/* Sticky Action Bar */}
+          <div className="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md border-2 border-primary-600/30 rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               type="button"
               onClick={() => setSubStep('WAREHOUSE')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>गोदाममा फर्कनुहोस् (Back to Warehouse)</span>
@@ -728,7 +728,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setSubStep('FINISH')}
-                className="px-4 py-2 text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm"
+                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
               >
                 सामान पछि थप्छु ➔ सिधै सम्पन्न गर्नुहोस् (Skip Items & Finish)
               </button>
@@ -737,7 +737,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 type="button"
                 onClick={handleSaveItems}
                 disabled={createBulkMutation.isPending}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-sm sm:text-base font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded-lg shadow-lg transition-transform active:scale-[0.99] disabled:opacity-50"
               >
                 {createBulkMutation.isPending ? (
                   <span>सुरक्षित गर्दैछ... (Saving...)</span>
@@ -885,12 +885,12 @@ export const Phase3InventoryStep: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
+          {/* Sticky Action Bar */}
+          <div className="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md border-2 border-primary-600/30 rounded-xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               type="button"
               onClick={() => setSubStep('ITEMS')}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded border border-neutral-300 transition-colors shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>सामान सूचीमा फर्कनुहोस् (Back to Items)</span>
@@ -900,7 +900,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setSubStep('FINISH')}
-                className="px-4 py-2 text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm"
+                className="px-4 py-2.5 text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-lg border border-neutral-300 transition-colors shadow-sm"
               >
                 स्टक पछि हाल्छु ➔ सिधै सम्पन्न गर्नुहोस् (Skip Stock & Finish)
               </button>
@@ -909,7 +909,7 @@ export const Phase3InventoryStep: React.FC<Props> = ({
                 type="button"
                 onClick={handlePostOpeningStock}
                 disabled={postStockMutation.isPending}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded shadow-sm transition-colors disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 text-sm sm:text-base font-bold text-white bg-primary-700 hover:bg-primary-800 active:bg-primary-900 rounded-lg shadow-lg transition-transform active:scale-[0.99] disabled:opacity-50"
               >
                 {postStockMutation.isPending ? (
                   <span>दर्ता गर्दैछ... (Posting Stock...)</span>
