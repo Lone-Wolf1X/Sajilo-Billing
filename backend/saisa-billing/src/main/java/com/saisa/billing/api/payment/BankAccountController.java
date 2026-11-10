@@ -71,5 +71,56 @@ public class BankAccountController {
         return bankRepo.findByTenantIdAndActiveTrueOrderByAccountCode(
             TenantContext.getCurrentTenantId());
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BankAccount> update(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Object> body) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+
+        BankAccount ba = bankRepo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank account not found"));
+        if (!ba.getTenantId().equals(tenantId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank account not found");
+        }
+
+        if (body.get("accountName") != null) ba.setAccountName((String) body.get("accountName"));
+        if (body.get("bankName") != null) ba.setBankName((String) body.get("bankName"));
+        if (body.get("accountNumber") != null) ba.setAccountNumber((String) body.get("accountNumber"));
+        if (body.get("ifscCode") != null) ba.setIfscCode((String) body.get("ifscCode"));
+        if (body.get("glAccountId") != null) {
+            ba.setGlAccountId(((Number) body.get("glAccountId")).longValue());
+        }
+        if (body.get("defaultAccount") != null) {
+            ba.setDefaultAccount((Boolean) body.get("defaultAccount"));
+        } else if (body.get("isDefault") != null) {
+            ba.setDefaultAccount((Boolean) body.get("isDefault"));
+        }
+        if (body.get("active") != null) {
+            ba.setActive((Boolean) body.get("active"));
+        }
+        ba.setUpdatedBy(TenantContext.getCurrentUserId());
+
+        return ResponseEntity.ok(bankRepo.save(ba));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+
+        BankAccount ba = bankRepo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank account not found"));
+        if (!ba.getTenantId().equals(tenantId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank account not found");
+        }
+
+        ba.setActive(false);
+        ba.setUpdatedBy(TenantContext.getCurrentUserId());
+        bankRepo.save(ba);
+
+        return ResponseEntity.noContent().build();
+    }
 }
 

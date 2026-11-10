@@ -17,7 +17,7 @@ import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/sync/presentation/sync_paused_banner.dart';
 import '../../features/sync/presentation/sync_queue_viewer_dialog.dart';
-import '../../features/admin/presentation/users_management_screen.dart';
+import '../../features/admin/presentation/admin_settings_home.dart';
 
 class DesktopAppShell extends ConsumerStatefulWidget {
   const DesktopAppShell({super.key});
@@ -103,7 +103,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
         const EditBusinessScreen(),
         const BackupScreen(),
         const SettingsScreen(),
-        if (isAdmin) const UsersManagementScreen(),
+        if (isAdmin) const AdminSettingsHome(),
       ];
 
       destinations = [
@@ -154,9 +154,9 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
         ),
         if (isAdmin)
           const NavigationRailDestination(
-            icon: Icon(Icons.manage_accounts_outlined),
-            selectedIcon: Icon(Icons.manage_accounts),
-            label: Text('Users (प्रयोगकर्ताहरू)'),
+            icon: Icon(Icons.admin_panel_settings_outlined),
+            selectedIcon: Icon(Icons.admin_panel_settings),
+            label: Text('Admin Panel (प्रशासक सेटिङ)'),
           ),
       ];
     }

@@ -162,3 +162,23 @@ final vendorsListProvider = FutureProvider.autoDispose<List<SaisaVendor>>((ref) 
 final syncQueueItemsProvider = FutureProvider.autoDispose<List<SyncQueueItem>>((ref) async {
   return ref.read(syncQueueServiceProvider).getRecentItems();
 });
+
+/// Bank GL accounts (active ASSET accounts) for bank linking
+final bankGlAccountsProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final api = ref.read(apiClientProvider);
+  final list = await api.get<List<dynamic>>('/accounts');
+  return list
+      .where((a) {
+        final m = a as Map<String, dynamic>;
+        return m['accountType'] == 'ASSET' && (m['active'] as bool? ?? true);
+      })
+      .cast<Map<String, dynamic>>()
+      .toList();
+});
+
+/// Bank accounts list
+final bankAccountsListProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final api = ref.read(apiClientProvider);
+  final list = await api.get<List<dynamic>>('/bank-accounts');
+  return list.cast<Map<String, dynamic>>().toList();
+});
