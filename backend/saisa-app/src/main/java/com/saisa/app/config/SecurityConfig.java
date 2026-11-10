@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                 .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login",
                                  "/api/v1/auth/refresh").permitAll()
+                .requestMatchers("/api/v1/licenses/public-key").permitAll()
                 .requestMatchers("/actuator/prometheus", "/actuator/metrics").authenticated()
                 // Everything else authenticated
                 .anyRequest().authenticated()

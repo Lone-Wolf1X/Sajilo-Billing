@@ -17,6 +17,7 @@ import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/sync/presentation/sync_paused_banner.dart';
 import '../../features/sync/presentation/sync_queue_viewer_dialog.dart';
+import '../../features/reports/presentation/reports_dashboard_screen.dart';
 import '../../features/admin/presentation/admin_settings_home.dart';
 
 class DesktopAppShell extends ConsumerStatefulWidget {
@@ -100,6 +101,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
         const PurchaseScreen(),
         const InventoryScreen(),
         const KhataScreen(),
+        const ReportsDashboardScreen(),
         const EditBusinessScreen(),
         const BackupScreen(),
         const SettingsScreen(),
@@ -136,6 +138,11 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
           icon: Icon(Icons.menu_book_outlined),
           selectedIcon: Icon(Icons.menu_book),
           label: Text('Khata (उधारो खाता)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.analytics_outlined),
+          selectedIcon: Icon(Icons.analytics),
+          label: Text('Reports & IRD Tax (लेखा तथा कर)'),
         ),
         const NavigationRailDestination(
           icon: Icon(Icons.business_outlined),

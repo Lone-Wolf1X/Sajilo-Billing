@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'bank_accounts_screen.dart';
+import 'chart_of_accounts_screen.dart';
 import 'company_profile_screen.dart';
+import 'email_settings_screen.dart';
+import 'license_subscription_screen.dart';
 import 'users_management_screen.dart';
 
 class AdminSettingsHome extends ConsumerStatefulWidget {
@@ -29,6 +32,21 @@ class _AdminSettingsHomeState extends ConsumerState<AdminSettingsHome> {
       'Bank Accounts\nबैंक खाताहरू',
       Icons.account_balance_outlined,
       Icons.account_balance,
+    ),
+    _TabDef(
+      'Chart of Accounts\nखाता सूची (GL)',
+      Icons.account_tree_outlined,
+      Icons.account_tree,
+    ),
+    _TabDef(
+      'Email & SMTP\nइमेल कन्फिगरेसन',
+      Icons.mark_email_read_outlined,
+      Icons.mark_email_read,
+    ),
+    _TabDef(
+      'License & Sub\nइजाजतपत्र तथा सदस्यता',
+      Icons.verified_user_outlined,
+      Icons.verified_user,
     ),
   ];
 
@@ -74,6 +92,9 @@ class _AdminSettingsHomeState extends ConsumerState<AdminSettingsHome> {
               UsersManagementScreen(),
               CompanyProfileScreen(),
               BankAccountsScreen(),
+              ChartOfAccountsScreen(),
+              EmailSettingsScreen(),
+              LicenseSubscriptionScreen(),
             ],
           ),
         ),
@@ -128,4 +149,3 @@ class _TabDef {
   final IconData selectedIcon;
   const _TabDef(this.label, this.icon, this.selectedIcon);
 }
-

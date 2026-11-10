@@ -17,6 +17,8 @@ import '../features/purchase/data/saisa_vendor.dart';
 import '../features/purchase/data/vendors_repository.dart';
 import '../features/billing/data/pos_invoice_repository.dart';
 import '../features/billing/application/pos_billing_service.dart';
+import 'license/license_model.dart';
+import 'license/license_service.dart';
 
 /// Token storage — singleton
 final tokenStorageProvider = Provider<TokenStorage>((ref) {
@@ -181,4 +183,14 @@ final bankAccountsListProvider = FutureProvider.autoDispose<List<Map<String, dyn
   final api = ref.read(apiClientProvider);
   final list = await api.get<List<dynamic>>('/bank-accounts');
   return list.cast<Map<String, dynamic>>().toList();
+});
+
+/// Commercial License Service Provider
+final licenseServiceProvider = Provider<LicenseService>((ref) {
+  return LicenseService(apiClient: ref.read(apiClientProvider));
+});
+
+/// Active License & Subscription Status Provider
+final licenseStatusProvider = FutureProvider<LicenseStatus>((ref) async {
+  return ref.read(licenseServiceProvider).getLicenseStatus();
 });
