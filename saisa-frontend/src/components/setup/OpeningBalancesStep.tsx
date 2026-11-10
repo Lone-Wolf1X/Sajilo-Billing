@@ -9,6 +9,7 @@ import {
   Sparkles,
   HelpCircle,
   Calculator,
+  AlertCircle,
 } from 'lucide-react';
 import { useOpeningBalance, usePostOpeningBalance } from '../../hooks/useSetup';
 import { OpeningBalanceSummary } from './OpeningBalanceSummary';
@@ -134,6 +135,7 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
 
     try {
       await postMutation.mutateAsync(payload);
+      onContinue?.();
     } catch {
       // Error handled by hook toast
     }
@@ -423,9 +425,31 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
         </div>
       </div>
 
+      {/* Unbalanced Warning Alert */}
+      {!isBalanced && totalAssets > 0 && (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-sm">डेबिट र क्रेडिट रकम मिलेको छैन (Debit ≠ Credit)</p>
+              <p className="text-amber-800 mt-0.5">
+                जम्मा सम्पत्ति (Dr) ₹{formatMoney(totalAssets.toFixed(2))} र जम्मा दायित्व + पुँजी (Cr) ₹{formatMoney(totalCredits.toFixed(2))} बराबर हुनुपर्छ। सजिलोको लागि तलको बटन थिची <strong>Auto-Capital</strong> चालु गर्नुहोस्।
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAutoCapital(true)}
+            className="px-3.5 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded text-xs font-semibold whitespace-nowrap shadow-sm"
+          >
+            Auto-Capital चालु गर्नुहोस्
+          </button>
+        </div>
+      )}
+
       {/* Action Buttons Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-neutral-300 rounded-lg p-5 shadow-sm">
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {onBack && (
             <button
               type="button"
@@ -441,9 +465,11 @@ export const OpeningBalancesStep: React.FC<Props> = ({ onBack, onContinue }) => 
             <button
               type="button"
               onClick={onContinue}
-              className="px-4 py-2 text-sm font-semibold text-neutral-600 hover:text-neutral-900 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded border border-neutral-300 transition-colors shadow-sm"
+              title="यदि अहिले ओपनिङ ब्यालेन्स राख्न चाहनुहुन्न भने यो थिच्नुहोस्"
             >
-              अहिलेलाई छोड्नुहोस् (Skip for now)
+              <span>रकम पछि हाल्छु ➔ अर्को चरण: मौज्दात (Skip to Step 3: Inventory)</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           )}
         </div>

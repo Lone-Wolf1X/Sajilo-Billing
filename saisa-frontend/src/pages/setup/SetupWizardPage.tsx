@@ -73,6 +73,76 @@ export const SetupWizardPage: React.FC = () => {
   const [authorizedPersonPhone, setAuthorizedPersonPhone] = useState('');
   const [authorizedPersonEmail, setAuthorizedPersonEmail] = useState('');
 
+  // Inline Validation Errors
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  const clearError = (field: string) => {
+    if (formErrors[field]) {
+      setFormErrors((prev) => {
+        const copy = { ...prev };
+        delete copy[field];
+        return copy;
+      });
+    }
+  };
+
+  const validatePhase1 = (): boolean => {
+    const errs: Record<string, string> = {};
+
+    if (!companyName.trim()) {
+      errs.companyName = 'Company Name (English) अनिवार्य छ (Required).';
+    } else if (companyName.trim().length < 3) {
+      errs.companyName = 'कम्पनीको नाम कम्तीमा ३ अक्षरको हुनुपर्छ (Min. 3 characters).';
+    }
+
+    if (panVatNo.trim()) {
+      const cleanPan = panVatNo.trim().replace(/\D/g, '');
+      if (cleanPan.length !== 9) {
+        errs.panVatNo = 'नेपालको प्यान/भ्याट नम्बर ठ्याक्कै ९ अंकको हुनुपर्छ (PAN must be exactly 9 digits).';
+      }
+    }
+
+    if (email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        errs.email = 'मान्य इमेल ठेगाना प्रविष्ट गर्नुहोस् (Invalid email format).';
+      }
+    }
+
+    if (phone.trim()) {
+      const cleanPhone = phone.trim().replace(/[\s-]/g, '');
+      if (!/^\+?[0-9]{7,15}$/.test(cleanPhone)) {
+        errs.phone = 'फोन नम्बर मान्य हुनुपर्छ (Valid 7-10 digit phone number).';
+      }
+    }
+
+    if (authorizedPersonEmail.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(authorizedPersonEmail.trim())) {
+        errs.authorizedPersonEmail = 'हस्ताक्षरकर्ताको इमेल मान्य छैन (Invalid email format).';
+      }
+    }
+
+    if (authorizedPersonPhone.trim()) {
+      const cleanPhone = authorizedPersonPhone.trim().replace(/[\s-]/g, '');
+      if (!/^\+?[0-9]{9,15}$/.test(cleanPhone)) {
+        errs.authorizedPersonPhone = 'मोबाइल नम्बर मान्य हुनुपर्छ (Valid 10 digit mobile number).';
+      }
+    }
+
+    if (addressValue.province && !addressValue.district) {
+      errs.district = 'कृपया जिल्ला छान्नुहोस् (Please select district).';
+    }
+
+    setFormErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const firstError = Object.values(errs)[0];
+      toast.error(firstError);
+      return false;
+    }
+    return true;
+  };
+
   // Sync profile data into state
   useEffect(() => {
     if (profile) {
@@ -111,8 +181,7 @@ export const SetupWizardPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent, complete: boolean = false) => {
     e.preventDefault();
 
-    if (!companyName.trim()) {
-      toast.error('Company Name (English) is required.');
+    if (!validatePhase1()) {
       return;
     }
 
@@ -330,10 +399,20 @@ export const SetupWizardPage: React.FC = () => {
                   type="text"
                   required
                   value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
+                  onChange={(e) => {
+                    setCompanyName(e.target.value);
+                    clearError('companyName');
+                  }}
                   placeholder="e.g. Acme Nepal Technologies Pvt. Ltd."
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-serif shadow-sm"
+                  className={`w-full px-3 py-2 text-sm border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 font-serif shadow-sm ${
+                    formErrors.companyName
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
+                {formErrors.companyName && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.companyName}</p>
+                )}
               </div>
 
               <div>
@@ -468,13 +547,24 @@ export const SetupWizardPage: React.FC = () => {
                   type="text"
                   maxLength={9}
                   value={panVatNo}
-                  onChange={(e) => setPanVatNo(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => {
+                    setPanVatNo(e.target.value.replace(/\D/g, ''));
+                    clearError('panVatNo');
+                  }}
                   placeholder="9-digit PAN (e.g. 601234567)"
-                  className="w-full px-3 py-2 text-sm font-mono font-bold tracking-wider border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
+                  className={`w-full px-3 py-2 text-sm font-mono font-bold tracking-wider border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 shadow-sm ${
+                    formErrors.panVatNo
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
-                <p className="text-[11px] text-neutral-500 mt-1">
-                  नेपालको कर कानुन अनुसार ९ अंकको प्यान नम्बर बिल र विजकमा अनिवार्य हुन्छ।
-                </p>
+                {formErrors.panVatNo ? (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.panVatNo}</p>
+                ) : (
+                  <p className="text-[11px] text-neutral-500 mt-1">
+                    नेपालको कर कानुन अनुसार ९ अंकको प्यान नम्बर बिल र विजकमा अनिवार्य हुन्छ।
+                  </p>
+                )}
               </div>
 
               <div>
@@ -502,8 +592,14 @@ export const SetupWizardPage: React.FC = () => {
 
             <CascadingAddressSelector
               value={addressValue}
-              onChange={(val) => setAddressValue(val)}
+              onChange={(val) => {
+                setAddressValue(val);
+                clearError('district');
+              }}
             />
+            {formErrors.district && (
+              <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.district}</p>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-neutral-200">
               <div>
@@ -513,10 +609,20 @@ export const SetupWizardPage: React.FC = () => {
                 <input
                   type="text"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    clearError('phone');
+                  }}
                   placeholder="01-XXXXXXX or 98XXXXXXXX"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
+                  className={`w-full px-3 py-2 text-sm border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 font-mono shadow-sm ${
+                    formErrors.phone
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
+                {formErrors.phone && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.phone}</p>
+                )}
               </div>
 
               <div>
@@ -526,10 +632,20 @@ export const SetupWizardPage: React.FC = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearError('email');
+                  }}
                   placeholder="billing@company.com.np"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
+                  className={`w-full px-3 py-2 text-sm border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 shadow-sm ${
+                    formErrors.email
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
+                {formErrors.email && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.email}</p>
+                )}
               </div>
             </div>
           </div>
@@ -577,10 +693,20 @@ export const SetupWizardPage: React.FC = () => {
                 <input
                   type="text"
                   value={authorizedPersonPhone}
-                  onChange={(e) => setAuthorizedPersonPhone(e.target.value)}
+                  onChange={(e) => {
+                    setAuthorizedPersonPhone(e.target.value);
+                    clearError('authorizedPersonPhone');
+                  }}
                   placeholder="+977-98XXXXXXXX"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 font-mono shadow-sm"
+                  className={`w-full px-3 py-2 text-sm border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 font-mono shadow-sm ${
+                    formErrors.authorizedPersonPhone
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
+                {formErrors.authorizedPersonPhone && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.authorizedPersonPhone}</p>
+                )}
               </div>
 
               <div>
@@ -590,10 +716,20 @@ export const SetupWizardPage: React.FC = () => {
                 <input
                   type="email"
                   value={authorizedPersonEmail}
-                  onChange={(e) => setAuthorizedPersonEmail(e.target.value)}
+                  onChange={(e) => {
+                    setAuthorizedPersonEmail(e.target.value);
+                    clearError('authorizedPersonEmail');
+                  }}
                   placeholder="signatory@company.com.np"
-                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-primary-500 shadow-sm"
+                  className={`w-full px-3 py-2 text-sm border rounded bg-white text-neutral-900 focus:outline-none focus:ring-1 shadow-sm ${
+                    formErrors.authorizedPersonEmail
+                      ? 'border-rose-400 focus:ring-rose-500'
+                      : 'border-neutral-300 focus:ring-primary-500'
+                  }`}
                 />
+                {formErrors.authorizedPersonEmail && (
+                  <p className="text-xs text-rose-600 mt-1 font-medium">{formErrors.authorizedPersonEmail}</p>
+                )}
               </div>
             </div>
           </div>
