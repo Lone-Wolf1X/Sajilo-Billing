@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
@@ -45,20 +45,33 @@ public class AdminController {
 
     // ==================== TENANT ONBOARDING & MANAGEMENT ====================
     @GetMapping("/tenants")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN')")
     public ResponseEntity<List<TenantSummaryResponse>> listTenants() {
         return ResponseEntity.ok(adminService.listTenants());
     }
 
     @PostMapping("/tenants/onboard")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN')")
     public ResponseEntity<TenantSummaryResponse> onboardTenant(@Valid @RequestBody OnboardTenantRequest req) {
         return ResponseEntity.ok(adminService.onboardTenant(req));
     }
 
     @PutMapping("/tenants/{id}/status")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN')")
     public ResponseEntity<TenantSummaryResponse> updateTenantStatus(
             @PathVariable Long id,
             @RequestParam String status) {
         return ResponseEntity.ok(adminService.toggleStatus(id, status));
+    }
+
+    @PostMapping("/tenants/{id}/inject-license")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN')")
+    public ResponseEntity<com.saisa.app.license.LicenseStatusResponse> injectLicense(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "GROWTH") String plan,
+            @RequestParam(defaultValue = "365") Integer durationDays,
+            @RequestParam(defaultValue = "5") Integer maxUsers) {
+        return ResponseEntity.ok(adminService.injectLicense(id, plan, durationDays, maxUsers));
     }
 
     // ==================== EMAIL CONFIGURATION & TEST ====================

@@ -26,7 +26,7 @@ public class WarehouseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<WarehouseResponse> create(@Valid @RequestBody CreateWarehouseRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();
@@ -51,7 +51,7 @@ public class WarehouseController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public WarehouseResponse update(@PathVariable Long id, @Valid @RequestBody UpdateWarehouseRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
 

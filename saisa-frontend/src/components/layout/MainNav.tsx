@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ChevronDown, PlusCircle } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
 interface DropdownItem {
   label: string;
@@ -169,7 +170,61 @@ const MENU_ITEMS: NavMenu[] = [
 
 export const MainNav: React.FC = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
+  const roles = user?.roles || [];
+  const isPlatformAdmin = roles.includes('PLATFORM_ADMIN') || user?.tenantCode === '_platform';
+  const isCashierOnly = roles.includes('CASHIER') && !roles.includes('ADMIN') && !roles.includes('ACCOUNTANT');
+
+  let activeMenus: NavMenu[] = [];
+
+  if (isPlatformAdmin) {
+    activeMenus = [
+      { id: 'dashboard', title: 'Dashboard', to: '/dashboard' },
+      { id: 'tenants', title: 'ग्राहक तथा लाइसेन्स (Tenants)', to: '/admin/tenants' },
+      { id: 'email', title: 'इमेल कन्फिग (SMTP)', to: '/admin/email-settings' },
+      { id: 'audit', title: 'अडिट लग (Audit Trail)', to: '/audit-trail' },
+    ];
+  } else if (isCashierOnly) {
+    activeMenus = [
+      { id: 'dashboard', title: 'Dashboard', to: '/dashboard' },
+      {
+        id: 'pos_billing',
+        title: 'काउन्टर बिलिङ (POS)',
+        sections: [
+          {
+            header: 'बिक्री अपरेशन',
+            items: [
+              { label: 'नयाँ बिक्री बिल बनाउनुहोस्', badge: '[F8]', to: '/invoices/new' },
+              { label: 'बिक्री बिलहरूको सूची (Invoices)', to: '/invoices' },
+              { label: 'ग्राहक भुक्तानी रसिद', badge: '[F6]', to: '/payments/receipt' },
+              { label: 'ग्राहकहरूको सूची (Customers)', to: '/customers' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'pos_stock',
+        title: 'सामान र मूल्य (Items)',
+        sections: [
+          {
+            header: 'स्टक र मूल्य सूची',
+            items: [
+              { label: 'सामान तथा मौज्दात खोज्नुहोस्', badge: '[F10]', to: '/inventory/items' },
+            ],
+          },
+        ],
+      },
+    ];
+  } else {
+    // Standard Owner / Accountant / Admin Menus
+    activeMenus = MENU_ITEMS.filter((item) => {
+      // Hide Platform Admin Panel from ordinary business owners
+      if (item.id === 'admin') return false;
+      return true;
+    });
+  }
 
   return (
     <header className="bg-brand-navy border-b border-[#162c47] text-white sticky top-0 z-40 shadow-md">
@@ -188,7 +243,7 @@ export const MainNav: React.FC = () => {
 
           {/* Menus */}
           <nav className="hidden md:flex items-center h-full gap-0.5">
-            {MENU_ITEMS.map((menu) => {
+            {activeMenus.map((menu) => {
               const isDirectLink = !menu.sections;
               const isActive = isDirectLink && location.pathname === menu.to;
 

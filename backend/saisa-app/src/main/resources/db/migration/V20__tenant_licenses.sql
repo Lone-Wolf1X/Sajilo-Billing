@@ -18,3 +18,4 @@ CREATE TABLE IF NOT EXISTS tenant_licenses (
 
 CREATE INDEX IF NOT EXISTS idx_tenant_licenses_tenant_id ON tenant_licenses(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_tenant_licenses_is_active ON tenant_licenses(tenant_id, is_active);
+

@@ -1,5 +1,5 @@
 import apiClient from '../lib/axios';
-import type { TenantSummary, OnboardTenantPayload, EmailSettings } from '../types/admin';
+import type { TenantSummary, OnboardTenantPayload, EmailSettings, DemoLead } from '../types/admin';
 
 export const adminService = {
   async listTenants(): Promise<TenantSummary[]> {
@@ -14,6 +14,25 @@ export const adminService = {
 
   async toggleTenantStatus(id: number, status: string): Promise<TenantSummary> {
     const res = await apiClient.put<TenantSummary>(`/api/v1/admin/tenants/${id}/status`, null, {
+      params: { status },
+    });
+    return res.data;
+  },
+
+  async injectLicense(id: number, plan: string, durationDays: number, maxUsers: number = 5): Promise<any> {
+    const res = await apiClient.post(`/api/v1/admin/tenants/${id}/inject-license`, null, {
+      params: { plan, durationDays, maxUsers },
+    });
+    return res.data;
+  },
+
+  async listDemoLeads(): Promise<DemoLead[]> {
+    const res = await apiClient.get<DemoLead[]>('/api/v1/platform/demo-leads');
+    return res.data;
+  },
+
+  async updateDemoLeadStatus(id: number, status: string): Promise<DemoLead> {
+    const res = await apiClient.put<DemoLead>(`/api/v1/platform/demo-leads/${id}/status`, null, {
       params: { status },
     });
     return res.data;

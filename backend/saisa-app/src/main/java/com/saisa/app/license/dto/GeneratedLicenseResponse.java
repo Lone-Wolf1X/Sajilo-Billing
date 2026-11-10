@@ -9,3 +9,4 @@ public record GeneratedLicenseResponse(
         String passwordUsed,
         boolean emailed
 ) {}
+

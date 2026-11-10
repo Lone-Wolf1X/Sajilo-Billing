@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/bank-reconciliation")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class BankReconciliationController {
 
     private final BankStatementLineRepository lineRepo;
@@ -42,7 +43,7 @@ public class BankReconciliationController {
     }
 
     @PostMapping("/lines")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<BankStatementLine> addLine(
             @Valid @RequestBody CreateStatementLineRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
@@ -74,7 +75,7 @@ public class BankReconciliationController {
     }
 
     @PostMapping("/auto-match")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public Map<String, Object> autoMatch(@RequestParam Long bankAccountId) {
         int matched = reconService.autoMatch(
             TenantContext.getCurrentTenantId(), bankAccountId);
@@ -84,7 +85,7 @@ public class BankReconciliationController {
     public record ManualMatchRequest(Long statementLineId, Long paymentId) {}
 
     @PostMapping("/match")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     @Auditable(action = "BANK_RECON_MATCH", entityType = "BankStatementLine")
     public BankStatementLine manualMatch(@RequestBody ManualMatchRequest req) {
         return reconService.manualMatch(
@@ -94,13 +95,13 @@ public class BankReconciliationController {
     }
 
     @PostMapping("/lines/{id}/unmatch")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public BankStatementLine unmatch(@PathVariable Long id) {
         return reconService.unmatch(TenantContext.getCurrentTenantId(), id);
     }
 
     @PostMapping("/lines/{id}/ignore")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public BankStatementLine ignore(@PathVariable Long id) {
         return reconService.ignore(TenantContext.getCurrentTenantId(), id,
             TenantContext.getCurrentUserId());

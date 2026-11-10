@@ -24,6 +24,7 @@ public class VendorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
     @Transactional(readOnly = true)
     public java.util.List<VendorResponse> list() {
         Long tenantId = TenantContext.getCurrentTenantId();
@@ -34,7 +35,7 @@ public class VendorController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<VendorResponse> create(@Valid @RequestBody CreateVendorRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();

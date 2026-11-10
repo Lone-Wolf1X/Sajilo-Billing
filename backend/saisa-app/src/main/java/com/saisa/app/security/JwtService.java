@@ -51,12 +51,46 @@ public class JwtService {
             .compact();
     }
 
+    /**
+     * Generates an impersonation token for PLATFORM_ADMIN to act within a target tenant.
+     * Contains:
+     *   tid      = original (platform) tenant id
+     *   imp_tid  = target tenant id
+     *   imp_code = target tenant code
+     *   roles    = platform admin roles
+     */
+    public String generateImpersonationToken(Long userId, Long originalTenantId,
+                                             Long targetTenantId, String targetTenantCode,
+                                             List<String> roles) {
+        Date now = new Date();
+        // Impersonation sessions valid for 1 hour
+        Date expiry = new Date(now.getTime() + 60 * 60 * 1000);
+        return Jwts.builder()
+            .subject(String.valueOf(userId))
+            .claim("tid", originalTenantId)
+            .claim("imp_tid", targetTenantId)
+            .claim("imp_code", targetTenantCode)
+            .claim("roles", roles)
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(signingKey)
+            .compact();
+    }
+
     public Long extractUserId(String token) {
         return Long.valueOf(extractClaim(token, Claims::getSubject));
     }
 
     public Long extractTenantId(String token) {
         return extractClaim(token, claims -> claims.get("tid", Long.class));
+    }
+
+    public Long extractImpersonatedTenantId(String token) {
+        return extractClaim(token, claims -> claims.get("imp_tid", Long.class));
+    }
+
+    public String extractImpersonatedTenantCode(String token) {
+        return extractClaim(token, claims -> claims.get("imp_code", String.class));
     }
 
     @SuppressWarnings("unchecked")

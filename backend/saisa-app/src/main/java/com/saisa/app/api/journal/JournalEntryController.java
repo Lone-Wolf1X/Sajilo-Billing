@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/journal-entries")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class JournalEntryController {
 
     private final JournalEntryRepository journalRepo;
@@ -89,7 +90,7 @@ public class JournalEntryController {
      * To post: POST /api/v1/journal-entries/{id}/post.
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<JournalEntryResponse> create(
             @Valid @RequestBody CreateJournalEntryRequest req) {
 
@@ -142,7 +143,7 @@ public class JournalEntryController {
     }
 
     @PostMapping("/{id}/post")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     @Auditable(action = "JOURNAL_POSTED", entityType = "JournalEntry")
     public JournalEntryResponse post(@PathVariable Long id) {
         JournalEntry draft = journalRepo.findByIdWithLines(id)
@@ -164,7 +165,7 @@ public class JournalEntryController {
     public record ReverseRequest(LocalDate reversalDate, String reason) {}
 
     @PostMapping("/{id}/reverse")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     @Auditable(action = "JOURNAL_REVERSED", entityType = "JournalEntry")
     public JournalEntryResponse reverse(@PathVariable Long id,
                                         @RequestBody ReverseRequest req) {

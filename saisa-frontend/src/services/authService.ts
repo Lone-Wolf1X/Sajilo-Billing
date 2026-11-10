@@ -22,6 +22,16 @@ export const authService = {
     return response.data;
   },
 
+  async forgotPassword(data: { email: string; tenantCode?: string }): Promise<{ success: boolean; message: string; email: string }> {
+    const response = await apiClient.post<{ success: boolean; message: string; email: string }>('/api/v1/auth/forgot-password', data);
+    return response.data;
+  },
+
+  async resetPasswordWithOtp(data: { email: string; otp: string; newPassword: string }): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.post<{ success: boolean; message: string }>('/api/v1/auth/reset-password-otp', data);
+    return response.data;
+  },
+
   logout(): void {
     useAuthStore.getState().logout();
   },

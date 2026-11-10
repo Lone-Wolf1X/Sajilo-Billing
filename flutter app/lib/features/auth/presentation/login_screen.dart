@@ -12,9 +12,9 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _tenantController = TextEditingController(text: 'nepalretail');
-  final _usernameController = TextEditingController(text: 'admin');
-  final _passwordController = TextEditingController(text: 'admin123');
+  final _tenantController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscure = true;
   bool _submitting = false;
   String? _error;
@@ -64,41 +64,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   colors: [Color(0xFF1E3A5F), Color(0xFF2A4D75), Color(0xFF162C47)],
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(64),
+              child: Padding(
+                padding: const EdgeInsets.all(64),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        _LogoMark(),
-                        SizedBox(width: 16),
-                        Text(
-                          'SAJILO BILLING',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 2,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            'assets/branding/saisa_pro_icon_192.png',
+                            width: 52,
+                            height: 52,
+                            errorBuilder: (_, __, ___) => const _LogoMark(),
                           ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'SAISA PRO',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            Text(
+                              'Enterprise Accounting & Sajilo Billing POS',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF38BDF8),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Enterprise Accounting Platform',
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Complete Nepal IRD Annex 13 Ready Double-Entry Accounting Platform with Hybrid Offline POS Billing.',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14,
                         color: Colors.white70,
-                        fontStyle: FontStyle.italic,
+                        height: 1.4,
                       ),
                     ),
-                    SizedBox(height: 48),
-                    _FeatureLine(text: 'Complete double-entry accounting'),
-                    _FeatureLine(text: 'Nepal VAT compliant invoicing'),
-                    _FeatureLine(text: 'Real-time financial reports'),
-                    _FeatureLine(text: 'Multi-company, multi-warehouse'),
+                    const SizedBox(height: 40),
+                    const _FeatureLine(text: 'Sajilo Billing: 100% Offline POS & Barcode Billing'),
+                    const _FeatureLine(text: 'Complete Double-Entry General Ledger'),
+                    const _FeatureLine(text: 'Nepal IRD Annex 13 Approved (D-01, D-02)'),
+                    const _FeatureLine(text: 'Real-time Trial Balance, P&L & Balance Sheet'),
+                    const _FeatureLine(text: 'Multi-warehouse FIFO Inventory & Khata'),
                   ],
                 ),
               ),

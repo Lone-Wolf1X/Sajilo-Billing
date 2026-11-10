@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../core/localization/locale_provider.dart';
 import '../../core/providers.dart';
+import '../../core/role_guard.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/billing/presentation/pos_billing_screen.dart';
@@ -55,118 +56,158 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
     setState(() => _selectedIndex = index);
   }
 
+  void _navigateToMenu(AppMenu menu) {
+    final authUser = ref.read(authStateProvider).value;
+    final allMenus = [
+      AppMenu.dashboard,
+      AppMenu.posBilling,
+      AppMenu.salesRegister,
+      AppMenu.purchases,
+      AppMenu.inventory,
+      AppMenu.khata,
+      AppMenu.reports,
+      AppMenu.businessInfo,
+      AppMenu.backup,
+      AppMenu.settings,
+      AppMenu.adminPanel,
+    ];
+    final visibleMenus = allMenus.where((m) => RoleGuard.canAccess(authUser, m)).toList();
+    final idx = visibleMenus.indexOf(menu);
+    if (idx != -1) {
+      setState(() => _selectedIndex = idx);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
     final authUser = ref.watch(authStateProvider).value;
-    final isCashier = authUser != null && authUser.hasRole('CASHIER') && !authUser.isAdmin;
-    final isAdmin = authUser?.isAdmin ?? false;
 
-    final List<Widget> pages;
-    final List<NavigationRailDestination> destinations;
-
-    if (isCashier) {
-      pages = const [
-        PosBillingScreen(),
-        SalesHistoryScreen(),
-        SettingsScreen(),
-      ];
-      destinations = const [
-        NavigationRailDestination(
-          icon: Icon(Icons.point_of_sale_outlined),
-          selectedIcon: Icon(Icons.point_of_sale),
-          label: Text('POS Billing (बिक्री)'),
+    final allItems = <_NavItem>[
+      _NavItem(
+        menu: AppMenu.dashboard,
+        widget: DashboardScreen(
+          onNavigateToSale: () => _navigateToMenu(AppMenu.posBilling),
+          onNavigateToPurchase: () => _navigateToMenu(AppMenu.purchases),
+          onNavigateToInventory: () => _navigateToMenu(AppMenu.inventory),
         ),
-        NavigationRailDestination(
-          icon: Icon(Icons.receipt_long_outlined),
-          selectedIcon: Icon(Icons.receipt_long),
-          label: Text('Sales Register (बिजक)'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('Settings (सेटिङ)'),
-        ),
-      ];
-    } else {
-      pages = [
-        DashboardScreen(
-          onNavigateToSale: () => _navigateToIndex(1),
-          onNavigateToPurchase: () => _navigateToIndex(3),
-          onNavigateToInventory: () => _navigateToIndex(4),
-        ),
-        const PosBillingScreen(),
-        const SalesHistoryScreen(),
-        const PurchaseScreen(),
-        const InventoryScreen(),
-        const KhataScreen(),
-        const ReportsDashboardScreen(),
-        const EditBusinessScreen(),
-        const BackupScreen(),
-        const SettingsScreen(),
-        if (isAdmin) const AdminSettingsHome(),
-      ];
-
-      destinations = [
-        const NavigationRailDestination(
+        destination: const NavigationRailDestination(
           icon: Icon(Icons.dashboard_outlined),
           selectedIcon: Icon(Icons.dashboard),
           label: Text('Dashboard / मुख्य पृष्ठ'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.posBilling,
+        widget: PosBillingScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.point_of_sale_outlined),
           selectedIcon: Icon(Icons.point_of_sale),
-          label: Text('POS Billing (बिक्री)'),
+          label: Text('Sajilo Billing POS (खुद्रा बिलिङ)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.salesRegister,
+        widget: SalesHistoryScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.receipt_long_outlined),
           selectedIcon: Icon(Icons.receipt_long),
           label: Text('Sales Register (बिजक)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.purchases,
+        widget: PurchaseScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.local_shipping_outlined),
           selectedIcon: Icon(Icons.local_shipping),
           label: Text('Purchases (खरिद)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.inventory,
+        widget: InventoryScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.inventory_2_outlined),
           selectedIcon: Icon(Icons.inventory_2),
           label: Text('Inventory (सामान)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.khata,
+        widget: KhataScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.menu_book_outlined),
           selectedIcon: Icon(Icons.menu_book),
           label: Text('Khata (उधारो खाता)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.reports,
+        widget: ReportsDashboardScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.analytics_outlined),
           selectedIcon: Icon(Icons.analytics),
           label: Text('Reports & IRD Tax (लेखा तथा कर)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.businessInfo,
+        widget: EditBusinessScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.business_outlined),
           selectedIcon: Icon(Icons.business),
           label: Text('Business Info (व्यापार)'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.backup,
+        widget: BackupScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.backup_table_outlined),
           selectedIcon: Icon(Icons.backup_table),
           label: Text('Backup / Restore'),
         ),
-        const NavigationRailDestination(
+      ),
+      const _NavItem(
+        menu: AppMenu.settings,
+        widget: SettingsScreen(),
+        destination: NavigationRailDestination(
           icon: Icon(Icons.settings_outlined),
           selectedIcon: Icon(Icons.settings),
           label: Text('Settings (सेटिङ)'),
         ),
-        if (isAdmin)
-          const NavigationRailDestination(
-            icon: Icon(Icons.admin_panel_settings_outlined),
-            selectedIcon: Icon(Icons.admin_panel_settings),
-            label: Text('Admin Panel (प्रशासक सेटिङ)'),
-          ),
-      ];
-    }
+      ),
+      const _NavItem(
+        menu: AppMenu.adminPanel,
+        widget: AdminSettingsHome(),
+        destination: NavigationRailDestination(
+          icon: Icon(Icons.admin_panel_settings_outlined),
+          selectedIcon: Icon(Icons.admin_panel_settings),
+          label: Text('Admin Panel (प्रशासक सेटिङ)'),
+        ),
+      ),
+    ];
+
+    final visibleItems = allItems.where((item) => RoleGuard.canAccess(authUser, item.menu)).toList();
+
+    final activeItems = visibleItems.isNotEmpty
+        ? visibleItems
+        : [
+            const _NavItem(
+              menu: AppMenu.settings,
+              widget: SettingsScreen(),
+              destination: NavigationRailDestination(
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings),
+                label: Text('Settings (सेटिङ)'),
+              ),
+            ),
+          ];
+
+    final pages = activeItems.map((it) => it.widget).toList();
+    final destinations = activeItems.map((it) => it.destination).toList();
 
     final safeIndex = _selectedIndex.clamp(0, pages.length - 1);
 
@@ -199,6 +240,33 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                       color: AppTheme.textDark,
                     ),
                   ),
+                  if (authUser?.isPlatformAdmin ?? false) ...[
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3E8FF),
+                        border: Border.all(color: const Color(0xFFC084FC)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.shield, size: 12, color: Color(0xFF7E22CE)),
+                          SizedBox(width: 4),
+                          Text(
+                            'PLATFORM ADMIN',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF7E22CE),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const Spacer(),
                   const SyncStatusBadge(),
                 ],
@@ -368,12 +436,20 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                                      color: authUser.isPlatformAdmin
+                                          ? const Color(0xFFF3E8FF)
+                                          : AppTheme.primaryBlue.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       authUser.roles.isNotEmpty ? authUser.roles.first : 'USER',
-                                      style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: authUser.isPlatformAdmin
+                                            ? const Color(0xFF7E22CE)
+                                            : AppTheme.primaryBlue,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -485,5 +561,17 @@ class SyncStatusBadge extends ConsumerWidget {
       orElse: () => const SizedBox.shrink(),
     );
   }
+}
+
+class _NavItem {
+  final AppMenu menu;
+  final Widget widget;
+  final NavigationRailDestination destination;
+
+  const _NavItem({
+    required this.menu,
+    required this.widget,
+    required this.destination,
+  });
 }
 

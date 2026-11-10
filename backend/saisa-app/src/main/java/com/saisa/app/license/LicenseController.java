@@ -50,7 +50,7 @@ public class LicenseController {
     }
 
     @PostMapping("/activate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN')")
     public ResponseEntity<LicenseStatusResponse> activateLicense(@RequestBody ActivateLicenseRequest req) {
         Long tenantId = TenantContext.getOptionalTenantId().orElse(1L);
 
@@ -73,7 +73,7 @@ public class LicenseController {
     }
 
     @PostMapping("/generate")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN')")
     public ResponseEntity<GeneratedLicenseResponse> generateLicense(@Valid @RequestBody GenerateLicenseRequest req) {
         LicenseContainer container = signerService.generateLicense(
                 req.tenantCode(),

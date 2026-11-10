@@ -16,6 +16,8 @@ public record OnboardTenantRequest(
     @NotBlank String adminUsername,
     @NotBlank String adminEmail,
     @NotBlank @Size(min = 6) String adminPassword,
-    @NotBlank String adminFullName
+    @NotBlank String adminFullName,
+    String licensePlan,
+    Integer licenseDurationDays
 ) {}
 

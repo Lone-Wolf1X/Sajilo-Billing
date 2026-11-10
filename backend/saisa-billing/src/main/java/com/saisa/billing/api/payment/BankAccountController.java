@@ -41,7 +41,7 @@ public class BankAccountController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<BankAccount> create(@Valid @RequestBody CreateBankAccountRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();
@@ -67,13 +67,14 @@ public class BankAccountController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
     public List<BankAccount> list() {
         return bankRepo.findByTenantIdAndActiveTrueOrderByAccountCode(
             TenantContext.getCurrentTenantId());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN')")
     public ResponseEntity<BankAccount> update(
             @PathVariable Long id,
             @RequestBody java.util.Map<String, Object> body) {
@@ -106,7 +107,7 @@ public class BankAccountController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Long tenantId = TenantContext.getCurrentTenantId();
 

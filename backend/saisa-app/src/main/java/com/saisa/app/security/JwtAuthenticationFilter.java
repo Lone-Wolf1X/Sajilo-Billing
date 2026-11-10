@@ -60,6 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // SECURITY: Set tenant context - only trusted source of tenant identity.
                 TenantContext.setCurrentTenantId(tenantId);
                 TenantContext.setCurrentUserId(userId);
+                TenantContext.setCurrentRoles(roles);
+
+                Long impTenantId = jwtService.extractImpersonatedTenantId(token);
+                if (impTenantId != null) {
+                    TenantContext.setImpersonatedTenantId(impTenantId);
+                    TenantContext.setImpersonatedTenantCode(jwtService.extractImpersonatedTenantCode(token));
+                }
             }
             chain.doFilter(request, response);
         } finally {

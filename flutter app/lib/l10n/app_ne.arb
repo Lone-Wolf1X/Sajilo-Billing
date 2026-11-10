@@ -1,7 +1,7 @@
 {
   "@@locale": "ne",
-  "appTitle": "सजिलो बिलिङ",
-  "onboardingTitle": "सजिलो बिलिङमा स्वागत छ",
+  "appTitle": "SAISA Pro (सईसा प्रो)",
+  "onboardingTitle": "SAISA Pro मा स्वागत छ",
   "onboardingSubtitle": "तपाईंको खुद्रा पसलको लागि व्यावसायिक बिजकहरू जारी गर्न व्यापार विवरण प्रविष्ट गर्नुहोस्।",
   "businessNameLabel": "व्यापार / पसलको नाम",
   "businessNameHint": "उदा. काठमाडौं किराना पसल",

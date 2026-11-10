@@ -36,6 +36,7 @@ public class PaymentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER', 'VIEWER')")
     @Transactional(readOnly = true)
     public List<PaymentResponse> list(
             @RequestParam(required = false) LocalDate from,
@@ -54,11 +55,21 @@ public class PaymentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER')")
     @Auditable(action = "PAYMENT_POSTED", entityType = "Payment")
     public ResponseEntity<PaymentResponse> create(@Valid @RequestBody CreatePaymentRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();
+
+        // Enforce CASHIER restrictions: Cashiers can only accept CASH payments from customers
+        if (TenantContext.hasRole("CASHIER") && !TenantContext.hasAnyRole("PLATFORM_ADMIN", "ADMIN", "ACCOUNTANT")) {
+            if (req.paymentMethod() != com.saisa.billing.domain.payment.PaymentMethod.CASH) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cashiers are only permitted to accept CASH payments");
+            }
+            if (req.partyType() != PartyType.CUSTOMER) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cashiers are only permitted to accept payments from customers");
+            }
+        }
 
         if (req.idempotencyKey() != null) {
             var existing = paymentRepo.findByTenantIdAndIdempotencyKey(tenantId, req.idempotencyKey());
@@ -104,6 +115,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER', 'VIEWER')")
     @Transactional(readOnly = true)
     public PaymentResponse get(@PathVariable Long id) {
         Payment p = paymentRepo.findByIdWithAllocations(id)

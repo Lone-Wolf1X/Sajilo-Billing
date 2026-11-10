@@ -15,3 +15,4 @@ public record GenerateLicenseRequest(
         @NotBlank String zipPassword,
         String deliveryEmail
 ) {}
+

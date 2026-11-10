@@ -35,7 +35,7 @@ public class StockAdjustmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<?> create(@Valid @RequestBody CreateAdjustmentRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();

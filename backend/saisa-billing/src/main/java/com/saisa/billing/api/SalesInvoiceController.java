@@ -39,6 +39,7 @@ public class SalesInvoiceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER', 'VIEWER')")
     @Transactional(readOnly = true)
     public List<SalesInvoiceResponse> list(
             @RequestParam(required = false) LocalDate from,
@@ -57,7 +58,7 @@ public class SalesInvoiceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER')")
     @Auditable(action = "SALES_INVOICE_CREATED", entityType = "SalesInvoice")
     public ResponseEntity<SalesInvoiceResponse> create(
             @Valid @RequestBody CreateSalesInvoiceRequest req) {
@@ -110,6 +111,7 @@ public class SalesInvoiceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'CASHIER', 'VIEWER')")
     @Transactional(readOnly = true)
     public SalesInvoiceResponse get(@PathVariable Long id) {
         SalesInvoice inv = salesRepo.findByIdWithLines(id)

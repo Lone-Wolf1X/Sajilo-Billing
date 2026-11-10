@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,8 +7,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, ShieldCheck, BookOpen, Layers, BarChart3 } from 'lucide-react';
+import { Dialog } from '@/components/ui/dialog';
+import {
+  Check,
+  ShieldCheck,
+  KeyRound,
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+  Layers,
+  BarChart3,
+  BookOpen,
+} from 'lucide-react';
 import { setupService } from '../services/setupService';
+import { authService } from '../services/authService';
 
 const loginSchema = z.object({
   tenantCode: z
@@ -37,15 +50,89 @@ export const LoginPage: React.FC = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      tenantCode: 'ACME',
-      username: 'admin',
-      password: 'Password@123',
+      tenantCode: '_platform',
+      username: 'superadmin',
+      password: 'ChangeMe#2026',
     },
   });
+
+  // Forgot Password / OTP Modal State
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+  const [forgotEmail, setForgotEmail] = useState('nextgeninnovationsprivatelimit@gmail.com');
+  const [forgotTenantCode, setForgotTenantCode] = useState('_platform');
+  const [forgotOtp, setForgotOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccessMessage, setForgotSuccessMessage] = useState('');
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      setForgotError('कृपया इमेल ठेगाना प्रविष्ट गर्नुहोस्।');
+      return;
+    }
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      const res = await authService.forgotPassword({
+        email: forgotEmail.trim(),
+        tenantCode: forgotTenantCode.trim() || undefined,
+      });
+      setForgotSuccessMessage(res.message);
+      setForgotStep(2);
+    } catch (err: any) {
+      setForgotError(err?.response?.data?.message || err?.message || 'OTP पठाउन सकिएन। कृपया इमेल जाँच गर्नुहोस्।');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotOtp.trim() || forgotOtp.trim().length !== 6) {
+      setForgotError('कृपया ६-अङ्कको OTP कोड प्रविष्ट गर्नुहोस्।');
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setForgotError('नयाँ पासवर्ड कम्तिमा ६ वर्णको हुनुपर्दछ।');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setForgotError('पासवर्डहरू मिलेनन्। कृपया दुवै फिल्डमा एउटै पासवर्ड राख्नुहोस्।');
+      return;
+    }
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      const res = await authService.resetPasswordWithOtp({
+        email: forgotEmail.trim(),
+        otp: forgotOtp.trim(),
+        newPassword: newPassword.trim(),
+      });
+      setForgotSuccessMessage(res.message);
+      setValue('password', newPassword.trim());
+      setTimeout(() => {
+        setForgotModalOpen(false);
+        setForgotStep(1);
+        setForgotOtp('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setForgotSuccessMessage('');
+      }, 2500);
+    } catch (err: any) {
+      setForgotError(err?.response?.data?.message || err?.message || 'पासवर्ड रिसेट गर्न सकिएन।');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
@@ -191,6 +278,18 @@ export const LoginPage: React.FC = () => {
                 <Label htmlFor="password" required className="mb-0">
                   Password
                 </Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotModalOpen(true);
+                    setForgotStep(1);
+                    setForgotError('');
+                    setForgotSuccessMessage('');
+                  }}
+                  className="text-xs text-primary-600 hover:text-primary-800 hover:underline font-semibold"
+                >
+                  पासवर्ड बिर्सनुभयो? (Forgot?)
+                </button>
               </div>
               <Input
                 id="password"
@@ -212,19 +311,174 @@ export const LoginPage: React.FC = () => {
               Sign In to Accounting System
             </Button>
 
-            {/* Quick Demo Hint */}
+            {/* Platform Superadmin Credentials Hint */}
             <div className="mt-4 p-3 rounded bg-blue-50/70 border border-blue-200 text-xs text-blue-900 space-y-1">
               <div className="font-semibold flex items-center justify-between">
-                <span>Quick Test Credentials:</span>
+                <span>Platform Superadmin Credentials:</span>
                 <span className="text-[10px] text-blue-700 font-mono bg-blue-100 px-1.5 py-0.5 rounded">Pre-filled</span>
               </div>
               <div className="flex items-center justify-between text-[11px] font-mono">
-                <span>Company: <strong>ACME</strong></span>
-                <span>User: <strong>admin</strong></span>
-                <span>Pass: <strong>Password@123</strong></span>
+                <span>Company: <strong>_platform</strong></span>
+                <span>User: <strong>superadmin</strong></span>
+                <span>Pass: <strong>ChangeMe#2026</strong></span>
+              </div>
+              <div className="text-[10px] text-blue-800 font-mono pt-0.5 flex items-center justify-between">
+                <span>Email: <strong>nextgeninnovationsprivatelimit@gmail.com</strong></span>
+                <span className="text-emerald-700 font-sans font-bold">● Live OTP</span>
               </div>
             </div>
           </form>
+
+          {/* Forgot Password & Reset via OTP Dialog */}
+          <Dialog
+            open={forgotModalOpen}
+            onOpenChange={setForgotModalOpen}
+            title={forgotStep === 1 ? "पासवर्ड रिसेट OTP अनुरोध (Request Password Reset OTP)" : "नयाँ पासवर्ड सेट गर्नुहोस् (Reset Password with OTP)"}
+            description={forgotStep === 1 ? "आफ्नो दर्ता गरिएको इमेल प्रविष्ट गर्नुहोस्। हामी तपाईंलाई ६-अङ्कको OTP कोड पठाउनेछौं।" : "तपाईंको इमेलमा प्राप्त भएको ६-अङ्कको OTP कोड र नयाँ पासवर्ड प्रविष्ट गर्नुहोस्।"}
+            className="max-w-md w-full"
+          >
+            {forgotError && (
+              <div className="mb-4 p-3 rounded bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                <span>{forgotError}</span>
+              </div>
+            )}
+
+            {forgotSuccessMessage && (
+              <div className="mb-4 p-3 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <span>{forgotSuccessMessage}</span>
+              </div>
+            )}
+
+            {forgotStep === 1 ? (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <Label htmlFor="forgotTenantCode">कम्पनी कोड (Company Code - Optional)</Label>
+                  <Input
+                    id="forgotTenantCode"
+                    value={forgotTenantCode}
+                    onChange={(e) => setForgotTenantCode(e.target.value)}
+                    placeholder="_platform वा कम्पनी कोड"
+                  />
+                  <p className="text-[11px] text-neutral-500 mt-1">Superadmin को लागि <code>_platform</code> राख्नुहोस्।</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="forgotEmail" required>दर्ता गरिएको इमेल (Registered Email Address)</Label>
+                  <div className="relative">
+                    <Input
+                      id="forgotEmail"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="e.g. nextgeninnovationsprivatelimit@gmail.com"
+                      required
+                      autoFocus
+                    />
+                    <Mail className="w-4 h-4 text-neutral-400 absolute right-3 top-3 pointer-events-none" />
+                  </div>
+                  <p className="text-[11px] text-neutral-500 mt-1">यस इमेलमा ६-अङ्कको गोप्य OTP कोड डेलिभर हुनेछ।</p>
+                </div>
+
+                <div className="pt-2 flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setForgotModalOpen(false)}
+                  >
+                    रद्द गर्नुहोस् (Cancel)
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    isLoading={forgotLoading}
+                    className="inline-flex items-center gap-1.5"
+                  >
+                    <span>इमेलमा OTP पठाउनुहोस्</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="bg-neutral-50 p-3 rounded border border-neutral-200 text-xs text-neutral-700">
+                  इमेल: <strong className="font-mono text-neutral-900">{forgotEmail}</strong>
+                </div>
+
+                <div>
+                  <Label htmlFor="forgotOtp" required>६-अङ्कको OTP कोड (Enter 6-Digit OTP)</Label>
+                  <Input
+                    id="forgotOtp"
+                    value={forgotOtp}
+                    onChange={(e) => setForgotOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    className="text-center font-mono text-xl tracking-[0.5em] font-bold"
+                    maxLength={6}
+                    required
+                    autoFocus
+                  />
+                  <p className="text-[11px] text-neutral-500 mt-1">तपाईंको Gmail इनबक्समा पठाइएको कोड यहाँ राख्नुहोस्।</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="newPassword" required>नयाँ पासवर्ड (New Password)</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="कम्तिमा ६ वर्ण"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword" required>नयाँ पासवर्ड पुनः पुष्टि गर्नुहोस् (Confirm Password)</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="नयाँ पासवर्ड दोहोर्याउनुहोस्"
+                    required
+                  />
+                </div>
+
+                <div className="pt-2 flex justify-between items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotStep(1);
+                      setForgotError('');
+                      setForgotSuccessMessage('');
+                    }}
+                    className="text-xs text-neutral-600 hover:text-neutral-900 underline"
+                  >
+                    ← इमेल परिवर्तन गर्नुहोस्
+                  </button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setForgotModalOpen(false)}
+                    >
+                      बन्द गर्नुहोस्
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      isLoading={forgotLoading}
+                      className="inline-flex items-center gap-1.5"
+                    >
+                      <KeyRound className="w-4 h-4" />
+                      <span>पासवर्ड परिवर्तन गर्नुहोस्</span>
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            )}
+          </Dialog>
 
           <div className="mt-6 pt-5 border-t border-paper-border text-center text-sm text-paper-muted">
             Need a new company workspace?{' '}

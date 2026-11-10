@@ -14,3 +14,4 @@ public record LicensePayload(
     int maxUsers,
     List<String> allowedFeatures
 ) {}
+

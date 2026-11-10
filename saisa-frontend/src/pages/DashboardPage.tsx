@@ -12,8 +12,11 @@ import { useBankAccounts } from '../hooks/useBankAccounts';
 import { useCreditNotes } from '../hooks/useCreditNotes';
 import { useDebitNotes } from '../hooks/useDebitNotes';
 import { useSetupStatus } from '../hooks/useSetup';
+import { useAuth } from '../hooks/useAuth';
+import { PlatformDashboard } from './dashboard/PlatformDashboard';
+import { CashierDashboard } from './dashboard/CashierDashboard';
 
-export const DashboardPage: React.FC = () => {
+export const FinancialDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { data: setupStatus, isLoading: isSetupLoading } = useSetupStatus();
 
@@ -519,4 +522,19 @@ export const DashboardPage: React.FC = () => {
       </div>
     </div>
   );
+};
+
+export const DashboardPage: React.FC = () => {
+  const { user } = useAuth();
+  const roles = user?.roles || [];
+
+  if (roles.includes('PLATFORM_ADMIN') || user?.tenantCode === '_platform') {
+    return <PlatformDashboard />;
+  }
+
+  if (roles.includes('CASHIER') && !roles.includes('ADMIN') && !roles.includes('ACCOUNTANT')) {
+    return <CashierDashboard />;
+  }
+
+  return <FinancialDashboard />;
 };

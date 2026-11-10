@@ -73,3 +73,40 @@ export const useSendTestEmail = () => {
   });
 };
 
+export const useDemoLeads = () => {
+  return useQuery({
+    queryKey: ['admin', 'demo-leads'],
+    queryFn: adminService.listDemoLeads,
+  });
+};
+
+export const useInjectLicense = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, plan, durationDays, maxUsers }: { id: number; plan: string; durationDays: number; maxUsers?: number }) =>
+      adminService.injectLicense(id, plan, durationDays, maxUsers),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'tenants'] });
+      toast.success('लाइसेन्स सफलतापूर्वक इन्जेक्ट गरियो! (License successfully injected)');
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || 'लाइसेन्स इन्जेक्ट गर्न सकिएन।');
+    },
+  });
+};
+
+export const useUpdateDemoLeadStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      adminService.updateDemoLeadStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'demo-leads'] });
+      toast.success('डेमो अनुरोधको स्थिति अद्यावधिक गरियो।');
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || 'स्थिति अद्यावधिक गर्न सकिएन।');
+    },
+  });
+};
+

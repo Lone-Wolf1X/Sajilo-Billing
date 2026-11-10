@@ -69,6 +69,12 @@ management:
         enabled: true
 
 saisa:
+  platform:
+    seed-enabled: ${PLATFORM_SEED_ENABLED:true}
+    superadmin-username: ${PLATFORM_ADMIN_USERNAME:superadmin}
+    superadmin-email: ${PLATFORM_ADMIN_EMAIL:nextgeninnovationsprivatelimit@gmail.com}
+    superadmin-password: ${PLATFORM_ADMIN_PASSWORD:ChangeMe#2026}
+    superadmin-full-name: ${PLATFORM_ADMIN_FULLNAME:NextGen Administrator}
   jwt:
     # Generate a new secret: openssl rand -base64 64
     # NEVER commit production secret to git. Use env var in prod.

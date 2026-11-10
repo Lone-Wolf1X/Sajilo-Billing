@@ -39,6 +39,29 @@ class SetupWizardEndToEndTest {
 
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper json;
+    @Autowired private com.saisa.app.ratelimit.RateLimitService rateLimitService;
+
+    @org.junit.jupiter.api.BeforeEach
+    void init() {
+        rateLimitService.clearAll();
+    }
+
+    private String impersonateAsPlatformAdmin(String tenantCode) throws Exception {
+        rateLimitService.clearAll();
+        var loginReq = new com.saisa.app.auth.dto.LoginRequest("_platform", "superadmin", "ChangeMe#2026");
+        String loginRes = mvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(loginReq)))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        String superadminToken = json.readTree(loginRes).get("accessToken").asText();
+
+        String impRes = mvc.perform(post("/api/v1/platform/impersonate/" + tenantCode)
+                .header("Authorization", "Bearer " + superadminToken))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        return json.readTree(impRes).get("accessToken").asText();
+    }
 
     @Test
     void completeBusinessProfileSetupFlow() throws Exception {
@@ -62,26 +85,34 @@ class SetupWizardEndToEndTest {
         JsonNode regNode = json.readTree(regRes);
         String token = regNode.get("accessToken").asText();
 
-        // 2. Check initial setup status
+        // 2. Security Check: Tenant ADMIN is strictly forbidden from running setup wizard
         mvc.perform(get("/api/v1/setup/status")
                 .header("Authorization", "Bearer " + token))
+            .andExpect(status().isForbidden());
+
+        // Platform Admin impersonates tenant to perform official setup wizard onboarding
+        String platformToken = impersonateAsPlatformAdmin(tenantCode);
+
+        // 3. Check initial setup status via platform token
+        mvc.perform(get("/api/v1/setup/status")
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupCompleted").value(false))
             .andExpect(jsonPath("$.setupStep").value(1))
             .andExpect(jsonPath("$.companyName").value("Himalayan Traders Pvt Ltd"));
 
-        // 3. Check locations & registration authorities catalog
+        // 4. Check locations & registration authorities catalog
         mvc.perform(get("/api/v1/setup/registration-authorities")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$['Office of the Company Registrar'].np").value("कम्पनी रजिष्ट्रारको कार्यालय"));
 
         mvc.perform(get("/api/v1/setup/locations")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.provinces[0].en").exists());
 
-        // 4. Update Profile (Phase 1)
+        // 5. Update Profile (Phase 1)
         var updateReq = new UpdateProfileRequest(
             "Himalayan Traders Pvt. Ltd.",
             "हिमालयन ट्रेडर्स प्रा. लि.",
@@ -109,7 +140,7 @@ class SetupWizardEndToEndTest {
         );
 
         mvc.perform(put("/api/v1/setup/profile")
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(updateReq)))
             .andExpect(status().isOk())
@@ -125,24 +156,24 @@ class SetupWizardEndToEndTest {
             .andExpect(jsonPath("$.authorizedPersonName").value("Pasang Sherpa"))
             .andExpect(jsonPath("$.setupStep").value(2));
 
-        // 5. Get Profile and verify persistence
+        // 6. Get Profile and verify persistence
         mvc.perform(get("/api/v1/setup/profile")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.companyNameNepali").value("हिमालयन ट्रेडर्स प्रा. लि."))
             .andExpect(jsonPath("$.authorizedPersonDesignation").value("Managing Director"))
             .andExpect(jsonPath("$.registrationAuthority").value("Office of the Company Registrar"));
 
-        // 6. Complete Setup
+        // 7. Complete Setup
         mvc.perform(post("/api/v1/setup/complete")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupCompleted").value(true))
             .andExpect(jsonPath("$.setupStep").value(4));
 
-        // 7. Status reflects completion
+        // 8. Status reflects completion
         mvc.perform(get("/api/v1/setup/status")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupCompleted").value(true))
             .andExpect(jsonPath("$.setupStep").value(4));
@@ -170,6 +201,14 @@ class SetupWizardEndToEndTest {
         JsonNode regNode = json.readTree(regRes);
         String token = regNode.get("accessToken").asText();
 
+        // Security Check: Tenant ADMIN is strictly forbidden from accessing setup opening balances
+        mvc.perform(get("/api/v1/setup/opening-balances")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isForbidden());
+
+        // Platform Admin impersonates tenant to manage opening balances
+        String platformToken = impersonateAsPlatformAdmin(tenantCode);
+
         // 2. Create accounting period for FY 2026-27 (2026-07-17 to 2027-07-16)
         var periodReq = Map.of(
             "periodName", "FY 2026-27",
@@ -184,7 +223,7 @@ class SetupWizardEndToEndTest {
 
         // 3. Verify initially no opening balances posted
         mvc.perform(get("/api/v1/setup/opening-balances")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.posted").value(false));
 
@@ -196,7 +235,7 @@ class SetupWizardEndToEndTest {
             "1000.00", null // Assets: 50,000 != Liabilities+Equity: 1,000
         );
         mvc.perform(post("/api/v1/setup/opening-balances")
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(unbalancedReq)))
             .andExpect(status().is4xxClientError());
@@ -217,7 +256,7 @@ class SetupWizardEndToEndTest {
             null           // Retained Earnings
         );
         mvc.perform(post("/api/v1/setup/opening-balances")
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(validReq)))
             .andExpect(status().isCreated())
@@ -237,18 +276,18 @@ class SetupWizardEndToEndTest {
 
         // 7. Verify setup status has advanced to at least step 2
         mvc.perform(get("/api/v1/setup/status")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupStep").value(2));
 
         // 8. Reset via reversal
         mvc.perform(delete("/api/v1/setup/opening-balances?reason=Wrong amounts")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isNoContent());
 
         // 9. Verify opening balance is cleared
         mvc.perform(get("/api/v1/setup/opening-balances")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.posted").value(false));
 
@@ -268,7 +307,7 @@ class SetupWizardEndToEndTest {
             null
         );
         mvc.perform(post("/api/v1/setup/opening-balances")
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(rePostReq)))
             .andExpect(status().isCreated())
@@ -355,7 +394,7 @@ class SetupWizardEndToEndTest {
 
         long warehouseId = json.readTree(whRes).get("id").asLong();
 
-        // 6. Post Opening Stock:
+        // 6. Prepare Opening Stock:
         // Item 1: 100 pcs @ Rs 350 = 35,000
         // Item 2: 50 pcs @ Rs 600 = 30,000
         // Total stock value = 65,000
@@ -368,8 +407,18 @@ class SetupWizardEndToEndTest {
             )
         );
 
+        // Security Check: Tenant ADMIN is strictly forbidden from posting opening stock via setup wizard
         mvc.perform(post("/api/v1/setup/opening-stock")
                 .header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.writeValueAsString(stockReq)))
+            .andExpect(status().isForbidden());
+
+        // Platform Admin impersonates tenant to configure opening stock
+        String platformToken = impersonateAsPlatformAdmin(tenantCode);
+
+        mvc.perform(post("/api/v1/setup/opening-stock")
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(stockReq)))
             .andExpect(status().isCreated())
@@ -380,14 +429,14 @@ class SetupWizardEndToEndTest {
 
         // 7. Verify Idempotency: Second call rejected
         mvc.perform(post("/api/v1/setup/opening-stock")
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + platformToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.writeValueAsString(stockReq)))
             .andExpect(status().is4xxClientError());
 
         // 8. Query Opening Stock Status
         mvc.perform(get("/api/v1/setup/opening-stock")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.posted").value(true))
             .andExpect(jsonPath("$.totalValue").value(65000.0));
@@ -402,7 +451,7 @@ class SetupWizardEndToEndTest {
 
         // 10. Complete Setup
         mvc.perform(post("/api/v1/setup/complete")
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + platformToken))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.setupCompleted").value(true))
             .andExpect(jsonPath("$.setupStep").value(4));

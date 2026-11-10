@@ -13,6 +13,12 @@ spring:
     locations: classpath:db/migration
 
 saisa:
+  platform:
+    seed-enabled: true
+    superadmin-username: superadmin
+    superadmin-email: superadmin@nextgeninnovations.com.np
+    superadmin-password: ChangeMe#2026
+    superadmin-full-name: SAISA Pro Super Admin
   jwt:
     secret: dGhpcy1pcy1hLXRlc3Qtb25seS1zZWNyZXQta2V5LWZvci1zYWlzYS1hY2NvdW50aW5nLWtleS1sZW5ndGgtNjQ=
     access-token-validity-minutes: 15

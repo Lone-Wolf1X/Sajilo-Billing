@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/setup")
+@PreAuthorize("hasRole('PLATFORM_ADMIN')")
 public class SetupController {
 
     private final ProfileSetupService setupService;
@@ -37,7 +38,6 @@ public class SetupController {
     }
 
     @PutMapping("/profile")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CompanyProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest req) {
         return ResponseEntity.ok(setupService.updateProfile(req));
     }
@@ -48,7 +48,6 @@ public class SetupController {
     }
 
     @PostMapping("/complete")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SetupStatusResponse> completeSetup() {
         return ResponseEntity.ok(setupService.completeSetup());
     }
@@ -70,7 +69,6 @@ public class SetupController {
     }
 
     @PostMapping("/opening-balances")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OpeningBalanceResponse> postOpeningBalances(
             @Valid @RequestBody OpeningBalanceRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
@@ -80,7 +78,6 @@ public class SetupController {
     }
 
     @DeleteMapping("/opening-balances")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> resetOpeningBalances(
             @RequestParam(required = false, defaultValue = "Reset opening balances") String reason) {
         Long tenantId = TenantContext.getCurrentTenantId();
@@ -96,7 +93,6 @@ public class SetupController {
     }
 
     @PostMapping("/opening-stock")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OpeningStockResponse> postOpeningStock(
             @Valid @RequestBody OpeningStockRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();

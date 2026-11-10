@@ -17,3 +17,4 @@ public record LicenseStatusResponse(
         List<String> allowedFeatures,
         boolean expired
 ) {}
+

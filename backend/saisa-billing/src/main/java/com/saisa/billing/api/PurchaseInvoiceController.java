@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/purchase-invoices")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class PurchaseInvoiceController {
 
     private final BillingService billingService;
@@ -56,7 +57,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<PurchaseInvoiceResponse> create(
             @Valid @RequestBody CreatePurchaseInvoiceRequest req) {
 

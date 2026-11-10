@@ -78,7 +78,7 @@ class CompanyProfile {
 
 final companyProfileProvider = FutureProvider.autoDispose<CompanyProfile>((ref) async {
   final api = ref.read(apiClientProvider);
-  final json = await api.get<Map<String, dynamic>>('/setup/profile');
+  final json = await api.get<Map<String, dynamic>>('/admin/profile');
   return CompanyProfile.fromJson(json);
 });
 
@@ -164,7 +164,7 @@ class _CompanyProfileScreenState extends ConsumerState<CompanyProfileScreen> {
     });
     try {
       final api = ref.read(apiClientProvider);
-      await api.put<Map<String, dynamic>>('/setup/profile', data: {
+      await api.put<Map<String, dynamic>>('/admin/profile', data: {
         'companyName': _companyName.text.trim(),
         'companyNameNepali': _companyNameNepali.text.trim().isEmpty
             ? null

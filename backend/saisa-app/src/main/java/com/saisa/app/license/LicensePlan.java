@@ -6,3 +6,4 @@ public enum LicensePlan {
     GROWTH,
     ENTERPRISE
 }
+

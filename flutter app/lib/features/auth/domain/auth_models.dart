@@ -73,7 +73,11 @@ class AuthUser {
   });
 
   bool hasRole(String role) => roles.contains(role);
-  bool get isAdmin => hasRole('ADMIN');
+  bool get isPlatformAdmin => hasRole('PLATFORM_ADMIN');
+  bool get isAdmin => hasRole('ADMIN') || isPlatformAdmin;
+  bool get isAccountant => hasRole('ACCOUNTANT') || isAdmin;
+  bool get isCashier => hasRole('CASHIER');
+  bool get isViewer => hasRole('VIEWER');
   String get displayName => fullName ?? tenantCode;
 }
 

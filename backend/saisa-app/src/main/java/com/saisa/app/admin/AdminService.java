@@ -2,6 +2,11 @@ package com.saisa.app.admin;
 
 import com.saisa.app.admin.dto.OnboardTenantRequest;
 import com.saisa.app.admin.dto.TenantSummaryResponse;
+import com.saisa.app.license.LicenseContainer;
+import com.saisa.app.license.LicensePlan;
+import com.saisa.app.license.LicenseSignerService;
+import com.saisa.app.license.LicenseStatusResponse;
+import com.saisa.app.license.LicenseVerifierService;
 import com.saisa.billing.infrastructure.persistence.SalesInvoiceRepository;
 import com.saisa.common.tenant.Tenant;
 import com.saisa.common.tenant.TenantRepository;
@@ -30,6 +35,8 @@ public class AdminService {
     private final SalesInvoiceRepository invoiceRepo;
     private final WarehouseRepository warehouseRepo;
     private final PasswordEncoder passwordEncoder;
+    private final LicenseSignerService signerService;
+    private final LicenseVerifierService verifierService;
 
     public AdminService(TenantRepository tenantRepo,
                         UserRepository userRepo,
@@ -37,7 +44,9 @@ public class AdminService {
                         ChartOfAccountRepository accountRepo,
                         SalesInvoiceRepository invoiceRepo,
                         WarehouseRepository warehouseRepo,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder,
+                        LicenseSignerService signerService,
+                        LicenseVerifierService verifierService) {
         this.tenantRepo = tenantRepo;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -45,10 +54,14 @@ public class AdminService {
         this.invoiceRepo = invoiceRepo;
         this.warehouseRepo = warehouseRepo;
         this.passwordEncoder = passwordEncoder;
+        this.signerService = signerService;
+        this.verifierService = verifierService;
     }
 
     public List<TenantSummaryResponse> listTenants() {
-        return tenantRepo.findAll().stream().map(t -> {
+        return tenantRepo.findAll().stream()
+            .filter(t -> !"_platform".equals(t.getTenantCode()))
+            .map(t -> {
             long userCount = userRepo.countByTenantId(t.getId());
             long invoiceCount = invoiceRepo.countByTenantId(t.getId());
             return new TenantSummaryResponse(
@@ -118,6 +131,29 @@ public class AdminService {
         admin.setRoles(Set.of(adminRole));
         userRepo.save(admin);
 
+        // Bind initial cryptographic license
+        LicensePlan plan = LicensePlan.GROWTH;
+        if (req.licensePlan() != null && !req.licensePlan().isBlank()) {
+            try {
+                plan = LicensePlan.valueOf(req.licensePlan().trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {}
+        }
+        int durationDays = (req.licenseDurationDays() != null && req.licenseDurationDays() > 0)
+            ? req.licenseDurationDays()
+            : (plan == LicensePlan.TRIAL ? 30 : 365);
+        try {
+            LicenseContainer container = signerService.generateLicense(
+                tenant.getTenantCode(),
+                tenant.getCompanyName(),
+                tenant.getPanVatNo(),
+                plan,
+                durationDays,
+                5,
+                null
+            );
+            verifierService.activateLicense(tenant.getId(), container);
+        } catch (Exception ignored) {}
+
         return new TenantSummaryResponse(
             tenant.getId(),
             tenant.getTenantCode(),
@@ -154,6 +190,32 @@ public class AdminService {
             userRepo.countByTenantId(tenant.getId()),
             invoiceRepo.countByTenantId(tenant.getId())
         );
+    }
+
+    @Transactional
+    public LicenseStatusResponse injectLicense(Long tenantId, String planStr, Integer durationDays, Integer maxUsers) {
+        Tenant tenant = tenantRepo.findById(tenantId)
+            .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
+        LicensePlan plan = LicensePlan.GROWTH;
+        if (planStr != null && !planStr.isBlank()) {
+            try {
+                plan = LicensePlan.valueOf(planStr.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid license plan: " + planStr);
+            }
+        }
+        int days = (durationDays != null && durationDays > 0) ? durationDays : 365;
+        int users = (maxUsers != null && maxUsers > 0) ? maxUsers : 5;
+        LicenseContainer container = signerService.generateLicense(
+            tenant.getTenantCode(),
+            tenant.getCompanyName(),
+            tenant.getPanVatNo(),
+            plan,
+            days,
+            users,
+            null
+        );
+        return verifierService.activateLicense(tenant.getId(), container);
     }
 
     private void seedSystemAccounts(Long tenantId) {

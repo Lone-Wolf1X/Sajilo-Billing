@@ -5,3 +5,4 @@ public record LicenseContainer(
     String signature,
     String algorithm
 ) {}
+

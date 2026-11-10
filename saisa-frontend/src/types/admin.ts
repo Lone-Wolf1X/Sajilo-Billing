@@ -27,6 +27,22 @@ export interface OnboardTenantPayload {
   adminEmail: string;
   adminPassword: string;
   adminFullName: string;
+  licensePlan?: string;
+  licenseDurationDays?: number;
+}
+
+export interface DemoLead {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  city?: string;
+  status: string;
+  requestedPlan: string;
+  notes?: string;
+  convertedTenantId?: number;
+  createdAt: string;
 }
 
 export interface EmailSettings {

@@ -7,12 +7,13 @@ import 'package:flutter/foundation.dart';
 class AppConfig {
   AppConfig._();
 
-  static const String _defaultBaseUrl = 'http://localhost:8080';
+  static const String _devBaseUrl = 'http://localhost:8080';
+  static const String _prodBaseUrl = 'https://nextgeninnovations.com.np/saisa-api';
 
   static String get baseUrl {
     const fromEnv = String.fromEnvironment('SAISA_API_URL');
     if (fromEnv.isNotEmpty) return fromEnv;
-    return _defaultBaseUrl;
+    return kReleaseMode ? _prodBaseUrl : _devBaseUrl;
   }
 
   static const String apiVersion = 'v1';
@@ -20,7 +21,8 @@ class AppConfig {
   static const Duration receiveTimeout = Duration(seconds: 30);
 
   /// App identity for logging / audit
-  static String get appName => 'Sajilo Billing';
+  static String get appName => 'SAISA Pro';
+  static String get appTagline => 'Enterprise Accounting & Sajilo Billing POS';
   static String get appVersion => '1.0.0';
   static bool get isDebug => kDebugMode;
 }

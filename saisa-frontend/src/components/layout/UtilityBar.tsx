@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 export const UtilityBar: React.FC = () => {
   const { user, logout } = useAuth();
 
+  const isPlatform = user?.tenantCode === '_platform' || user?.roles?.includes('PLATFORM_ADMIN');
   const tenantCode = user?.tenantCode || 'ACME-01';
   const username = user?.fullName || user?.username || 'Administrator';
   const role = user?.roles?.[0] || 'ADMIN';
@@ -12,7 +13,9 @@ export const UtilityBar: React.FC = () => {
     <div className="bg-[#142338] text-[#c5d5e8] text-xs py-1.5 px-4 md:px-6 flex flex-wrap justify-between items-center gap-2 border-b border-[#233a59]">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="font-semibold text-white flex items-center gap-1">
-          🏢 {user?.tenantCode ? `${user.tenantCode.toUpperCase()} Enterprise` : 'Acme Traders Pvt. Ltd.'}
+          {isPlatform
+            ? '⚡ SAISA Pro • Platform Operations Console'
+            : `🏢 ${user?.tenantCode ? `${user.tenantCode.toUpperCase()} Enterprise` : 'Sajilo Billing Store'}`}
         </span>
         <span className="text-[#3d5a80]">|</span>
         <span>

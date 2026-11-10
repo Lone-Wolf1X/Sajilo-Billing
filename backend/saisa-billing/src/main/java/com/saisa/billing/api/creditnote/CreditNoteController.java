@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/credit-notes")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class CreditNoteController {
 
     private final CreditNoteService service;
@@ -32,7 +33,7 @@ public class CreditNoteController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     @Auditable(action = "CREDIT_NOTE_POSTED", entityType = "CreditNote")
     public ResponseEntity<CreditNoteResponse> create(
             @Valid @RequestBody CreateCreditNoteRequest req) {

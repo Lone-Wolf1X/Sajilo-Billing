@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class ChartOfAccountsController {
 
     private final ChartOfAccountRepository accountRepo;
@@ -43,7 +44,7 @@ public class ChartOfAccountsController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest req) {
         Long tenantId = AuthenticatedUser.tenantId();
 

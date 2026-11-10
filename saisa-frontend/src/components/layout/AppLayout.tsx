@@ -5,20 +5,23 @@ import { MainNav } from './MainNav';
 import { FunctionKeysBar } from './FunctionKeysBar';
 import { Footer } from './Footer';
 import { useSetupStatus } from '../../hooks/useSetup';
+import { useAuth } from '../../hooks/useAuth';
 import { AlertCircle, ArrowRight } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const { data: setupStatus } = useSetupStatus();
 
+  const isPlatformAdmin = user?.roles?.includes('PLATFORM_ADMIN') || user?.tenantCode === '_platform';
   const showSetupBanner =
-    setupStatus && !setupStatus.setupCompleted && location.pathname !== '/setup';
+    !isPlatformAdmin && setupStatus && !setupStatus.setupCompleted && location.pathname !== '/setup';
 
   return (
     <div className="flex flex-col min-h-screen bg-paper text-paper-text">
       <UtilityBar />
       <MainNav />
-      <FunctionKeysBar />
+      {!isPlatformAdmin && <FunctionKeysBar />}
 
       <main className="flex-1 max-w-[1400px] w-full mx-auto p-4 md:p-6">
         {showSetupBanner && (

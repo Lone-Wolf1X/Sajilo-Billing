@@ -31,7 +31,7 @@ public class ItemController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<ItemResponse> create(@Valid @RequestBody CreateItemRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
         Long userId = TenantContext.getCurrentUserId();
@@ -67,7 +67,7 @@ public class ItemController {
     }
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     @Transactional
     public ResponseEntity<BulkItemResponse> createBulk(@Valid @RequestBody BulkItemRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
@@ -122,7 +122,7 @@ public class ItemController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ItemResponse update(@PathVariable Long id, @Valid @RequestBody UpdateItemRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();
 

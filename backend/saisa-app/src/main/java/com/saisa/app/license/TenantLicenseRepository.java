@@ -12,3 +12,4 @@ public interface TenantLicenseRepository extends JpaRepository<TenantLicense, Lo
 
     Optional<TenantLicense> findByLicenseId(String licenseId);
 }
+

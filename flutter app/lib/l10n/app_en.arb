@@ -1,10 +1,10 @@
 {
   "@@locale": "en",
-  "appTitle": "Sajilo Billing",
+  "appTitle": "SAISA Pro",
   "@appTitle": {
     "description": "Application title"
   },
-  "onboardingTitle": "Welcome to Sajilo Billing",
+  "onboardingTitle": "Welcome to SAISA Pro",
   "onboardingSubtitle": "Setup your business profile to start generating professional invoices for your retail store.",
   "businessNameLabel": "Business / Shop Name",
   "businessNameHint": "e.g., Kathmandu Kirana Pasal",

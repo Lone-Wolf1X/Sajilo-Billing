@@ -318,3 +318,4 @@ class _NewAccountDialogState extends ConsumerState<_NewAccountDialog> {
     );
   }
 }
+

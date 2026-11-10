@@ -5,3 +5,4 @@ public record ActivateLicenseRequest(
         String zipPassword,
         String licenseJson
 ) {}
+

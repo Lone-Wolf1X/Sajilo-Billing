@@ -14,10 +14,16 @@ import org.springframework.context.annotation.Configuration;
 public class RateLimitConfig {
 
     private static int regCapacity = 3;
+    private static int loginCapacity = 5;
 
     @Value("${saisa.ratelimit.register-capacity:3}")
     public void setRegisterCapacity(int capacity) {
         regCapacity = capacity;
+    }
+
+    @Value("${saisa.ratelimit.login-capacity:5}")
+    public void setLoginCapacity(int capacity) {
+        loginCapacity = capacity;
     }
 
     /**
@@ -32,10 +38,10 @@ public class RateLimitConfig {
             .build();
     }
 
-    /** Login: 5 attempts per 15 minutes. */
+    /** Login: 5 attempts per 15 minutes by default, configurable for tests. */
     public static Bucket newLoginBucket() {
         return Bucket.builder()
-            .addLimit(Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(15))))
+            .addLimit(Bandwidth.classic(loginCapacity, Refill.greedy(loginCapacity, Duration.ofMinutes(15))))
             .build();
     }
 

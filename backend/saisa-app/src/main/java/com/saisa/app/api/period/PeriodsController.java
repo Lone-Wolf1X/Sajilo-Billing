@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/periods")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class PeriodsController {
 
     private final AccountingPeriodRepository periodRepo;
@@ -47,7 +48,7 @@ public class PeriodsController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<PeriodResponse> create(@Valid @RequestBody CreatePeriodRequest req) {
         if (req.endDate().isBefore(req.startDate())) {
             throw new InvalidJournalEntryException("endDate must be >= startDate");

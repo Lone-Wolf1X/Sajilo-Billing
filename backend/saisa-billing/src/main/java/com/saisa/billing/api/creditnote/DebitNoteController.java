@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/debit-notes")
+@PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
 public class DebitNoteController {
 
     private final DebitNoteService service;
@@ -31,7 +32,7 @@ public class DebitNoteController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT')")
     public ResponseEntity<DebitNoteResponse> create(
             @Valid @RequestBody CreateDebitNoteRequest req) {
         Long tenantId = TenantContext.getCurrentTenantId();

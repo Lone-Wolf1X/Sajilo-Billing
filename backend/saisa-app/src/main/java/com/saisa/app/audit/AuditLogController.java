@@ -23,7 +23,7 @@ public class AuditLogController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('PLATFORM_ADMIN', 'ADMIN', 'ACCOUNTANT', 'VIEWER')")
     public List<AuditLog> list(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String action,

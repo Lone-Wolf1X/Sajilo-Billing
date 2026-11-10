@@ -172,7 +172,7 @@ public class AuthService {
 
         return new AuthResponse(
             accessToken, refreshToken, 900,  // 15 minutes
-            user.getId(), user.getTenantId(), tenantCode);
+            user.getId(), user.getTenantId(), tenantCode, roles);
     }
 
     @Transactional
