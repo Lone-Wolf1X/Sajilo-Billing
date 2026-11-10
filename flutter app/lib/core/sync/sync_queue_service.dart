@@ -124,3 +124,4 @@ class SyncSummary {
   final int failed;
   const SyncSummary({required this.synced, required this.failed});
 }
+

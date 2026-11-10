@@ -109,6 +109,31 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
         final contentArea = Column(
           children: [
             const SyncPausedBanner(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.desktop_windows, size: 16, color: AppTheme.textMuted),
+                  const SizedBox(width: 8),
+                  Text(
+                    destinations[_selectedIndex].label is Text
+                        ? (destinations[_selectedIndex].label as Text).data ?? ''
+                        : '',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppTheme.textDark,
+                    ),
+                  ),
+                  const Spacer(),
+                  const SyncStatusBadge(),
+                ],
+              ),
+            ),
             Expanded(child: pages[_selectedIndex]),
           ],
         );
@@ -341,3 +366,47 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
     );
   }
 }
+
+class SyncStatusBadge extends ConsumerWidget {
+  const SyncStatusBadge({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pendingAsync = ref.watch(pendingSyncCountProvider);
+    return pendingAsync.maybeWhen(
+      data: (count) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: count == 0 ? const Color(0xFFE6F4EA) : const Color(0xFFFEF3C7),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: count == 0
+                ? const Color(0xFF34A853).withOpacity(0.3)
+                : const Color(0xFFF59E0B).withOpacity(0.4),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              count == 0 ? Icons.cloud_done : Icons.cloud_upload,
+              size: 14,
+              color: count == 0 ? const Color(0xFF137333) : const Color(0xFFB45309),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              count == 0 ? 'All Synced' : '$count Pending',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: count == 0 ? const Color(0xFF137333) : const Color(0xFFB45309),
+              ),
+            ),
+          ],
+        ),
+      ),
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+}
+

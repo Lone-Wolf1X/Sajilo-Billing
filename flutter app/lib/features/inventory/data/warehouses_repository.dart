@@ -10,3 +10,4 @@ class WarehousesRepository {
     return data.map((e) => SaisaWarehouse.fromJson(e as Map<String, dynamic>)).toList();
   }
 }
+

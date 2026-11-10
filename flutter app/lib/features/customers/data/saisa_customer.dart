@@ -36,3 +36,4 @@ class SaisaCustomer {
         active: j['active'] as bool? ?? true,
       );
 }
+

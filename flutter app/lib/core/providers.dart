@@ -12,6 +12,8 @@ import '../features/inventory/data/items_repository.dart';
 import '../features/inventory/data/saisa_item.dart';
 import '../features/inventory/data/saisa_warehouse.dart';
 import '../features/inventory/data/warehouses_repository.dart';
+import '../features/billing/data/pos_invoice_repository.dart';
+import '../features/billing/application/pos_billing_service.dart';
 
 /// Token storage — singleton
 final tokenStorageProvider = Provider<TokenStorage>((ref) {
@@ -126,4 +128,17 @@ final syncQueueServiceProvider = Provider<SyncQueueService>((ref) {
 /// Sync queue pending count — for header badge
 final pendingSyncCountProvider = FutureProvider.autoDispose<int>((ref) async {
   return ref.read(syncQueueServiceProvider).pendingCount();
+});
+
+/// POS Invoice repository
+final posInvoiceRepositoryProvider = Provider<PosInvoiceRepository>((ref) {
+  return PosInvoiceRepository(ref.read(apiClientProvider));
+});
+
+/// POS Billing service
+final posBillingServiceProvider = Provider<PosBillingService>((ref) {
+  return PosBillingService(
+    invoiceRepo: ref.read(posInvoiceRepositoryProvider),
+    syncQueue: ref.read(syncQueueServiceProvider),
+  );
 });

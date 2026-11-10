@@ -21,3 +21,4 @@ class SaisaWarehouse {
         active: j['active'] as bool? ?? true,
       );
 }
+
