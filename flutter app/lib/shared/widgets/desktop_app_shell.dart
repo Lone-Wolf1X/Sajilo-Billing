@@ -17,6 +17,7 @@ import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/sync/presentation/sync_paused_banner.dart';
 import '../../features/sync/presentation/sync_queue_viewer_dialog.dart';
+import '../../features/admin/presentation/users_management_screen.dart';
 
 class DesktopAppShell extends ConsumerStatefulWidget {
   const DesktopAppShell({super.key});
@@ -58,70 +59,109 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
     final authUser = ref.watch(authStateProvider).value;
+    final isCashier = authUser != null && authUser.hasRole('CASHIER') && !authUser.isAdmin;
+    final isAdmin = authUser?.isAdmin ?? false;
 
-    final pages = [
-      DashboardScreen(
-        onNavigateToSale: () => _navigateToIndex(1),
-        onNavigateToPurchase: () => _navigateToIndex(3),
-        onNavigateToInventory: () => _navigateToIndex(4),
-      ),
-      const PosBillingScreen(),
-      const SalesHistoryScreen(),
-      const PurchaseScreen(),
-      const InventoryScreen(),
-      const KhataScreen(),
-      const EditBusinessScreen(),
-      const BackupScreen(),
-      const SettingsScreen(),
-    ];
+    final List<Widget> pages;
+    final List<NavigationRailDestination> destinations;
 
-    const destinations = [
-      NavigationRailDestination(
-        icon: Icon(Icons.dashboard_outlined),
-        selectedIcon: Icon(Icons.dashboard),
-        label: Text('Dashboard / मुख्य पृष्ठ'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.point_of_sale_outlined),
-        selectedIcon: Icon(Icons.point_of_sale),
-        label: Text('POS Billing (बिक्री)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.receipt_long_outlined),
-        selectedIcon: Icon(Icons.receipt_long),
-        label: Text('Sales Register (बिजक)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.local_shipping_outlined),
-        selectedIcon: Icon(Icons.local_shipping),
-        label: Text('Purchases (खरिद)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.inventory_2_outlined),
-        selectedIcon: Icon(Icons.inventory_2),
-        label: Text('Inventory (सामान)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.menu_book_outlined),
-        selectedIcon: Icon(Icons.menu_book),
-        label: Text('Khata (उधारो खाता)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.business_outlined),
-        selectedIcon: Icon(Icons.business),
-        label: Text('Business Info (व्यापार)'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.backup_table_outlined),
-        selectedIcon: Icon(Icons.backup_table),
-        label: Text('Backup / Restore'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.settings_outlined),
-        selectedIcon: Icon(Icons.settings),
-        label: Text('Settings (सेटिङ)'),
-      ),
-    ];
+    if (isCashier) {
+      pages = const [
+        PosBillingScreen(),
+        SalesHistoryScreen(),
+        SettingsScreen(),
+      ];
+      destinations = const [
+        NavigationRailDestination(
+          icon: Icon(Icons.point_of_sale_outlined),
+          selectedIcon: Icon(Icons.point_of_sale),
+          label: Text('POS Billing (बिक्री)'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.receipt_long_outlined),
+          selectedIcon: Icon(Icons.receipt_long),
+          label: Text('Sales Register (बिजक)'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
+          label: Text('Settings (सेटिङ)'),
+        ),
+      ];
+    } else {
+      pages = [
+        DashboardScreen(
+          onNavigateToSale: () => _navigateToIndex(1),
+          onNavigateToPurchase: () => _navigateToIndex(3),
+          onNavigateToInventory: () => _navigateToIndex(4),
+        ),
+        const PosBillingScreen(),
+        const SalesHistoryScreen(),
+        const PurchaseScreen(),
+        const InventoryScreen(),
+        const KhataScreen(),
+        const EditBusinessScreen(),
+        const BackupScreen(),
+        const SettingsScreen(),
+        if (isAdmin) const UsersManagementScreen(),
+      ];
+
+      destinations = [
+        const NavigationRailDestination(
+          icon: Icon(Icons.dashboard_outlined),
+          selectedIcon: Icon(Icons.dashboard),
+          label: Text('Dashboard / मुख्य पृष्ठ'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.point_of_sale_outlined),
+          selectedIcon: Icon(Icons.point_of_sale),
+          label: Text('POS Billing (बिक्री)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.receipt_long_outlined),
+          selectedIcon: Icon(Icons.receipt_long),
+          label: Text('Sales Register (बिजक)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.local_shipping_outlined),
+          selectedIcon: Icon(Icons.local_shipping),
+          label: Text('Purchases (खरिद)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.inventory_2_outlined),
+          selectedIcon: Icon(Icons.inventory_2),
+          label: Text('Inventory (सामान)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.menu_book_outlined),
+          selectedIcon: Icon(Icons.menu_book),
+          label: Text('Khata (उधारो खाता)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.business_outlined),
+          selectedIcon: Icon(Icons.business),
+          label: Text('Business Info (व्यापार)'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.backup_table_outlined),
+          selectedIcon: Icon(Icons.backup_table),
+          label: Text('Backup / Restore'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.settings_outlined),
+          selectedIcon: Icon(Icons.settings),
+          label: Text('Settings (सेटिङ)'),
+        ),
+        if (isAdmin)
+          const NavigationRailDestination(
+            icon: Icon(Icons.manage_accounts_outlined),
+            selectedIcon: Icon(Icons.manage_accounts),
+            label: Text('Users (प्रयोगकर्ताहरू)'),
+          ),
+      ];
+    }
+
+    final safeIndex = _selectedIndex.clamp(0, pages.length - 1);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -143,8 +183,8 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                   const Icon(Icons.desktop_windows, size: 16, color: AppTheme.textMuted),
                   const SizedBox(width: 8),
                   Text(
-                    destinations[_selectedIndex].label is Text
-                        ? (destinations[_selectedIndex].label as Text).data ?? ''
+                    destinations[safeIndex].label is Text
+                        ? (destinations[safeIndex].label as Text).data ?? ''
                         : '',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
@@ -157,7 +197,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                 ],
               ),
             ),
-            Expanded(child: pages[_selectedIndex]),
+            Expanded(child: pages[safeIndex]),
           ],
         );
 
@@ -200,7 +240,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                     return ListTile(
                       leading: destinations[idx].icon,
                       title: destinations[idx].label,
-                      selected: _selectedIndex == idx,
+                      selected: safeIndex == idx,
                       onTap: () {
                         Navigator.pop(context);
                         _navigateToIndex(idx);
@@ -219,7 +259,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
             children: [
               // Navigation Rail (Extended on desktop >= 900, compact icons on tablet < 900)
               NavigationRail(
-                selectedIndex: _selectedIndex,
+                selectedIndex: safeIndex,
                 onDestinationSelected: _navigateToIndex,
                 extended: isExtended,
                 minExtendedWidth: 220,

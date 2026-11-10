@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     java.util.List<User> findByTenantId(Long tenantId);
 
+    java.util.List<User> findByTenantIdOrderByUsername(Long tenantId);
+
     long countByTenantId(Long tenantId);
 }
 

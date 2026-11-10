@@ -1,13 +1,21 @@
 package com.saisa.app.admin;
 
+import com.saisa.app.admin.dto.AdminUserResponse;
+import com.saisa.app.admin.dto.CreateUserRequest;
 import com.saisa.app.admin.dto.OnboardTenantRequest;
+import com.saisa.app.admin.dto.ResetPasswordRequest;
 import com.saisa.app.admin.dto.TenantSummaryResponse;
+import com.saisa.app.admin.dto.UpdateUserStatusRequest;
 import com.saisa.app.admin.email.EmailService;
 import com.saisa.app.admin.email.EmailSettings;
+import com.saisa.common.tenant.TenantContext;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,14 +27,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
     private final EmailService emailService;
+    private final AdminUserService userService;
 
-    public AdminController(AdminService adminService, EmailService emailService) {
+    public AdminController(
+            AdminService adminService,
+            EmailService emailService,
+            AdminUserService userService) {
         this.adminService = adminService;
         this.emailService = emailService;
+        this.userService = userService;
     }
 
     // ==================== TENANT ONBOARDING & MANAGEMENT ====================
@@ -68,5 +82,45 @@ public class AdminController {
             "timestamp", java.time.Instant.now().toString()
         ));
     }
-}
 
+    // ==================== USER MANAGEMENT ====================
+    @GetMapping("/users")
+    public List<AdminUserResponse> listUsers() {
+        return userService.listUsers(TenantContext.getCurrentTenantId());
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<AdminUserResponse> createUser(@Valid @RequestBody CreateUserRequest req) {
+        Long tenantId = TenantContext.getCurrentTenantId();
+        Long currentUserId = TenantContext.getCurrentUserId();
+        AdminUserResponse resp = userService.createUser(tenantId, req, currentUserId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resp);
+    }
+
+    @PutMapping("/users/{id}/status")
+    public AdminUserResponse updateUserStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserStatusRequest req) {
+        return userService.updateStatus(
+            TenantContext.getCurrentTenantId(), id, req.status(),
+            TenantContext.getCurrentUserId());
+    }
+
+    @PostMapping("/users/{id}/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable Long id,
+            @Valid @RequestBody ResetPasswordRequest req) {
+        userService.resetPassword(
+            TenantContext.getCurrentTenantId(), id, req.newPassword(),
+            TenantContext.getCurrentUserId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(
+            TenantContext.getCurrentTenantId(), id,
+            TenantContext.getCurrentUserId());
+        return ResponseEntity.noContent().build();
+    }
+}

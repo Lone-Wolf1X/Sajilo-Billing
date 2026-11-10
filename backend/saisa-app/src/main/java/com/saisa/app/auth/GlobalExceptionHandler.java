@@ -35,6 +35,18 @@ public class GlobalExceptionHandler {
             .body(error("INVALID_CREDENTIALS", "Invalid username or password"));
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+    public ResponseEntity<Map<String, Object>> handleDisabled(org.springframework.security.authentication.DisabledException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(error("ACCOUNT_DISABLED", "User account is disabled. Contact your administrator."));
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.LockedException.class)
+    public ResponseEntity<Map<String, Object>> handleLocked(org.springframework.security.authentication.LockedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(error("ACCOUNT_LOCKED", "User account is temporarily locked due to failed login attempts."));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
