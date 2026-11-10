@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers.dart';
+import '../../customers/data/saisa_customer.dart';
 import '../application/pos_billing_service.dart';
 import '../application/pos_cart_controller.dart';
+import 'print/pos_print_service.dart';
+import 'print/receipt_data.dart';
 import 'widgets/cart_table.dart';
 import 'widgets/customer_selector.dart';
 import 'widgets/item_picker.dart';
@@ -46,13 +49,32 @@ class _PosBillingScreenState extends ConsumerState<PosBillingScreen> {
       // Invalidate sync badge count
       ref.invalidate(pendingSyncCountProvider);
 
+      final customers = ref.read(customersListProvider).valueOrNull ?? [];
+      final customer = customers.cast<SaisaCustomer?>().firstWhere(
+            (c) => c?.id == cart.customerId,
+            orElse: () => null,
+          );
+      final user = ref.read(authStateProvider).valueOrNull;
+
+      final receiptData = ReceiptDataBuilder.fromBillResult(
+        result: result,
+        cartLines: cart.lines,
+        customerName: customer?.customerName ?? 'Walk-in Customer / नगद ग्राहक',
+        customerPan: customer?.pan ?? customer?.gstin,
+        companyName: user?.tenantCode.toUpperCase(),
+        companyNameNepali: 'सजिलो बिलिङ्ग (SAISA Retail)',
+        companyPanVat: '601234567',
+        companyAddress: 'Kathmandu, Nepal',
+        invoiceDate: DateTime.now().toIso8601String().split('T').first,
+      );
+
       if (!mounted) return;
 
       // Show success dialog
       await showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => _SuccessDialog(result: result),
+        builder: (_) => _SuccessDialog(result: result, receiptData: receiptData),
       );
 
       // Clear cart
@@ -343,7 +365,8 @@ class _WarehouseSelector extends ConsumerWidget {
 
 class _SuccessDialog extends StatelessWidget {
   final PosBillResult result;
-  const _SuccessDialog({required this.result});
+  final ReceiptData receiptData;
+  const _SuccessDialog({required this.result, required this.receiptData});
 
   @override
   Widget build(BuildContext context) {
@@ -384,9 +407,27 @@ class _SuccessDialog extends StatelessWidget {
         ],
       ),
       actions: [
-        TextButton(
+        OutlinedButton.icon(
+          onPressed: () => PosPrintService.showPrintDialog(
+            context: context,
+            receiptData: receiptData,
+          ),
+          icon: const Icon(Icons.print, size: 18),
+          label: const Text('PRINT RECEIPT (रसिद छाप्नुहोस्)'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFF0D9488),
+            side: const BorderSide(color: Color(0xFF0D9488)),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          ),
+        ),
+        ElevatedButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('OK / जारी राख्नुहोस्'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF1E3A8A),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          ),
+          child: const Text('DONE / सम्पन्न'),
         ),
       ],
     );

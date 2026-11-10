@@ -87,3 +87,4 @@ class CustomerSelector extends ConsumerWidget {
     );
   }
 }
+

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -15,6 +16,7 @@ import '../../features/business/presentation/edit_business_screen.dart';
 import '../../features/backup/presentation/backup_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/sync/presentation/sync_paused_banner.dart';
+import '../../features/sync/presentation/sync_queue_viewer_dialog.dart';
 
 class DesktopAppShell extends ConsumerStatefulWidget {
   const DesktopAppShell({super.key});
@@ -25,6 +27,27 @@ class DesktopAppShell extends ConsumerStatefulWidget {
 
 class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
   int _selectedIndex = 0;
+  Timer? _autoSyncTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Run background sync every 30 seconds
+    _autoSyncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      final auth = ref.read(authStateProvider).valueOrNull;
+      if (auth != null) {
+        ref.read(syncQueueServiceProvider).processPending().then((_) {
+          ref.invalidate(pendingSyncCountProvider);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoSyncTimer?.cancel();
+    super.dispose();
+  }
 
   void _navigateToIndex(int index) {
     setState(() => _selectedIndex = index);
@@ -374,35 +397,42 @@ class SyncStatusBadge extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingAsync = ref.watch(pendingSyncCountProvider);
     return pendingAsync.maybeWhen(
-      data: (count) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: count == 0 ? const Color(0xFFE6F4EA) : const Color(0xFFFEF3C7),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: count == 0
-                ? const Color(0xFF34A853).withOpacity(0.3)
-                : const Color(0xFFF59E0B).withOpacity(0.4),
-          ),
+      data: (count) => InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => showDialog(
+          context: context,
+          builder: (_) => const SyncQueueViewerDialog(),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              count == 0 ? Icons.cloud_done : Icons.cloud_upload,
-              size: 14,
-              color: count == 0 ? const Color(0xFF137333) : const Color(0xFFB45309),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: count == 0 ? const Color(0xFFE6F4EA) : const Color(0xFFFEF3C7),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: count == 0
+                  ? const Color(0xFF34A853).withOpacity(0.3)
+                  : const Color(0xFFF59E0B).withOpacity(0.4),
             ),
-            const SizedBox(width: 5),
-            Text(
-              count == 0 ? 'All Synced' : '$count Pending',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                count == 0 ? Icons.cloud_done : Icons.cloud_upload,
+                size: 14,
                 color: count == 0 ? const Color(0xFF137333) : const Color(0xFFB45309),
               ),
-            ),
-          ],
+              const SizedBox(width: 5),
+              Text(
+                count == 0 ? 'All Synced' : '$count Pending',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: count == 0 ? const Color(0xFF137333) : const Color(0xFFB45309),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       orElse: () => const SizedBox.shrink(),

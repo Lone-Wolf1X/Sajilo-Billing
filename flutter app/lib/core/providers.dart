@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api/saisa_api_client.dart';
+import 'database/app_database.dart';
 import 'database/database_provider.dart';
 import 'errors/api_exception.dart';
 import 'storage/token_storage.dart';
@@ -12,6 +13,8 @@ import '../features/inventory/data/items_repository.dart';
 import '../features/inventory/data/saisa_item.dart';
 import '../features/inventory/data/saisa_warehouse.dart';
 import '../features/inventory/data/warehouses_repository.dart';
+import '../features/purchase/data/saisa_vendor.dart';
+import '../features/purchase/data/vendors_repository.dart';
 import '../features/billing/data/pos_invoice_repository.dart';
 import '../features/billing/application/pos_billing_service.dart';
 
@@ -141,4 +144,21 @@ final posBillingServiceProvider = Provider<PosBillingService>((ref) {
     invoiceRepo: ref.read(posInvoiceRepositoryProvider),
     syncQueue: ref.read(syncQueueServiceProvider),
   );
+});
+
+/// Vendors repository
+final vendorsRepositoryProvider = Provider<VendorsRepository>((ref) {
+  return VendorsRepository(api: ref.read(apiClientProvider));
+});
+
+/// Vendors list
+final vendorsListProvider = FutureProvider.autoDispose<List<SaisaVendor>>((ref) async {
+  final auth = ref.watch(authStateProvider);
+  if (auth.valueOrNull == null) return <SaisaVendor>[];
+  return ref.read(vendorsRepositoryProvider).listVendors();
+});
+
+/// Sync queue items list — for queue viewer
+final syncQueueItemsProvider = FutureProvider.autoDispose<List<SyncQueueItem>>((ref) async {
+  return ref.read(syncQueueServiceProvider).getRecentItems();
 });

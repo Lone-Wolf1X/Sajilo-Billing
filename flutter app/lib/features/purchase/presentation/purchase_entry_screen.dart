@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/paisa_helper.dart';
 import '../../inventory/presentation/inventory_provider.dart';
@@ -143,6 +144,53 @@ class _PurchaseEntryScreenState extends ConsumerState<PurchaseEntryScreen> {
         lines: _lines,
         remarks: _remarksController.text.trim().isEmpty ? null : _remarksController.text.trim(),
       );
+
+      // Enqueue to SAISA sync queue for backend double-entry posting
+      try {
+        final vendors = ref.read(vendorsListProvider).valueOrNull ?? [];
+        final vendorId = vendors.isNotEmpty ? vendors.first.id : 1;
+        final warehouses = ref.read(warehousesListProvider).valueOrNull ?? [];
+        final warehouseId = warehouses.isNotEmpty ? warehouses.first.id : 1;
+        final invNum = _billNumberController.text.trim().isNotEmpty
+            ? _billNumberController.text.trim()
+            : 'PINV-${DateTime.now().millisecondsSinceEpoch}';
+
+        final payload = {
+          'invoiceNumber': invNum,
+          'vendorInvoiceNo': _billNumberController.text.trim().isNotEmpty
+              ? _billNumberController.text.trim()
+              : null,
+          'invoiceDate': _purchaseDate.toIso8601String().split('T').first,
+          'dueDate': _purchaseDate.add(const Duration(days: 30)).toIso8601String().split('T').first,
+          'vendorId': vendorId,
+          'warehouseId': warehouseId,
+          'notes': _remarksController.text.trim().isNotEmpty
+              ? _remarksController.text.trim()
+              : 'Stock intake via Sajilo Billing',
+          'lines': _lines.map((l) {
+            return {
+              'itemId': 1,
+              'description': l.itemName,
+              'quantity': l.quantity.toStringAsFixed(4),
+              'unitPrice': (l.ratePaisa / 100.0).toStringAsFixed(4),
+              'taxRate': l.isVatApplicable ? '0.1300' : '0.0000',
+            };
+          }).toList(),
+        };
+
+        await ref.read(syncQueueServiceProvider).enqueue(
+          opType: 'PURCHASE_INVOICE',
+          payload: payload,
+          idempotencyKey: 'pur-$invNum-${DateTime.now().millisecondsSinceEpoch}',
+        );
+
+        // Immediate background push
+        ref.read(syncQueueServiceProvider).processPending().then((_) {
+          ref.invalidate(pendingSyncCountProvider);
+        });
+      } catch (e) {
+        debugPrint('Purchase sync queue error: $e');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

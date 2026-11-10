@@ -105,3 +105,4 @@ class PosCartController extends StateNotifier<PosCartState> {
 final posCartProvider = StateNotifierProvider<PosCartController, PosCartState>((ref) {
   return PosCartController();
 });
+

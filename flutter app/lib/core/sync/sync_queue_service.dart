@@ -117,6 +117,14 @@ class SyncQueueService {
         .getSingle();
     return row.read(countExp) ?? 0;
   }
+
+  /// Get all recent queue items for viewer dialog.
+  Future<List<SyncQueueItem>> getRecentItems({int limit = 50}) async {
+    return (_db.select(_db.syncQueueItems)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+          ..limit(limit))
+        .get();
+  }
 }
 
 class SyncSummary {

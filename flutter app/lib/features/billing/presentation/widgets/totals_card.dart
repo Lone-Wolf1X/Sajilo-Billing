@@ -74,3 +74,4 @@ class TotalsCard extends ConsumerWidget {
     return '$sign${buffer.toString()}.$decPart';
   }
 }
+

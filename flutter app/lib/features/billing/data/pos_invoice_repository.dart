@@ -29,3 +29,4 @@ class PosInvoiceRepository {
     return await _api.post<Map<String, dynamic>>('/sales-invoices', data: payload);
   }
 }
+
