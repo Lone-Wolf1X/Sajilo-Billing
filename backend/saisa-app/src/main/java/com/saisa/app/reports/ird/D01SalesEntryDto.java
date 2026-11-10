@@ -16,3 +16,4 @@ public record D01SalesEntryDto(
     BigDecimal vatAmount,
     BigDecimal exportAmount
 ) {}
+

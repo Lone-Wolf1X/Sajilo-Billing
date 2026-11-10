@@ -18,3 +18,4 @@ public record OnboardTenantRequest(
     @NotBlank @Size(min = 6) String adminPassword,
     @NotBlank String adminFullName
 ) {}
+

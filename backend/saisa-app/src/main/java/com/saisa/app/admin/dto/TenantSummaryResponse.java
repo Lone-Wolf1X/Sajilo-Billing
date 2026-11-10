@@ -16,3 +16,4 @@ public record TenantSummaryResponse(
     long userCount,
     long invoiceCount
 ) {}
+

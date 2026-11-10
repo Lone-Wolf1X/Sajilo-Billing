@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../core/localization/locale_provider.dart';
+import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/billing/presentation/pos_billing_screen.dart';
@@ -33,6 +34,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
+    final authUser = ref.watch(authStateProvider).value;
 
     final pages = [
       DashboardScreen(
@@ -230,13 +232,67 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                     ),
                   ),
                 ),
-                trailing: isExtended
-                    ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: OutlinedButton.icon(
+                trailing: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isExtended && authUser != null) ...[
+                        Container(
+                          width: 190,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppTheme.borderSubtle),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.account_circle, size: 18, color: AppTheme.primaryBlue),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      authUser.displayName,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    authUser.tenantCode.toUpperCase(),
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      authUser.roles.isNotEmpty ? authUser.roles.first : 'USER',
+                                      style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      if (isExtended)
+                        OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            minimumSize: const Size(180, 32),
+                            minimumSize: const Size(190, 32),
                           ),
                           onPressed: () {
                             ref.read(localeProvider.notifier).toggleLocale();
@@ -247,8 +303,30 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                             style: const TextStyle(fontSize: 12),
                           ),
                         ),
-                      )
-                    : null,
+                      const SizedBox(height: 6),
+                      if (isExtended)
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppTheme.dangerRed,
+                            minimumSize: const Size(190, 32),
+                          ),
+                          onPressed: () {
+                            ref.read(authStateProvider.notifier).logout();
+                          },
+                          icon: const Icon(Icons.logout, size: 16),
+                          label: const Text('Sign Out / लगआउट', style: TextStyle(fontSize: 12)),
+                        )
+                      else
+                        IconButton(
+                          tooltip: 'Sign Out / लगआउट',
+                          icon: const Icon(Icons.logout, size: 20, color: AppTheme.dangerRed),
+                          onPressed: () {
+                            ref.read(authStateProvider.notifier).logout();
+                          },
+                        ),
+                    ],
+                  ),
+                ),
                 destinations: destinations,
               ),
               const VerticalDivider(thickness: 1, width: 1, color: AppTheme.borderSubtle),

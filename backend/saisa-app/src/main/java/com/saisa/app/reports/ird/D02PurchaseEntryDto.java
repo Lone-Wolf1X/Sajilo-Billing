@@ -16,3 +16,4 @@ public record D02PurchaseEntryDto(
     BigDecimal vatAmount,
     BigDecimal importAmount
 ) {}
+

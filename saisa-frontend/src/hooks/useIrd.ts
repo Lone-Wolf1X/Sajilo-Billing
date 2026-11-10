@@ -21,3 +21,4 @@ export const useIrdSummary = (fromDate?: string, toDate?: string) => {
     queryFn: () => irdService.getSummary(fromDate, toDate),
   });
 };
+

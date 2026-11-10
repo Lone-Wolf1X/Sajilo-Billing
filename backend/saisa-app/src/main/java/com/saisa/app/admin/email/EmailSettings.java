@@ -50,3 +50,4 @@ public class EmailSettings {
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 }
+

@@ -17,3 +17,4 @@ public record IrdTaxSummaryResponse(
     long salesCount,
     long purchaseCount
 ) {}
+

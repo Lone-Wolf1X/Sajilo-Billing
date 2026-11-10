@@ -16,3 +16,4 @@ CREATE TABLE IF NOT EXISTS email_settings (
 -- Seed with initial SMTP credentials
 INSERT INTO email_settings (smtp_host, smtp_port, smtp_username, smtp_password, from_email, from_name, starttls_enabled, auth_enabled)
 VALUES ('smtp.gmail.com', 587, 'nextgeninnovationsprivatelimit@gmail.com', 'mdvx fwry lrmd pwsc', 'nextgeninnovationsprivatelimit@gmail.com', 'SAISA Billing & Accounting', TRUE, TRUE);
+

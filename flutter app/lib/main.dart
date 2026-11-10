@@ -4,12 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'core/localization/locale_provider.dart';
+import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/presentation/auth_state_notifier.dart';
 import 'features/auth/presentation/login_screen.dart';
-import 'features/auth/presentation/splash_screen.dart';
-import 'features/business/presentation/business_provider.dart';
-import 'features/onboarding/presentation/onboarding_screen.dart';
 import 'shared/widgets/desktop_app_shell.dart';
 
 void main() async {
@@ -28,7 +25,6 @@ class SajiloBillingApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocale = ref.watch(localeProvider);
     final authState = ref.watch(authStateProvider);
-    final businessProfileAsync = ref.watch(businessProfileStreamProvider);
 
     return MaterialApp(
       title: 'Sajilo Billing',
@@ -42,41 +38,36 @@ class SajiloBillingApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      home: _buildHome(authState, businessProfileAsync),
+      home: authState.when(
+        loading: () => const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        error: (e, _) => Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text('Failed to restore session: $e', textAlign: TextAlign.center),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => ref.invalidate(authStateProvider),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        data: (user) => user == null
+            ? const LoginScreen()
+            : const DesktopAppShell(),
+      ),
     );
-  }
-
-  Widget _buildHome(AuthState authState, AsyncValue<dynamic> businessProfileAsync) {
-    switch (authState.status) {
-      case AuthStatus.splash:
-        return SplashScreen(
-          onFinish: () {
-            // authStateNotifier advances state automatically after checkInitialSession()
-          },
-        );
-      case AuthStatus.unauthenticated:
-        return const LoginScreen();
-      case AuthStatus.authenticated:
-        return businessProfileAsync.when(
-          loading: () => const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (error, stack) => Scaffold(
-            body: Center(
-              child: SelectableText('Error initializing local database: $error'),
-            ),
-          ),
-          data: (profile) {
-            // If no business profile has been configured, show the first-run onboarding wizard
-            if (profile == null) {
-              return const OnboardingScreen();
-            }
-            // Otherwise navigate to the desktop app shell
-            return const DesktopAppShell();
-          },
-        );
-    }
   }
 }

@@ -40,3 +40,4 @@ public class IrdTaxReportController {
         return ResponseEntity.ok(irdService.getSummary(fromDate, toDate));
     }
 }
+

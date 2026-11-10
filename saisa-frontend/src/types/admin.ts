@@ -41,3 +41,4 @@ export interface EmailSettings {
   authEnabled: boolean;
   updatedAt?: string;
 }
+
