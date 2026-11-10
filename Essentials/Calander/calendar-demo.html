@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepali Calendar Widget - Banking Demonstration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 40px 20px;
+        }
+        .demo-card {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .calendar-picker-popup {
+            position: absolute;
+            z-index: 1050;
+            top: 100%;
+            left: 0;
+            display: none;
+            margin-top: 5px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .calendar-picker-popup.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="demo-card">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary">🇳🇵 Nepali Dual Calendar (AD ↔ BS)</h3>
+        <p class="text-muted">Universal Offline Calendar Widget & Date Picker for Banking Applications</p>
+    </div>
+
+    <form id="sampleForm">
+        <!-- Date of Birth Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Date of Birth (AD)</label>
+                <div class="input-group position-relative">
+                    <input type="text" class="form-control" id="dob" name="dob" placeholder="YYYY-MM-DD" onclick="toggleNepaliDatePicker('dob')" style="cursor: pointer;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="toggleNepaliDatePicker('dob')">📅</button>
+                    
+                    <!-- Popover Iframe -->
+                    <div id="picker_dob" class="calendar-picker-popup">
+                        <iframe src="nepali_calendar_widget.php?target=dob" style="width: 320px; height: 380px; border: none; border-radius: 10px;" scrolling="no"></iframe>
+                    </div>
+                </div>
+                <small class="text-muted">Gregorian Calendar Date</small>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Date of Birth (BS)</label>
+                <div class="input-group position-relative">
+                    <input type="text" class="form-control" id="dobBs" name="dobBs" placeholder="YYYY-MM-DD" onclick="toggleNepaliDatePicker('dobBs')" style="cursor: pointer;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="toggleNepaliDatePicker('dobBs')">📅</button>
+                    
+                    <!-- Popover Iframe -->
+                    <div id="picker_dobBs" class="calendar-picker-popup">
+                        <iframe src="nepali_calendar_widget.php?target=dobBs" style="width: 320px; height: 380px; border: none; border-radius: 10px;" scrolling="no"></iframe>
+                    </div>
+                </div>
+                <small class="text-muted">Bikram Sambat (वि.सं.)</small>
+            </div>
+        </div>
+
+        <!-- Issue Date Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Citizenship Issue Date (AD)</label>
+                <div class="input-group position-relative">
+                    <input type="text" class="form-control" id="issueDate" name="issueDate" placeholder="YYYY-MM-DD" onclick="toggleNepaliDatePicker('issueDate')" style="cursor: pointer;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="toggleNepaliDatePicker('issueDate')">📅</button>
+                    
+                    <div id="picker_issueDate" class="calendar-picker-popup">
+                        <iframe src="nepali_calendar_widget.php?target=issueDate" style="width: 320px; height: 380px; border: none; border-radius: 10px;" scrolling="no"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Citizenship Issue Date (BS)</label>
+                <div class="input-group position-relative">
+                    <input type="text" class="form-control" id="issueDateBs" name="issueDateBs" placeholder="YYYY-MM-DD" onclick="toggleNepaliDatePicker('issueDateBs')" style="cursor: pointer;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="toggleNepaliDatePicker('issueDateBs')">📅</button>
+                    
+                    <div id="picker_issueDateBs" class="calendar-picker-popup">
+                        <iframe src="nepali_calendar_widget.php?target=issueDateBs" style="width: 320px; height: 380px; border: none; border-radius: 10px;" scrolling="no"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>💡 Features:</strong>
+            <ul class="mb-0 ps-3">
+                <li>Automatic dual AD and BS date synchronization upon clicking any date in the calendar widget.</li>
+                <li>Panchang Tithi and Paksha display.</li>
+                <li>Saturday holiday highlighting in red.</li>
+                <li>Direct typing bidirectional auto-conversion via <code>convert-date.php</code>.</li>
+            </ul>
+        </div>
+    </form>
+</div>
+
+<!-- Calendar Client Engine -->
+<script src="calendar-integration.js"></script>
+
+</body>
+</html>

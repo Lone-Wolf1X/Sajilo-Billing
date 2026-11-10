@@ -26,6 +26,9 @@ import { DebitNotesPage } from './pages/debitnote/DebitNotesPage';
 import { DebitNoteDetailPage } from './pages/debitnote/DebitNoteDetailPage';
 import { ItemsPage } from './pages/items/ItemsPage';
 import { SetupWizardPage } from './pages/setup/SetupWizardPage';
+import { TenantsPage } from './pages/admin/TenantsPage';
+import { EmailSettingsPage } from './pages/admin/EmailSettingsPage';
+import { IrdTaxReportPage } from './pages/reports/IrdTaxReportPage';
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -348,6 +351,24 @@ export const router = createBrowserRouter([
                 stepName="Step 21: Financial Reports UI"
               />
             ),
+          },
+          // IRD Annex 13 Tax Return
+          {
+            path: 'reports/ird-annex13',
+            element: <IrdTaxReportPage />,
+          },
+          {
+            path: 'reports/vat-return',
+            element: <IrdTaxReportPage />,
+          },
+          // Admin & System Configuration
+          {
+            path: 'admin/tenants',
+            element: <TenantsPage />,
+          },
+          {
+            path: 'admin/email-settings',
+            element: <EmailSettingsPage />,
           },
           {
             path: 'audit-trail',

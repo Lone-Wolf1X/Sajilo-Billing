@@ -45,6 +45,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Mail sender - SMTP notifications -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- Actuator - health checks, metrics -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

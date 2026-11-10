@@ -120,6 +120,7 @@ const MENU_ITEMS: NavMenu[] = [
       {
         header: 'Primary Statements',
         items: [
+          { label: 'IRD भ्याट विवरण (Annex 13 • D-01/D-02)', badge: 'IRD', to: '/reports/ird-annex13' },
           { label: 'Trial Balance', to: '/reports/trial-balance' },
           { label: 'Profit & Loss Statement (P&L)', to: '/reports/profit-loss' },
           { label: 'Balance Sheet', to: '/reports/balance-sheet' },
@@ -134,6 +135,19 @@ const MENU_ITEMS: NavMenu[] = [
         items: [
           { label: 'Audit Trail & Change Logs', to: '/audit-trail' },
           { label: 'Double-Entry Integrity Check', to: '/reports/integrity' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'admin',
+    title: 'Admin Panel',
+    sections: [
+      {
+        header: 'Multi-Tenant & System Administration',
+        items: [
+          { label: 'ग्राहक तथा संस्था व्यवस्थापन (Tenants)', badge: 'Onboard', to: '/admin/tenants' },
+          { label: 'इमेल कन्फिगरेसन (Email / SMTP)', badge: 'SMTP', to: '/admin/email-settings' },
         ],
       },
     ],

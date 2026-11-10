@@ -21,6 +21,12 @@ public interface SalesInvoiceRepository extends JpaRepository<SalesInvoice, Long
 
     Optional<SalesInvoice> findByTenantIdAndInvoiceNumber(Long tenantId, String invoiceNumber);
 
+    long countByTenantId(Long tenantId);
+
+    List<SalesInvoice> findByTenantIdOrderByInvoiceDateDesc(Long tenantId);
+
+    List<SalesInvoice> findByTenantIdAndInvoiceDateBetweenOrderByInvoiceDateAsc(Long tenantId, LocalDate startDate, LocalDate endDate);
+
     @Query("""
         SELECT i FROM SalesInvoice i
         WHERE i.tenantId = :tenantId

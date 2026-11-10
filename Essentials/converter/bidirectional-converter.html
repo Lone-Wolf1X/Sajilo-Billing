@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bidirectional Preeti Converter</title>
+    <style>
+        @font-face {
+            font-family: 'Preeti';
+            src: url('Preeti Normal.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            min-height: 150px;
+            resize: vertical;
+            transition: all 0.3s;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .preeti-font {
+            font-family: 'Preeti', 'Courier New', monospace;
+            font-size: 20px;
+        }
+
+        .unicode-font {
+            font-family: 'Noto Sans Devanagari', 'Segoe UI', sans-serif;
+            font-size: 20px;
+        }
+
+        .swap-button {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #333;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 968px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .example-text {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        .direction-indicator {
+            text-align: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 Bidirectional Preeti Converter</h1>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <div class="info-box">
+                <h3>📚 How to Use</h3>
+                <ul>
+                    <li><strong>Preeti → Unicode:</strong> Type Preeti font text on the left, see Unicode on the right
+                    </li>
+                    <li><strong>Unicode → Preeti:</strong> Type Unicode Nepali text on the right, see Preeti on the left
+                    </li>
+                    <li><strong>Swap:</strong> Click the swap button to exchange input/output</li>
+                    <li><strong>Font Selection:</strong> Choose between Preeti, Kantipur, or PCS Nepali</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="converter-grid">
+            <!-- Preeti to Unicode -->
+            <div class="card">
+                <h2><span class="icon">📝</span> Preeti Font Input</h2>
+
+                <label for="fontSelect1">Font Type:</label>
+                <select id="fontSelect1">
+                    <option value="preeti">Preeti</option>
+                    <option value="kantipur">Kantipur</option>
+                    <option value="pcs nepali">PCS Nepali</option>
+                </select>
+
+                <label for="preetiInput">Type in Preeti Font:</label>
+                <textarea id="preetiInput" class="preeti-font" placeholder="g]kfn">g]kfn</textarea>
+                <div class="example-text">Example: g]kfn, sf7df08\", lxdfn</div>
+
+                <div class="direction-indicator">→</div>
+
+                <label>Unicode Output:</label>
+                <textarea id="unicodeOutput" class="unicode-font" readonly>नेपाल</textarea>
+            </div>
+
+            <!-- Unicode to Preeti -->
+            <div class="card">
+                <h2><span class="icon">🔤</span> Unicode Input</h2>
+
+                <label for="fontSelect2">Font Type:</label>
+                <select id="fontSelect2">
+                    <option value="preeti">Preeti</option>
+                    <option value="kantipur">Kantipur</option>
+                    <option value="pcs nepali">PCS Nepali</option>
+                </select>
+
+                <label for="unicodeInput">Type in Unicode:</label>
+                <textarea id="unicodeInput" class="unicode-font" placeholder="नेपाल">नेपाल</textarea>
+                <div class="example-text">Example: नेपाल, काठमाडौं, हिमाल</div>
+
+                <div class="direction-indicator">→</div>
+
+                <label>Preeti Font Output:</label>
+                <textarea id="preetiOutput" class="preeti-font" readonly>g]kfn</textarea>
+            </div>
+        </div>
+
+        <div class="swap-button">
+            <button class="btn" onclick="swapContent()">🔄 Swap Input ↔ Output</button>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">📊</span> Conversion Statistics</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="charCount">0</div>
+                    <div class="stat-label">Characters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wordCount">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="fontType">Preeti</div>
+                    <div class="stat-label">Active Font</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="preeti-converter-core.js"></script>
+    <script>
+        // Get elements
+        const preetiInput = document.getElementById('preetiInput');
+        const unicodeOutput = document.getElementById('unicodeOutput');
+        const unicodeInput = document.getElementById('unicodeInput');
+        const preetiOutput = document.getElementById('preetiOutput');
+        const fontSelect1 = document.getElementById('fontSelect1');
+        const fontSelect2 = document.getElementById('fontSelect2');
+
+        // Sync font selectors
+        fontSelect1.addEventListener('change', function () {
+            fontSelect2.value = this.value;
+            convertPreetiToUnicode();
+            convertUnicodeToPreeti();
+            updateStats();
+        });
+
+        fontSelect2.addEventListener('change', function () {
+            fontSelect1.value = this.value;
+            convertPreetiToUnicode();
+            convertUnicodeToPreeti();
+            updateStats();
+        });
+
+        // Preeti to Unicode conversion
+        function convertPreetiToUnicode() {
+            try {
+                const text = preetiInput.value;
+                const font = fontSelect1.value;
+                const result = PreetiConverterCore.toUnicode(text, font);
+                unicodeOutput.value = result;
+            } catch (error) {
+                unicodeOutput.value = 'Error: ' + error.message;
+            }
+        }
+
+        // Unicode to Preeti conversion
+        function convertUnicodeToPreeti() {
+            try {
+                const text = unicodeInput.value;
+                const font = fontSelect2.value;
+                const result = PreetiConverterCore.toPreeti(text, font);
+                preetiOutput.value = result;
+            } catch (error) {
+                preetiOutput.value = 'Error: ' + error.message;
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const text = preetiInput.value || unicodeInput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const font = fontSelect1.value;
+
+            document.getElementById('charCount').textContent = charCount;
+            document.getElementById('wordCount').textContent = wordCount;
+            document.getElementById('fontType').textContent = font.charAt(0).toUpperCase() + font.slice(1);
+        }
+
+        // Swap content
+        function swapContent() {
+            const tempPreeti = preetiInput.value;
+            const tempUnicode = unicodeInput.value;
+
+            preetiInput.value = preetiOutput.value;
+            unicodeInput.value = unicodeOutput.value;
+
+            convertPreetiToUnicode();
+            convertUnicodeToPreeti();
+            updateStats();
+        }
+
+        // Event listeners
+        preetiInput.addEventListener('input', function () {
+            convertPreetiToUnicode();
+            updateStats();
+        });
+
+        unicodeInput.addEventListener('input', function () {
+            convertUnicodeToPreeti();
+            updateStats();
+        });
+
+        // Initial conversion
+        convertPreetiToUnicode();
+        convertUnicodeToPreeti();
+        updateStats();
+
+        // Log supported fonts
+        console.log('Supported Fonts:', PreetiConverterCore.getSupportedFonts());
+        console.log('Converter Version:', PreetiConverterCore.version);
+    </script>
+</body>
+
+</html>

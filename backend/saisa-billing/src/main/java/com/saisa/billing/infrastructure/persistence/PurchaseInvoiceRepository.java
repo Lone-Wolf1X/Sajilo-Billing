@@ -21,6 +21,12 @@ public interface PurchaseInvoiceRepository extends JpaRepository<PurchaseInvoice
 
     Optional<PurchaseInvoice> findByTenantIdAndInvoiceNumber(Long tenantId, String invoiceNumber);
 
+    long countByTenantId(Long tenantId);
+
+    List<PurchaseInvoice> findByTenantIdOrderByInvoiceDateDesc(Long tenantId);
+
+    List<PurchaseInvoice> findByTenantIdAndInvoiceDateBetweenOrderByInvoiceDateAsc(Long tenantId, LocalDate startDate, LocalDate endDate);
+
     @Query("""
         SELECT i FROM PurchaseInvoice i
         WHERE i.tenantId = :tenantId
