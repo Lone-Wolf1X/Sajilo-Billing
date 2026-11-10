@@ -38,3 +38,4 @@ class ApiException implements Exception {
   bool get isForbidden => statusCode == 403;
   bool get isNetworkError => code == 'NETWORK_ERROR';
 }
+

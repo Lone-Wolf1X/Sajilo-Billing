@@ -202,3 +202,4 @@ class SaisaApiClient {
 
   Dio get raw => _dio;
 }
+

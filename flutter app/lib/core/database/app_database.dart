@@ -22,6 +22,7 @@ import 'tables/party_ledger_table.dart';
 import 'tables/party_payments_table.dart';
 import 'tables/local_auth_table.dart';
 import 'tables/printer_settings_table.dart';
+import '../sync/sync_queue.dart';
 
 part 'app_database.g.dart';
 
@@ -46,12 +47,13 @@ part 'app_database.g.dart';
   PartyPayments,
   LocalAuth,
   PrinterSettings,
+  SyncQueueItems,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? db_conn.openAppConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -97,6 +99,11 @@ class AppDatabase extends _$AppDatabase {
           if (from < 7) {
             try {
               await m.addColumn(sales, sales.status);
+            } catch (_) {}
+          }
+          if (from < 8) {
+            try {
+              await m.createTable(syncQueueItems);
             } catch (_) {}
           }
         },

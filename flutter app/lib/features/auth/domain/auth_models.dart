@@ -76,3 +76,4 @@ class AuthUser {
   bool get isAdmin => hasRole('ADMIN');
   String get displayName => fullName ?? tenantCode;
 }
+

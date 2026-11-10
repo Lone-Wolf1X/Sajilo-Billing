@@ -13592,6 +13592,516 @@ class PrinterSettingsCompanion extends UpdateCompanion<PrinterSetting> {
   }
 }
 
+class $SyncQueueItemsTable extends SyncQueueItems
+    with TableInfo<$SyncQueueItemsTable, SyncQueueItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SyncQueueItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _opTypeMeta = const VerificationMeta('opType');
+  @override
+  late final GeneratedColumn<String> opType = GeneratedColumn<String>(
+      'op_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _payloadJsonMeta =
+      const VerificationMeta('payloadJson');
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+      'payload_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _idempotencyKeyMeta =
+      const VerificationMeta('idempotencyKey');
+  @override
+  late final GeneratedColumn<String> idempotencyKey = GeneratedColumn<String>(
+      'idempotency_key', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('PENDING'));
+  static const VerificationMeta _attemptsMeta =
+      const VerificationMeta('attempts');
+  @override
+  late final GeneratedColumn<int> attempts = GeneratedColumn<int>(
+      'attempts', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _lastErrorMeta =
+      const VerificationMeta('lastError');
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+      'last_error', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _syncedAtMeta =
+      const VerificationMeta('syncedAt');
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+      'synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _serverResponseJsonMeta =
+      const VerificationMeta('serverResponseJson');
+  @override
+  late final GeneratedColumn<String> serverResponseJson =
+      GeneratedColumn<String>('server_response_json', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        opType,
+        payloadJson,
+        idempotencyKey,
+        status,
+        attempts,
+        lastError,
+        createdAt,
+        syncedAt,
+        serverResponseJson
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_queue_items';
+  @override
+  VerificationContext validateIntegrity(Insertable<SyncQueueItem> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('op_type')) {
+      context.handle(_opTypeMeta,
+          opType.isAcceptableOrUnknown(data['op_type']!, _opTypeMeta));
+    } else if (isInserting) {
+      context.missing(_opTypeMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+          _payloadJsonMeta,
+          payloadJson.isAcceptableOrUnknown(
+              data['payload_json']!, _payloadJsonMeta));
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    if (data.containsKey('idempotency_key')) {
+      context.handle(
+          _idempotencyKeyMeta,
+          idempotencyKey.isAcceptableOrUnknown(
+              data['idempotency_key']!, _idempotencyKeyMeta));
+    } else if (isInserting) {
+      context.missing(_idempotencyKeyMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('attempts')) {
+      context.handle(_attemptsMeta,
+          attempts.isAcceptableOrUnknown(data['attempts']!, _attemptsMeta));
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(_lastErrorMeta,
+          lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(_syncedAtMeta,
+          syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
+    }
+    if (data.containsKey('server_response_json')) {
+      context.handle(
+          _serverResponseJsonMeta,
+          serverResponseJson.isAcceptableOrUnknown(
+              data['server_response_json']!, _serverResponseJsonMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SyncQueueItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SyncQueueItem(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      opType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}op_type'])!,
+      payloadJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payload_json'])!,
+      idempotencyKey: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}idempotency_key'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      attempts: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}attempts'])!,
+      lastError: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}last_error']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      syncedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}synced_at']),
+      serverResponseJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}server_response_json']),
+    );
+  }
+
+  @override
+  $SyncQueueItemsTable createAlias(String alias) {
+    return $SyncQueueItemsTable(attachedDatabase, alias);
+  }
+}
+
+class SyncQueueItem extends DataClass implements Insertable<SyncQueueItem> {
+  final int id;
+  final String opType;
+  final String payloadJson;
+  final String idempotencyKey;
+  final String status;
+  final int attempts;
+  final String? lastError;
+  final DateTime createdAt;
+  final DateTime? syncedAt;
+  final String? serverResponseJson;
+  const SyncQueueItem(
+      {required this.id,
+      required this.opType,
+      required this.payloadJson,
+      required this.idempotencyKey,
+      required this.status,
+      required this.attempts,
+      this.lastError,
+      required this.createdAt,
+      this.syncedAt,
+      this.serverResponseJson});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['op_type'] = Variable<String>(opType);
+    map['payload_json'] = Variable<String>(payloadJson);
+    map['idempotency_key'] = Variable<String>(idempotencyKey);
+    map['status'] = Variable<String>(status);
+    map['attempts'] = Variable<int>(attempts);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    if (!nullToAbsent || serverResponseJson != null) {
+      map['server_response_json'] = Variable<String>(serverResponseJson);
+    }
+    return map;
+  }
+
+  SyncQueueItemsCompanion toCompanion(bool nullToAbsent) {
+    return SyncQueueItemsCompanion(
+      id: Value(id),
+      opType: Value(opType),
+      payloadJson: Value(payloadJson),
+      idempotencyKey: Value(idempotencyKey),
+      status: Value(status),
+      attempts: Value(attempts),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
+      createdAt: Value(createdAt),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+      serverResponseJson: serverResponseJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(serverResponseJson),
+    );
+  }
+
+  factory SyncQueueItem.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SyncQueueItem(
+      id: serializer.fromJson<int>(json['id']),
+      opType: serializer.fromJson<String>(json['opType']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+      idempotencyKey: serializer.fromJson<String>(json['idempotencyKey']),
+      status: serializer.fromJson<String>(json['status']),
+      attempts: serializer.fromJson<int>(json['attempts']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+      serverResponseJson:
+          serializer.fromJson<String?>(json['serverResponseJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'opType': serializer.toJson<String>(opType),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+      'idempotencyKey': serializer.toJson<String>(idempotencyKey),
+      'status': serializer.toJson<String>(status),
+      'attempts': serializer.toJson<int>(attempts),
+      'lastError': serializer.toJson<String?>(lastError),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+      'serverResponseJson': serializer.toJson<String?>(serverResponseJson),
+    };
+  }
+
+  SyncQueueItem copyWith(
+          {int? id,
+          String? opType,
+          String? payloadJson,
+          String? idempotencyKey,
+          String? status,
+          int? attempts,
+          Value<String?> lastError = const Value.absent(),
+          DateTime? createdAt,
+          Value<DateTime?> syncedAt = const Value.absent(),
+          Value<String?> serverResponseJson = const Value.absent()}) =>
+      SyncQueueItem(
+        id: id ?? this.id,
+        opType: opType ?? this.opType,
+        payloadJson: payloadJson ?? this.payloadJson,
+        idempotencyKey: idempotencyKey ?? this.idempotencyKey,
+        status: status ?? this.status,
+        attempts: attempts ?? this.attempts,
+        lastError: lastError.present ? lastError.value : this.lastError,
+        createdAt: createdAt ?? this.createdAt,
+        syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+        serverResponseJson: serverResponseJson.present
+            ? serverResponseJson.value
+            : this.serverResponseJson,
+      );
+  SyncQueueItem copyWithCompanion(SyncQueueItemsCompanion data) {
+    return SyncQueueItem(
+      id: data.id.present ? data.id.value : this.id,
+      opType: data.opType.present ? data.opType.value : this.opType,
+      payloadJson:
+          data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
+      idempotencyKey: data.idempotencyKey.present
+          ? data.idempotencyKey.value
+          : this.idempotencyKey,
+      status: data.status.present ? data.status.value : this.status,
+      attempts: data.attempts.present ? data.attempts.value : this.attempts,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+      serverResponseJson: data.serverResponseJson.present
+          ? data.serverResponseJson.value
+          : this.serverResponseJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncQueueItem(')
+          ..write('id: $id, ')
+          ..write('opType: $opType, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('idempotencyKey: $idempotencyKey, ')
+          ..write('status: $status, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('serverResponseJson: $serverResponseJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, opType, payloadJson, idempotencyKey,
+      status, attempts, lastError, createdAt, syncedAt, serverResponseJson);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SyncQueueItem &&
+          other.id == this.id &&
+          other.opType == this.opType &&
+          other.payloadJson == this.payloadJson &&
+          other.idempotencyKey == this.idempotencyKey &&
+          other.status == this.status &&
+          other.attempts == this.attempts &&
+          other.lastError == this.lastError &&
+          other.createdAt == this.createdAt &&
+          other.syncedAt == this.syncedAt &&
+          other.serverResponseJson == this.serverResponseJson);
+}
+
+class SyncQueueItemsCompanion extends UpdateCompanion<SyncQueueItem> {
+  final Value<int> id;
+  final Value<String> opType;
+  final Value<String> payloadJson;
+  final Value<String> idempotencyKey;
+  final Value<String> status;
+  final Value<int> attempts;
+  final Value<String?> lastError;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> syncedAt;
+  final Value<String?> serverResponseJson;
+  const SyncQueueItemsCompanion({
+    this.id = const Value.absent(),
+    this.opType = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.idempotencyKey = const Value.absent(),
+    this.status = const Value.absent(),
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.serverResponseJson = const Value.absent(),
+  });
+  SyncQueueItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required String opType,
+    required String payloadJson,
+    required String idempotencyKey,
+    this.status = const Value.absent(),
+    this.attempts = const Value.absent(),
+    this.lastError = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.serverResponseJson = const Value.absent(),
+  })  : opType = Value(opType),
+        payloadJson = Value(payloadJson),
+        idempotencyKey = Value(idempotencyKey);
+  static Insertable<SyncQueueItem> custom({
+    Expression<int>? id,
+    Expression<String>? opType,
+    Expression<String>? payloadJson,
+    Expression<String>? idempotencyKey,
+    Expression<String>? status,
+    Expression<int>? attempts,
+    Expression<String>? lastError,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? syncedAt,
+    Expression<String>? serverResponseJson,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (opType != null) 'op_type': opType,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (idempotencyKey != null) 'idempotency_key': idempotencyKey,
+      if (status != null) 'status': status,
+      if (attempts != null) 'attempts': attempts,
+      if (lastError != null) 'last_error': lastError,
+      if (createdAt != null) 'created_at': createdAt,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (serverResponseJson != null)
+        'server_response_json': serverResponseJson,
+    });
+  }
+
+  SyncQueueItemsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? opType,
+      Value<String>? payloadJson,
+      Value<String>? idempotencyKey,
+      Value<String>? status,
+      Value<int>? attempts,
+      Value<String?>? lastError,
+      Value<DateTime>? createdAt,
+      Value<DateTime?>? syncedAt,
+      Value<String?>? serverResponseJson}) {
+    return SyncQueueItemsCompanion(
+      id: id ?? this.id,
+      opType: opType ?? this.opType,
+      payloadJson: payloadJson ?? this.payloadJson,
+      idempotencyKey: idempotencyKey ?? this.idempotencyKey,
+      status: status ?? this.status,
+      attempts: attempts ?? this.attempts,
+      lastError: lastError ?? this.lastError,
+      createdAt: createdAt ?? this.createdAt,
+      syncedAt: syncedAt ?? this.syncedAt,
+      serverResponseJson: serverResponseJson ?? this.serverResponseJson,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (opType.present) {
+      map['op_type'] = Variable<String>(opType.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (idempotencyKey.present) {
+      map['idempotency_key'] = Variable<String>(idempotencyKey.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (attempts.present) {
+      map['attempts'] = Variable<int>(attempts.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (serverResponseJson.present) {
+      map['server_response_json'] = Variable<String>(serverResponseJson.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SyncQueueItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('opType: $opType, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('idempotencyKey: $idempotencyKey, ')
+          ..write('status: $status, ')
+          ..write('attempts: $attempts, ')
+          ..write('lastError: $lastError, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('serverResponseJson: $serverResponseJson')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -13618,6 +14128,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LocalAuthTable localAuth = $LocalAuthTable(this);
   late final $PrinterSettingsTable printerSettings =
       $PrinterSettingsTable(this);
+  late final $SyncQueueItemsTable syncQueueItems = $SyncQueueItemsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -13642,7 +14153,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         partyLedger,
         partyPayments,
         localAuth,
-        printerSettings
+        printerSettings,
+        syncQueueItems
       ];
 }
 
@@ -18979,6 +19491,209 @@ class $$PrinterSettingsTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+typedef $$SyncQueueItemsTableCreateCompanionBuilder = SyncQueueItemsCompanion
+    Function({
+  Value<int> id,
+  required String opType,
+  required String payloadJson,
+  required String idempotencyKey,
+  Value<String> status,
+  Value<int> attempts,
+  Value<String?> lastError,
+  Value<DateTime> createdAt,
+  Value<DateTime?> syncedAt,
+  Value<String?> serverResponseJson,
+});
+typedef $$SyncQueueItemsTableUpdateCompanionBuilder = SyncQueueItemsCompanion
+    Function({
+  Value<int> id,
+  Value<String> opType,
+  Value<String> payloadJson,
+  Value<String> idempotencyKey,
+  Value<String> status,
+  Value<int> attempts,
+  Value<String?> lastError,
+  Value<DateTime> createdAt,
+  Value<DateTime?> syncedAt,
+  Value<String?> serverResponseJson,
+});
+
+class $$SyncQueueItemsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SyncQueueItemsTable,
+    SyncQueueItem,
+    $$SyncQueueItemsTableFilterComposer,
+    $$SyncQueueItemsTableOrderingComposer,
+    $$SyncQueueItemsTableCreateCompanionBuilder,
+    $$SyncQueueItemsTableUpdateCompanionBuilder> {
+  $$SyncQueueItemsTableTableManager(
+      _$AppDatabase db, $SyncQueueItemsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$SyncQueueItemsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$SyncQueueItemsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> opType = const Value.absent(),
+            Value<String> payloadJson = const Value.absent(),
+            Value<String> idempotencyKey = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
+            Value<String?> serverResponseJson = const Value.absent(),
+          }) =>
+              SyncQueueItemsCompanion(
+            id: id,
+            opType: opType,
+            payloadJson: payloadJson,
+            idempotencyKey: idempotencyKey,
+            status: status,
+            attempts: attempts,
+            lastError: lastError,
+            createdAt: createdAt,
+            syncedAt: syncedAt,
+            serverResponseJson: serverResponseJson,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String opType,
+            required String payloadJson,
+            required String idempotencyKey,
+            Value<String> status = const Value.absent(),
+            Value<int> attempts = const Value.absent(),
+            Value<String?> lastError = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
+            Value<String?> serverResponseJson = const Value.absent(),
+          }) =>
+              SyncQueueItemsCompanion.insert(
+            id: id,
+            opType: opType,
+            payloadJson: payloadJson,
+            idempotencyKey: idempotencyKey,
+            status: status,
+            attempts: attempts,
+            lastError: lastError,
+            createdAt: createdAt,
+            syncedAt: syncedAt,
+            serverResponseJson: serverResponseJson,
+          ),
+        ));
+}
+
+class $$SyncQueueItemsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $SyncQueueItemsTable> {
+  $$SyncQueueItemsTableFilterComposer(super.$state);
+  ColumnFilters<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get opType => $state.composableBuilder(
+      column: $state.table.opType,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get payloadJson => $state.composableBuilder(
+      column: $state.table.payloadJson,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get idempotencyKey => $state.composableBuilder(
+      column: $state.table.idempotencyKey,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get status => $state.composableBuilder(
+      column: $state.table.status,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get attempts => $state.composableBuilder(
+      column: $state.table.attempts,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get lastError => $state.composableBuilder(
+      column: $state.table.lastError,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get syncedAt => $state.composableBuilder(
+      column: $state.table.syncedAt,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get serverResponseJson => $state.composableBuilder(
+      column: $state.table.serverResponseJson,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$SyncQueueItemsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $SyncQueueItemsTable> {
+  $$SyncQueueItemsTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get opType => $state.composableBuilder(
+      column: $state.table.opType,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get payloadJson => $state.composableBuilder(
+      column: $state.table.payloadJson,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get idempotencyKey => $state.composableBuilder(
+      column: $state.table.idempotencyKey,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get status => $state.composableBuilder(
+      column: $state.table.status,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get attempts => $state.composableBuilder(
+      column: $state.table.attempts,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get lastError => $state.composableBuilder(
+      column: $state.table.lastError,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get createdAt => $state.composableBuilder(
+      column: $state.table.createdAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get syncedAt => $state.composableBuilder(
+      column: $state.table.syncedAt,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get serverResponseJson => $state.composableBuilder(
+      column: $state.table.serverResponseJson,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
@@ -19022,4 +19737,6 @@ class $AppDatabaseManager {
       $$LocalAuthTableTableManager(_db, _db.localAuth);
   $$PrinterSettingsTableTableManager get printerSettings =>
       $$PrinterSettingsTableTableManager(_db, _db.printerSettings);
+  $$SyncQueueItemsTableTableManager get syncQueueItems =>
+      $$SyncQueueItemsTableTableManager(_db, _db.syncQueueItems);
 }

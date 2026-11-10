@@ -1,9 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api/saisa_api_client.dart';
+import 'database/database_provider.dart';
 import 'errors/api_exception.dart';
 import 'storage/token_storage.dart';
+import 'sync/sync_queue_service.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/domain/auth_models.dart';
+import '../features/customers/data/customers_repository.dart';
+import '../features/customers/data/saisa_customer.dart';
+import '../features/inventory/data/items_repository.dart';
+import '../features/inventory/data/saisa_item.dart';
+import '../features/inventory/data/saisa_warehouse.dart';
+import '../features/inventory/data/warehouses_repository.dart';
 
 /// Token storage — singleton
 final tokenStorageProvider = Provider<TokenStorage>((ref) {
@@ -68,3 +76,54 @@ class AuthNotifier extends AsyncNotifier<AuthUser?> {
     state = const AsyncData(null);
   }
 }
+
+// ================= Phase 2A Providers =================
+
+/// Items repository
+final itemsRepositoryProvider = Provider<ItemsRepository>((ref) {
+  return ItemsRepository(ref.read(apiClientProvider));
+});
+
+/// Items list — auto-fetched after login
+final itemsListProvider = FutureProvider.autoDispose<List<SaisaItem>>((ref) async {
+  final auth = ref.watch(authStateProvider);
+  if (auth.valueOrNull == null) return <SaisaItem>[];
+  return ref.read(itemsRepositoryProvider).listItems();
+});
+
+/// Customers repository
+final customersRepositoryProvider = Provider<CustomersRepository>((ref) {
+  return CustomersRepository(ref.read(apiClientProvider));
+});
+
+/// Customers list
+final customersListProvider = FutureProvider.autoDispose<List<SaisaCustomer>>((ref) async {
+  final auth = ref.watch(authStateProvider);
+  if (auth.valueOrNull == null) return <SaisaCustomer>[];
+  return ref.read(customersRepositoryProvider).listCustomers();
+});
+
+/// Warehouses repository
+final warehousesRepositoryProvider = Provider<WarehousesRepository>((ref) {
+  return WarehousesRepository(ref.read(apiClientProvider));
+});
+
+/// Warehouses list
+final warehousesListProvider = FutureProvider.autoDispose<List<SaisaWarehouse>>((ref) async {
+  final auth = ref.watch(authStateProvider);
+  if (auth.valueOrNull == null) return <SaisaWarehouse>[];
+  return ref.read(warehousesRepositoryProvider).listWarehouses();
+});
+
+/// Sync queue service — using Drift AppDatabase from databaseProvider
+final syncQueueServiceProvider = Provider<SyncQueueService>((ref) {
+  return SyncQueueService(
+    api: ref.read(apiClientProvider),
+    db: ref.read(databaseProvider),
+  );
+});
+
+/// Sync queue pending count — for header badge
+final pendingSyncCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  return ref.read(syncQueueServiceProvider).pendingCount();
+});

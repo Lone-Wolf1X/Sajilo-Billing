@@ -24,3 +24,4 @@ class AppConfig {
   static String get appVersion => '1.0.0';
   static bool get isDebug => kDebugMode;
 }
+
